@@ -17,3 +17,6 @@ out/
 
 # JIRA plugin
 atlassian-ide-plugin.xml
+
+### JS
+/node_modules/
