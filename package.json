@@ -1,0 +1,25 @@
+{
+  "name": "eeajs",
+  "version": "1.0.0",
+  "description": "EEA JSON-RPC API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PegaSysEng/eeajs.git"
+  },
+  "keywords": [
+    "web3",
+    "pantheon",
+    "eea",
+    "orion"
+  ],
+  "author": "pegasyseng",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/PegaSysEng/eeajs/issues"
+  },
+  "homepage": "https://github.com/PegaSysEng/eeajs#readme"
+}
