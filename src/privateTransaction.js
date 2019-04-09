@@ -1,5 +1,5 @@
 'use strict'
-const ethUtil = require('ethereumjs-util')
+const ethUtil = require('./custom-ethjs-util')
 const BN = ethUtil.BN
 
 // secp256k1n/2
@@ -116,6 +116,7 @@ class PrivateTransaction {
         }, {
             name: 'privateFor',
             allowZero: true, //if you comment out this line test fails (for now)
+            bufferArray: true,
             default: [new Buffer([])]
         }, {
             name: 'restriction',
