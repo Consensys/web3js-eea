@@ -16,11 +16,15 @@ function EEAClient(web3, chainId) {
     const getMakerTransaction = (txHash, delay, retries) => {
         const waitFor = ms => new Promise(r => setTimeout(r, ms));
 
+        var notified = false;
         const retryOperation = (operation, delay, times) => new Promise((resolve, reject) => {
             return operation()
                 .then(result => {
                     if (result == null) {
-                        console.log("Waiting ...")
+                        if (!notified) {
+                            console.log("Waiting ...")
+                            notified = true;
+                        }
                         throw Error("Waiting for tx to be mined")
                     } else {
                         resolve()
@@ -56,12 +60,11 @@ function EEAClient(web3, chainId) {
                     tx.to = options.to;
                     tx.value = 0;
                     tx.data = options.data;
-                    tx.chainId = chainId;
+                    tx._chainId = chainId;
                     tx.privateFrom = options.privateFrom;
                     tx.privateFor = options.privateFor;
                     tx.restriction = "restricted";
                     tx.sign(privateKeyBuffer);
-
 
                     const signedRlpEncoded = tx.serialize().toString('hex');
 
