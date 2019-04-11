@@ -1,6 +1,6 @@
 const Web3 = require('web3');
 const EEAClient = require('../src');
-const EventEmitter = require('./EventEmitter.json');
+const EventEmitter = require('./solidity/EventEmitter/EventEmitter.json');
 
 const web3 = new EEAClient(new Web3('http://localhost:20000'), 2018);
 

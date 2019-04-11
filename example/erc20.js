@@ -1,6 +1,6 @@
 const Web3 = require('web3');
 const EEAClient = require('../src');
-const HumandStandartTokenJson = require('./HumanStandardToken.json');
+const HumandStandartTokenJson = require('./solidity/HumanStandardToken/HumanStandardToken.json');
 const Buffer = require('safe-buffer').Buffer;
 const ethUtil = require('../src/custom-ethjs-util')
 
