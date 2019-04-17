@@ -1,73 +1,90 @@
-const Web3 = require('web3');
-const EEAClient = require('../src');
-const EventEmitter = require('./solidity/EventEmitter/EventEmitter.json');
+const Web3 = require("web3");
+const EEAClient = require("../src");
+const EventEmitter = require("./solidity/EventEmitter/EventEmitter.json");
 
-const web3 = new EEAClient(new Web3('http://localhost:20000'), 2018);
+const { orion, pantheon } = require("./keys.js");
 
+const web3 = new EEAClient(new Web3(pantheon.node1.url), 2018);
 // pass by reference monkey patch
 // gives us `signature` field on abi items
-const contract = web3.eth.Contract(EventEmitter.abi);
+web3.eth.Contract(EventEmitter.abi);
 
-const contractOptions = {
-    data: '0x' + EventEmitter.binary,
-    privateFrom: 'A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=',
-    privateFor: ['Ko2bVqD+nNlNYL5EE7y3IdOnviftjiizpjRt+HTuFBs='],
-    privateKey: '8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63'
+const createPrivateEmitterContract = () => {
+  const contractOptions = {
+    data: "0x" + EventEmitter.binary,
+    privateFrom: orion.node1.publicKey,
+    privateFor: [orion.node2.publicKey],
+    privateKey: pantheon.node1.privateKey
+  };
+  return web3.eea.sendRawTransaction(contractOptions);
 };
 
-web3.eea.sendRawTransaction(contractOptions).then(res => {
-    console.log("Transaction Hash " + res.data.result);
-    return web3.eea.getTransactionReceipt(res.data.result, 'A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=')
-}).then(privateTransactionReceipt => {
-    console.log("Private Transaction Receipt");
-    console.log(privateTransactionReceipt.data);
-    return privateTransactionReceipt.data.result.contractAddress
-}).then(contractAddress => {
-    // can we do a web3.eea.Contract? somehow need to override to use the eea.sendRawTransaction when invoking contract methods
-    // const contract = web3.eth.Contract(HumandStandartTokenJson.abi, contractAddress);
-    // contract.methods.transfer(["to", "value"]).send(??)
-
-    // already 0x prefixed
-    const functionAbi = EventEmitter.abi.find(function (element) {
-        return element.name === 'store'
+const getPrivateContractAddress = transactionHash => {
+  console.log("Transaction Hash ", transactionHash);
+  return web3.eea
+    .getTransactionReceipt(transactionHash, orion.node1.publicKey)
+    .then(privateTransactionReceipt => {
+      console.log("Private Transaction Receipt\n", privateTransactionReceipt);
+      return privateTransactionReceipt.contractAddress;
     });
-    const functionArgs = web3.eth.abi.encodeParameters(functionAbi.inputs, [1000]).slice(2);
+};
 
-    return web3.eea.sendRawTransaction({
-        to: contractAddress,
-        data: functionAbi.signature + functionArgs,
-        privateFrom: 'A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=',
-        privateFor: ['Ko2bVqD+nNlNYL5EE7y3IdOnviftjiizpjRt+HTuFBs='],
-        privateKey: '8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63'
-    })
-}).then(res => {
-    console.log("Transaction Hash " + res.data.result);
-    return web3.eea.getTransactionReceipt(res.data.result, 'A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=')
-}).then(privateTransactionReceipt => {
-    console.log("Private Transaction Receipt");
-    console.log(privateTransactionReceipt.data);
-    if (privateTransactionReceipt.data.result.logs.length > 0) {
-        console.log("Log 0");
-        console.log(privateTransactionReceipt.data.result.logs[0])
-    }
-    return privateTransactionReceipt.data.result.to
-}).then(contractAddress => {
+const storeValue = (contractAddress, value) => {
+  const functionAbi = EventEmitter.abi.find(e => {
+    return e.name === "store";
+  });
+  const functionArgs = web3.eth.abi
+    .encodeParameters(functionAbi.inputs, [value])
+    .slice(2);
 
-    // already 0x prefixed
-    const functionAbi = EventEmitter.abi.find(function (element) {
-        return element.name === 'value'
+  const functionCall = {
+    to: contractAddress,
+    data: functionAbi.signature + functionArgs,
+    privateFrom: orion.node1.publicKey,
+    privateFor: [orion.node2.publicKey],
+    privateKey: pantheon.node1.privateKey
+  };
+  return web3.eea.sendRawTransaction(functionCall);
+};
+
+const getValue = contractAddress => {
+  const functionAbi = EventEmitter.abi.find(e => {
+    return e.name === "value";
+  });
+
+  const functionCall = {
+    to: contractAddress,
+    data: functionAbi.signature,
+    privateFrom: orion.node1.publicKey,
+    privateFor: [orion.node2.publicKey],
+    privateKey: pantheon.node1.privateKey
+  };
+
+  return web3.eea.sendRawTransaction(functionCall).then(transactionHash => {
+    return web3.eea
+      .getTransactionReceipt(transactionHash, orion.node1.publicKey)
+      .then(result => {
+        console.log("Get Value:", result.output);
+      });
+  });
+};
+
+const getPrivateTransactionReceipt = transactionHash => {
+  return web3.eea
+    .getTransactionReceipt(transactionHash, orion.node1.publicKey)
+    .then(result => {
+      console.log("Transaction Hash:", transactionHash);
+      console.log("Event Emited:", result.logs[0].data);
     });
-    web3.eea.sendRawTransaction({
-        to: contractAddress,
-        data: functionAbi.signature,
-        privateFrom: 'A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=',
-        privateFor: ['Ko2bVqD+nNlNYL5EE7y3IdOnviftjiizpjRt+HTuFBs='],
-        privateKey: '8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63'
-    }).then(res => {
-        console.log("Transaction Hash " + res.data.result);
-        return web3.eea.getTransactionReceipt(res.data.result, 'A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=')
-    }).then(privateTransactionReceipt => {
-        console.log("Private Transaction Receipt");
-        console.log(privateTransactionReceipt.data.result);
-    });
-});
+};
+
+createPrivateEmitterContract()
+  .then(getPrivateContractAddress)
+  .then(contractAddress => {
+    return storeValue(contractAddress, 1000)
+      .then(transactionHash => getPrivateTransactionReceipt(transactionHash))
+      .then(() => getValue(contractAddress))
+      .then(() => storeValue(contractAddress, 42))
+      .then(transactionHash => getPrivateTransactionReceipt(transactionHash))
+      .then(() => getValue(contractAddress));
+  });
