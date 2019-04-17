@@ -46,7 +46,7 @@ This deploys the `EventEmitter` contract, sets a value of `1000` and gets the va
 $ node example/eventEmitter.js
 ```
 
-Output
+Sample Output
 ```bash
 Transaction Hash 0x9673cb3eebd6cf0139921c74c154bb1eb91c7d3c935362eb19dbda76a40bbfce
 Waiting ...
@@ -67,10 +67,10 @@ Private Transaction Receipt
   id: 1,
   result:
    { contractAddress: null,
-     from: '0xfe3b557e8fb62b89f4916b721be55ceb828dbd73',
-     to: '0x5bd6dee320c5407682fba7954ae53e16ee4f4794',
-     output: '0x',
-     logs: [ [Object] ] } }
+     from: '0xfe3b557e8fb62b89f4916b721be55ceb828db d73',
+     to: '0x5bd6dee320c5407682fba7954ae53e16ee4f479 4',
+     output: '0x', 
+     logs: [ [Object] ] } } 
 Log 0
 { address: '0x5bd6dee320c5407682fba7954ae53e16ee4f4794',
   topics:
@@ -101,7 +101,7 @@ Execute `node example/erc20.js`. It'll deploys a `HumanStandardToken` contract a
 ```bash
 $ node example/erc20.js
 ```
-Output
+Sample Output
 ```bash
 Transaction Hash 0xbaca8bb4b7d4a087a12511e01ba685a642337a2eddfea2fc0aaaaeb6b6f996bd
 Waiting ...Private Transaction Receipt{ jsonrpc: '2.0',  id: 1,  result:   { contractAddress: '0xdaa74d5ab2e0b0fad11fca33a76b27c4092f90db',     from: '0xfe3b557e8fb62b89f4916b721be55ceb828dbd73',     to: null,     output:      '0x6080604052600436106100955763ffffffff60e060020a60003504166306fdde0381146100a7578063095ea7b31461013157806318160ddd1461016957806323b872dd14610190578063313ce567146101ba57806354fd4d50146101e557806370a08231146101fa57806395d89b411461021b578063a9059cbb14610230578063cae9ca5114610254578063dd62ed3e146102bd575b3480156100a157600080fd5b50600080fd5b3480156100b357600080fd5b506100bc6102e4565b6040805160208082528351818301528351919283929083019185019080838360005b838110156100f65781810151838201526020016100de565b50505050905090810190601f1680156101235780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b34801561013d57600080fd5b50610155600160a060020a0360043516602435610372565b604080519115158252519081900360200190f35b34801561017557600080fd5b5061017e6103d9565b60408051918252519081900360200190f35b34801561019c57600080fd5b50610155600160a060020a03600435811690602435166044356103df565b3480156101c657600080fd5b506101cf6104cc565b6040805160ff9092168252519081900360200190f35b3480156101f157600080fd5b506100bc6104d5565b34801561020657600080fd5b5061017e600160a060020a0360043516610530565b34801561022757600080fd5b506100bc61054b565b34801561023c57600080fd5b50610155600160a060020a03600435166024356105a6565b34801561026057600080fd5b50604080516020600460443581810135601f8101849004840285018401909552848452610155948235600160a060020a031694602480359536959460649492019190819084018382808284375094975061063f9650505050505050565b3480156102c957600080fd5b5061017e600160a060020a03600435811690602435166107da565b6003805460408051602060026001851615610100026000190190941693909304601f8101849004840282018401909252818152929183018282801561036a5780601f1061033f5761010080835404028352916020019161036a565b820191906000526020600020905b81548152906001019060200180831161034d57829003601f168201915b505050505081565b336000818152600260209081526040808320600160a060020a038716808552908352818420869055815186815291519394909390927f8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925928290030190a35060015b92915050565b60005481565b600160a060020a038316600090815260016020526040812054821180159061042a5750600160a060020a03841660009081526002602090815260408083203384529091529020548211155b80156104365750600082115b156104c157600160a060020a03808416600081815260016020908152604080832080548801905593881
@@ -150,6 +150,81 @@ Log 0
   logIndex: '0x0',
   removed: false }
   ```
+
+## Multinode example
+The examle provides a simple interaction with pantheon nodes created in [Pantheon-Quickstart](https://github.com/PegaSysEng/pantheon-quickstart).
+
+1. Deploy `EventEmitter` contract.
+
+data - Binary of the contract
+privateFrom - public Orion key (Node1)
+privateFor -  public Orion key (Node2)
+privateKey - Pantheon private key (Node1), to sign the contract.
+
+```bash
+$ node example/contractCreation.js
+```
+
+2. Get the contract address from the Private Transaction Receipt and set the contract hash into a variable.
+```bash
+$ export CONTRACT_ADDRESS=0xdaa74d5ab2e0b0fad11fca33a76b27c4092f90db
+```
+
+3. Store the value from `node1`.
+```bash
+$ node example/storeValueFromNode1.js
+```
+
+4. Get the value from `node2`
+```bash
+$ node example/getValueFromNode2.js
+```
+
+Sample Output
+```bash
+(node:24545) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+Transaction Hash 0x9673cb3eebd6cf0139921c74c154bb1eb91c7f3c935362eb19dbdf76a40bbfce
+Waiting ...
+Private Transaction Receipt
+{	jsonrpc: '2.0',
+	id: 1,
+	result:
+		{ contractAddress: null,
+		from: 'Ko2bVqD+nNlNYL5EE7y3IdOnviftjiizpjRt+HTuFBs=',
+		to: 'A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=',
+		output:
+			'0x00000000000000000000000000000000000000000000000000000000000003e8',
+			logs: [] } }
+```
+It can be verified from the output - `0x00000000000000000000000000000000000000000000000000000000000003e8`
+
+5. Store the value from `node2`.
+```bash
+$ node example/multiNodeExample/storeValueFromNode2.js
+```
+
+6. Get the value from `node1`
+```bash
+$ node example/multiNodeExample/getValueFromNode1.js
+```
+
+Sample Output
+```bash
+(node:24545) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+Transaction Hash 0x9673cb3eebd6cf0139921c74c154bb1eb91c7f3c935362eb19dbdf76a40bbfce
+Waiting ...
+Private Transaction Receipt
+{	jsonrpc: '2.0',
+	id: 1,
+	result:
+		{ contractAddress: null,
+		from: 'A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=',
+		to: 'Ko2bVqD+nNlNYL5EE7y3IdOnviftjiizpjRt+HTuFBs='',
+		output:
+			'0x0000000000000000000000000000000000000000000000000000000000000064',
+			logs: [] } }
+```
+It can be verified from the output - `0x0000000000000000000000000000000000000000000000000000000000000064`
 
 ## Run the tests
 To run all the tests:
