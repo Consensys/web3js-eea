@@ -9,7 +9,7 @@ web3.eth.Contract(EventEmitter.abi);
 
 const createPrivateEmitterContract = () => {
   const contractOptions = {
-    data: "0x" + EventEmitter.binary,
+    data: `0x${EventEmitter.binary}`,
     privateFrom: orion.node1.publicKey,
     privateFor: [orion.node2.publicKey],
     privateKey: pantheon.node1.privateKey
@@ -27,4 +27,6 @@ const getPrivateContractAddress = transactionHash => {
     });
 };
 
-createPrivateEmitterContract().then(getPrivateContractAddress);
+createPrivateEmitterContract()
+  .then(getPrivateContractAddress)
+  .catch(console.log);

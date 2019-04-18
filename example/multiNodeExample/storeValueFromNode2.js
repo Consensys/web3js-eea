@@ -26,14 +26,19 @@ const storeValueFromNode2 = value => {
     privateFor: [orion.node1.publicKey],
     privateKey: pantheon.node2.privateKey
   };
-  return web3.eea.sendRawTransaction(functionCall).then(transactionHash => {
-    return web3.eea
-      .getTransactionReceipt(transactionHash, orion.node2.publicKey)
-      .then(result => {
-        console.log("Transaction Hash:", transactionHash);
-        console.log("Event Emited:", result.logs[0].data);
-      });
-  });
+  return web3.eea
+    .sendRawTransaction(functionCall)
+    .then(transactionHash => {
+      console.log("Transaction Hash:", transactionHash);
+      return web3.eea.getTransactionReceipt(
+        transactionHash,
+        orion.node2.publicKey
+      );
+    })
+    .then(result => {
+      console.log("Event Emited:", result.logs[0].data);
+      return result;
+    });
 };
 
 const getValue = (url, privateFrom, privateFor, privateKey) => {
@@ -52,40 +57,49 @@ const getValue = (url, privateFrom, privateFor, privateKey) => {
     privateKey
   };
 
-  return web3.eea.sendRawTransaction(functionCall).then(transactionHash => {
-    return web3.eea
-      .getTransactionReceipt(transactionHash, orion.node1.publicKey)
-      .then(result => {
-        console.log("Get Value from " + url + ":", result.output);
-      });
-  });
+  return web3.eea
+    .sendRawTransaction(functionCall)
+    .then(transactionHash => {
+      return web3.eea.getTransactionReceipt(
+        transactionHash,
+        orion.node1.publicKey
+      );
+    })
+    .then(result => {
+      console.log(`Get Value from ${url}:`, result.output);
+      return result;
+    });
 };
 
-const getValueFromNode1 = () =>
-  getValue(
+const getValueFromNode1 = () => {
+  return getValue(
     pantheon.node1.url,
     orion.node1.publicKey,
     [orion.node2.publicKey],
     pantheon.node1.privateKey
   );
+};
 
-const getValueFromNode2 = () =>
-  getValue(
+const getValueFromNode2 = () => {
+  return getValue(
     pantheon.node2.url,
     orion.node2.publicKey,
     [orion.node1.publicKey],
     pantheon.node2.privateKey
   );
+};
 
-const getValueFromNode3 = () =>
-  getValue(
+const getValueFromNode3 = () => {
+  return getValue(
     pantheon.node3.url,
     orion.node3.publicKey,
     [orion.node1.publicKey],
     pantheon.node3.privateKey
   );
+};
 
 storeValueFromNode2(42)
   .then(getValueFromNode1)
   .then(getValueFromNode2)
-  .then(getValueFromNode3);
+  .then(getValueFromNode3)
+  .catch(console.log);

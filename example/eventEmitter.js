@@ -11,7 +11,7 @@ web3.eth.Contract(EventEmitter.abi);
 
 const createPrivateEmitterContract = () => {
   const contractOptions = {
-    data: "0x" + EventEmitter.binary,
+    data: `0x${EventEmitter.binary}`,
     privateFrom: orion.node1.publicKey,
     privateFor: [orion.node2.publicKey],
     privateKey: pantheon.node1.privateKey
@@ -60,13 +60,18 @@ const getValue = contractAddress => {
     privateKey: pantheon.node1.privateKey
   };
 
-  return web3.eea.sendRawTransaction(functionCall).then(transactionHash => {
-    return web3.eea
-      .getTransactionReceipt(transactionHash, orion.node1.publicKey)
-      .then(result => {
-        console.log("Get Value:", result.output);
-      });
-  });
+  return web3.eea
+    .sendRawTransaction(functionCall)
+    .then(transactionHash => {
+      return web3.eea.getTransactionReceipt(
+        transactionHash,
+        orion.node1.publicKey
+      );
+    })
+    .then(result => {
+      console.log("Get Value:", result.output);
+      return result.output;
+    });
 };
 
 const getPrivateTransactionReceipt = transactionHash => {
@@ -75,16 +80,29 @@ const getPrivateTransactionReceipt = transactionHash => {
     .then(result => {
       console.log("Transaction Hash:", transactionHash);
       console.log("Event Emited:", result.logs[0].data);
+      return result;
     });
 };
 
 createPrivateEmitterContract()
   .then(getPrivateContractAddress)
   .then(contractAddress => {
+    // eslint-disable-next-line promise/no-nesting
     return storeValue(contractAddress, 1000)
-      .then(transactionHash => getPrivateTransactionReceipt(transactionHash))
-      .then(() => getValue(contractAddress))
-      .then(() => storeValue(contractAddress, 42))
-      .then(transactionHash => getPrivateTransactionReceipt(transactionHash))
-      .then(() => getValue(contractAddress));
-  });
+      .then(transactionHash => {
+        return getPrivateTransactionReceipt(transactionHash);
+      })
+      .then(() => {
+        return getValue(contractAddress);
+      })
+      .then(() => {
+        return storeValue(contractAddress, 42);
+      })
+      .then(transactionHash => {
+        return getPrivateTransactionReceipt(transactionHash);
+      })
+      .then(() => {
+        return getValue(contractAddress);
+      });
+  })
+  .catch(console.log);
