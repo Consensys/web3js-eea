@@ -16,7 +16,7 @@ To run this tutorial, you must have the following installed:
         inside a Linux VM such as Ubuntu. 
 
 - [Pantheon-Quickstart](https://github.com/PegaSysEng/pantheon-quickstart)
-    - [Privacy](https://github.com/PegaSysEng/pantheon-quickstart/tree/4-node-example/privacy)
+    - Clone, set up and run Pantheon Quickstart following the [instructions](https://docs.pantheon.pegasys.tech/en/stable/Tutorials/Private-Network-Quickstart/).
 
 - [Nodejs](https://nodejs.org/en/download/)
 
@@ -31,19 +31,19 @@ To start clone the repository:
 $ git clone https://github.com/PegaSysEng/eeajs.git
 ```
 
-Access the folder and install the dependencies.
+Access the folder and install the dependencies:
 
 ```bash
 $ cd eeajs/
 $ npm install
 ```
 
-Execute `node example/eventEmitter.js`.
-This deploys the `EventEmitter` contract, sets a value of `1000` and gets the value.
 
+Deploy the `EventEmitter` contract:
 ```bash
 $ node example/eventEmitter.js
 ```
+This sets a value of `1000` and gets the value back.
 
 Sample Output
 ```bash
@@ -95,11 +95,12 @@ Private Transaction Receipt
   logs: [] }
 ```
 
-Execute `node example/erc20.js`. It deploys a `HumanStandardToken` contract and transfers 1 token to node2.
+`erc20.js` deploys a `HumanStandardToken` contract and transfers 1 token to node2.
 
 ```bash
 $ node example/erc20.js
 ```
+
 Sample Output
 ```bash
 Transaction Hash 0xbaca8bb4b7d4a087a12511e01ba685a642337a2eddfea2fc0aaaaeb6b6f996bd
