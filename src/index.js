@@ -97,7 +97,7 @@ function EEAClient(web3, chainId) {
         })
         .then(transactionCount => {
           const nonce = tx.to === null ? 0 : transactionCount + 1;
-          tx.nonce = nonce;
+          tx.nonce = options.nonce || nonce;
           tx.gasPrice = GAS_PRICE;
           tx.gasLimit = GAS_LIMIT;
           tx.to = options.to;
