@@ -1,5 +1,5 @@
 const axios = require("axios");
-const RLP = require("rlp");
+const { rlphash } = require("./custom-ethjs-util");
 
 const PrivateTransaction = require("./privateTransaction");
 
@@ -64,8 +64,12 @@ function EEAClient(web3, chainId) {
       return Promise.resolve(0);
     }
 
-    options.privateFor.sort();
-    const privacyGroupId = RLP.encode(options.privateFor).toString("hex");
+    const participants = options.privateFor;
+    participants.push(options.privateFrom);
+    participants.sort();
+
+    const privacyGroupId = rlphash(participants).toString("hex");
+
     const payload = {
       jsonrpc: "2.0",
       method: "eea_getTransactionCount",
