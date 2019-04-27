@@ -96,7 +96,7 @@ function EEAClient(web3, chainId) {
           privateFor: options.privateFor
         })
         .then(transactionCount => {
-          const nonce = tx.to === null ? 0 : transactionCount + 1;
+          const nonce = tx.to === null ? 0 : transactionCount;
           tx.nonce = options.nonce || nonce;
           tx.gasPrice = GAS_PRICE;
           tx.gasLimit = GAS_LIMIT;
