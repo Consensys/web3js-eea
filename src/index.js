@@ -1,5 +1,6 @@
 const axios = require("axios");
-const { rlphash } = require("./custom-ethjs-util");
+const RLP = require("rlp");
+const { keccak256 } = require("./custom-ethjs-util");
 
 const PrivateTransaction = require("./privateTransaction");
 
@@ -67,8 +68,13 @@ function EEAClient(web3, chainId) {
     const participants = options.privateFor;
     participants.push(options.privateFrom);
     participants.sort();
+    const map = participants.map(x => {
+      return Buffer.from(x, "base64");
+    });
 
-    const privacyGroupId = rlphash(participants).toString("hex");
+    const rlp = RLP.encode(map).toString("hex");
+
+    const privacyGroupId = keccak256(`0x${rlp}`).toString("hex");
 
     const payload = {
       jsonrpc: "2.0",
