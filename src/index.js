@@ -3,7 +3,7 @@ const PrivateTransaction = require("./privateTransaction");
 const ethUtil = require("./custom-ethjs-util");
 
 function EEAClient(web3, chainId) {
-  const GAS_PRICE = 1000;
+  const GAS_PRICE = 0;
   const GAS_LIMIT = 3000000;
 
   // eslint-disable-next-line no-underscore-dangle
