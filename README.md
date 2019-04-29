@@ -1,5 +1,13 @@
 # EEA JavaScript libraries - EEAJS
-EEA JavaScript libraries to interact with Pantheon-Quickstart exploring the privacy feature and deploy contracts.
+
+EEA JavaScript libraries including examples to:
+
+* Interact with the Pantheon Private Network Quickstart to deploy a contract and send private transactions.
+  Using the EEAJS library with the Private Network Quickstart is described below. 
+  
+* Deploy a contract and send private transactions in your own private network. Using the EEAJS library
+with your own network is described in the [Pantheon documentation](https://docs.pantheon.pegasys.tech/en/latest/Privacy/Creating-Sending-Private-Transactions/). 
+
 
 ## Prerequisites
 
@@ -11,39 +19,48 @@ To run this tutorial, you must have the following installed:
 
 - MacOS or Linux 
     
-    !!! important 
+        **Important** 
         The Private Network Quickstart is not supported on Windows. If using Windows, run the quickstart
         inside a Linux VM such as Ubuntu. 
 
-- [Pantheon-Quickstart](https://github.com/PegaSysEng/pantheon-quickstart)
-    - Clone, set up and run Pantheon Quickstart following the [instructions](https://docs.pantheon.pegasys.tech/en/stable/Tutorials/Private-Network-Quickstart/).
-
 - [Nodejs](https://nodejs.org/en/download/)
+
+## Clone Pantheon Quickstart 
+
+Clone the **pantheon-quickstart* repository: 
+
+```
+git clone https://github.com/PegaSysEng/pantheon-quickstart.git
+```
+
+## Start Privacy Private Network Quickstart  
+
+Go to the `pantheon-quickstart/privacy` directory and start the network: 
+
+```
+./run.sh
+```
 
 ## Deploy Contracts
 
-A step by step series of examples that tell you how to get a development environment running
-
-
-To start clone the repository:
+Clone the **eeajs** repository:
 
 ```bash
-$ git clone https://github.com/PegaSysEng/eeajs.git
+git clone https://github.com/PegaSysEng/eeajs.git
 ```
 
-Access the folder and install the dependencies:
+Go to the `eeajs` directory and install the dependencies:
 
 ```bash
-$ cd eeajs/
-$ npm install
+cd eeajs/
+npm install
 ```
-
 
 Deploy the `EventEmitter` contract:
 ```bash
-$ node example/eventEmitter.js
+node example/eventEmitter.js
 ```
-This sets a value of `1000` and gets the value back.
+The contract sets a value of `1000` and retrieves the value.
 
 Sample Output
 ```bash
@@ -151,7 +168,8 @@ Log 0
   removed: false }
   ```
 
-## Multinode example
+## Multinode Example
+
 The examle provides a simple interaction with Pantheon nodes created in [Pantheon-Quickstart](https://github.com/PegaSysEng/pantheon-quickstart).
 
 1. Deploy `EventEmitter` contract.
@@ -227,7 +245,8 @@ Private Transaction Receipt
 It can be verified from the output - `0x0000000000000000000000000000000000000000000000000000000000000064`
 
 
-## Run the tests
+## Run Tests
+
 To run all the tests:
 ```bash
 $ npm test
