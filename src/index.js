@@ -1,6 +1,8 @@
 const axios = require("axios");
+const RLP = require("rlp");
+const { keccak256 } = require("./custom-ethjs-util");
+
 const PrivateTransaction = require("./privateTransaction");
-const ethUtil = require("./custom-ethjs-util");
 
 function EEAClient(web3, chainId) {
   const GAS_PRICE = 0;
@@ -58,18 +60,50 @@ function EEAClient(web3, chainId) {
     return retryOperation(operation, delay, retries);
   };
 
+  const getTransactionCount = options => {
+    if (!options.to) {
+      return Promise.resolve(0);
+    }
+
+    const participants = options.privateFor;
+    participants.push(options.privateFrom);
+    participants.sort();
+    const map = participants.map(x => {
+      return Buffer.from(x, "base64");
+    });
+
+    const rlp = RLP.encode(map).toString("hex");
+
+    const privacyGroupId = keccak256(`0x${rlp}`).toString("hex");
+
+    const payload = {
+      jsonrpc: "2.0",
+      method: "eea_getTransactionCount",
+      params: [options.to, `0x${privacyGroupId}`],
+      id: 1
+    };
+
+    return axios.post(host, payload).then(result => {
+      return parseInt(result.data.result, 16);
+    });
+  };
+
   // eslint-disable-next-line no-param-reassign
   web3.eea = {
+    getTransactionCount,
     sendRawTransaction: options => {
       const tx = new PrivateTransaction();
       const privateKeyBuffer = Buffer.from(options.privateKey, "hex");
 
-      return web3.eth
-        .getTransactionCount(
-          ethUtil.privateToAddress(privateKeyBuffer).toString("hex")
-        )
-        .then(nonce => {
-          tx.nonce = nonce;
+      return web3.eea
+        .getTransactionCount({
+          to: options.to,
+          privateFrom: options.privateFrom,
+          privateFor: options.privateFor
+        })
+        .then(transactionCount => {
+          const nonce = tx.to === null ? 0 : transactionCount;
+          tx.nonce = options.nonce || nonce;
           tx.gasPrice = GAS_PRICE;
           tx.gasLimit = GAS_LIMIT;
           tx.to = options.to;
@@ -98,10 +132,10 @@ function EEAClient(web3, chainId) {
     getTransactionReceipt: (
       txHash,
       enclavePublicKey,
-      delay = 100,
-      retries = 30
+      retries = 30,
+      delay = 100
     ) => {
-      return getMakerTransaction(txHash, delay, retries)
+      return getMakerTransaction(txHash, retries, delay)
         .then(() => {
           return axios.post(host, {
             jsonrpc: "2.0",

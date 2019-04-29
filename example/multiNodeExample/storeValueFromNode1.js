@@ -36,6 +36,7 @@ const storeValueFromNode1 = value => {
       );
     })
     .then(result => {
+      console.log(result);
       console.log("Event Emited:", result.logs[0].data);
       return result;
     });
