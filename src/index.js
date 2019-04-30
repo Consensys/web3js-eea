@@ -98,8 +98,8 @@ function EEAClient(web3, chainId) {
     getTransactionReceipt: (
       txHash,
       enclavePublicKey,
-      delay = 100,
-      retries = 30
+      delay = 1000,
+      retries = 300
     ) => {
       return getMakerTransaction(txHash, delay, retries)
         .then(() => {
