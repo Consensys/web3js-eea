@@ -1,8 +1,7 @@
 const axios = require("axios");
 const RLP = require("rlp");
 const _ = require("lodash");
-const { keccak256 } = require("./custom-ethjs-util");
-const ethUtil = require("./custom-ethjs-util");
+const { keccak256, privateToAddress } = require("./custom-ethjs-util");
 
 const PrivateTransaction = require("./privateTransaction");
 
@@ -63,7 +62,6 @@ function EEAClient(web3, chainId) {
   };
 
   const getTransactionCount = options => {
-    const from = `0x${ethUtil.privateToAddress(options.from).toString("hex")}`;
     const participants = _.chain(options.privateFor || [])
       .concat(options.privateFrom)
       .uniq()
@@ -92,7 +90,7 @@ function EEAClient(web3, chainId) {
     const payload = {
       jsonrpc: "2.0",
       method: "eea_getTransactionCount",
-      params: [from, privacyGroup],
+      params: [options.from, privacyGroup],
       id: 1
     };
 
@@ -107,10 +105,10 @@ function EEAClient(web3, chainId) {
     sendRawTransaction: options => {
       const tx = new PrivateTransaction();
       const privateKeyBuffer = Buffer.from(options.privateKey, "hex");
-
+      const from = `0x${privateToAddress(privateKeyBuffer).toString("hex")}`;
       return web3.eea
         .getTransactionCount({
-          from: privateKeyBuffer,
+          from,
           privateFrom: options.privateFrom,
           privateFor: options.privateFor
         })
