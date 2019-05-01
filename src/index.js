@@ -1,12 +1,13 @@
 const axios = require("axios");
 const RLP = require("rlp");
+const _ = require("lodash");
 const { keccak256 } = require("./custom-ethjs-util");
 const ethUtil = require("./custom-ethjs-util");
 
 const PrivateTransaction = require("./privateTransaction");
 
 function EEAClient(web3, chainId) {
-  const GAS_PRICE = 0;
+  const GAS_PRICE = 5000;
   const GAS_LIMIT = 3000000;
 
   // eslint-disable-next-line no-underscore-dangle
@@ -63,14 +64,26 @@ function EEAClient(web3, chainId) {
 
   const getTransactionCount = options => {
     const from = `0x${ethUtil.privateToAddress(options.from).toString("hex")}`;
-    const participants = options.privateFor;
-    participants.push(options.privateFrom);
-    const map = participants.map(x => {
-      return Buffer.from(x, "base64");
-    });
-    map.sort();
+    const participants = _.chain(options.privateFor || [])
+      .concat(options.privateFrom)
+      .uniq()
+      .map(publicKey => {
+        const buffer = Buffer.from(publicKey, "base64");
+        let result = 1;
+        buffer.forEach(value => {
+          result = (31 * result + value) % 0x7fffffff;
+        });
+        return { b64: publicKey, buf: buffer, hash: result };
+      })
+      .sort((a, b) => {
+        return a.hash - b.hash;
+      })
+      .map(x => {
+        return x.buf;
+      })
+      .value();
 
-    const rlp = RLP.encode(map);
+    const rlp = RLP.encode(participants);
 
     const privacyGroupIdHash = keccak256(rlp).toString("hex");
 
