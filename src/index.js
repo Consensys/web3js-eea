@@ -85,11 +85,9 @@ function EEAClient(web3, chainId) {
 
     const rlp = RLP.encode(participants);
 
-    const privacyGroupIdHash = keccak256(rlp).toString("hex");
-
-    const privacyGroup = `0x${Buffer.from(
-      Buffer.from(privacyGroupIdHash, "hex").toString("base64")
-    ).toString("hex")}`;
+    const privacyGroup = Buffer.from(
+      keccak256(rlp).toString("base64")
+    ).toString("hex");
 
     const payload = {
       jsonrpc: "2.0",
