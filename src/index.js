@@ -1,6 +1,9 @@
 const axios = require("axios");
+const RLP = require("rlp");
+const _ = require("lodash");
+const { keccak256, privateToAddress } = require("./custom-ethjs-util");
+
 const PrivateTransaction = require("./privateTransaction");
-const ethUtil = require("./custom-ethjs-util");
 
 function EEAClient(web3, chainId) {
   const GAS_PRICE = 0;
@@ -58,18 +61,59 @@ function EEAClient(web3, chainId) {
     return retryOperation(operation, delay, retries);
   };
 
+  const getTransactionCount = options => {
+    const participants = _.chain(options.privateFor || [])
+      .concat(options.privateFrom)
+      .uniq()
+      .map(publicKey => {
+        const buffer = Buffer.from(publicKey, "base64");
+        let result = 1;
+        buffer.forEach(value => {
+          result = (31 * result + value) % 0x7fffffff;
+        });
+        return { b64: publicKey, buf: buffer, hash: result };
+      })
+      .sort((a, b) => {
+        return a.hash - b.hash;
+      })
+      .map(x => {
+        return x.buf;
+      })
+      .value();
+
+    const rlp = RLP.encode(participants);
+
+    const privacyGroup = Buffer.from(
+      keccak256(rlp).toString("base64")
+    ).toString("hex");
+
+    const payload = {
+      jsonrpc: "2.0",
+      method: "eea_getTransactionCount",
+      params: [options.from, privacyGroup],
+      id: 1
+    };
+
+    return axios.post(host, payload).then(result => {
+      return parseInt(result.data.result, 16);
+    });
+  };
+
   // eslint-disable-next-line no-param-reassign
   web3.eea = {
+    getTransactionCount,
     sendRawTransaction: options => {
       const tx = new PrivateTransaction();
       const privateKeyBuffer = Buffer.from(options.privateKey, "hex");
-
-      return web3.eth
-        .getTransactionCount(
-          ethUtil.privateToAddress(privateKeyBuffer).toString("hex")
-        )
-        .then(nonce => {
-          tx.nonce = nonce;
+      const from = `0x${privateToAddress(privateKeyBuffer).toString("hex")}`;
+      return web3.eea
+        .getTransactionCount({
+          from,
+          privateFrom: options.privateFrom,
+          privateFor: options.privateFor
+        })
+        .then(transactionCount => {
+          tx.nonce = options.nonce || transactionCount;
           tx.gasPrice = GAS_PRICE;
           tx.gasLimit = GAS_LIMIT;
           tx.to = options.to;
@@ -98,10 +142,10 @@ function EEAClient(web3, chainId) {
     getTransactionReceipt: (
       txHash,
       enclavePublicKey,
-      delay = 1000,
-      retries = 300
+      retries = 300,
+      delay = 1000
     ) => {
-      return getMakerTransaction(txHash, delay, retries)
+      return getMakerTransaction(txHash, retries, delay)
         .then(() => {
           return axios.post(host, {
             jsonrpc: "2.0",
