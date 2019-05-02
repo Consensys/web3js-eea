@@ -69,7 +69,7 @@ function EEAClient(web3, chainId) {
         const buffer = Buffer.from(publicKey, "base64");
         let result = 1;
         buffer.forEach(value => {
-          result = (31 * result + value) % 0x7fffffff;
+          result = (31 * result + (value << 24 >> 24)) & 0xffffffff ;
         });
         return { b64: publicKey, buf: buffer, hash: result };
       })
