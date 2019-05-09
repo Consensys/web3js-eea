@@ -16,6 +16,13 @@ function EEAClient(web3, chainId) {
     throw Error("Only supports http");
   }
 
+  /**
+   * Returns the Private Marker transaction
+   * @param {string} txHash The transaction hash
+   * @param {int} retries Number of retries to be made to get the private marker transaction receipt
+   * @param {int} delay The delay between the retries
+   * @returns Promise to resolve the private marker transaction receipt
+   */
   const getMakerTransaction = (txHash, retries, delay) => {
     /* eslint-disable promise/param-names */
     /* eslint-disable promise/avoid-new */
@@ -61,6 +68,11 @@ function EEAClient(web3, chainId) {
     return retryOperation(operation, delay, retries);
   };
 
+  /**
+   * Get the transaction count
+   * @param options Options passed into `eea_sendRawTransaction`
+   * @returns {Promise<transaction count | never>}
+   */
   const getTransactionCount = options => {
     const participants = _.chain(options.privateFor || [])
       .concat(options.privateFrom)
@@ -69,7 +81,8 @@ function EEAClient(web3, chainId) {
         const buffer = Buffer.from(publicKey, "base64");
         let result = 1;
         buffer.forEach(value => {
-          result = (31 * result + (value << 24 >> 24)) & 0xffffffff ;
+          // eslint-disable-next-line no-bitwise
+          result = (31 * result + ((value << 24) >> 24)) & 0xffffffff;
         });
         return { b64: publicKey, buf: buffer, hash: result };
       })
@@ -102,6 +115,19 @@ function EEAClient(web3, chainId) {
   // eslint-disable-next-line no-param-reassign
   web3.eea = {
     getTransactionCount,
+    /**
+     * Send the Raw transaction to the Pantheon node
+     * @param options Map to send a raw transction to pantheon
+     * options map can contain the following:
+     * privateKey : Private Key used to sign transaction with
+     * privateFrom : Enclave public key
+     * privateFor : Enclave keys to send the transaction to
+     * nonce(Optional) : If not provided, will be calculated using `eea_getTransctionCount`
+     * to : The address to send the transaction
+     * data : Data to be sent in the transaction
+     *
+     * @returns {Promise<AxiosResponse<any> | never>}
+     */
     sendRawTransaction: options => {
       const tx = new PrivateTransaction();
       const privateKeyBuffer = Buffer.from(options.privateKey, "hex");
@@ -139,6 +165,14 @@ function EEAClient(web3, chainId) {
           return result.data.result;
         });
     },
+    /**
+     * Get the private transaction Receipt.
+     * @param {string} txHash Transaction Hash of the marker transaction
+     * @param {string} enclavePublicKey Public key used to start-up the Enclave
+     * @param {int} retries Number of retries to be made to get the private marker transaction receipt
+     * @param {int} delay The delay between the retries
+     * @returns {Promise<AxiosResponse<any> | never>}
+     */
     getTransactionReceipt: (
       txHash,
       enclavePublicKey,
