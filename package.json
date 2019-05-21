@@ -4,7 +4,8 @@
   "description": "EEA JSON-RPC API",
   "main": "index.js",
   "scripts": {
-    "test": "tape test/**/*.js",
+    "test:unit": "tape test/unit/**/*.js",
+    "test:integration": "node ./test/integration/support/before.js && tape test/integration/**/*.test.js; node ./test/integration/support/after.js",
     "lint": "eslint ."
   },
   "husky": {
@@ -44,6 +45,7 @@
   "devDependencies": {
     "axios": "^0.18.0",
     "babel-eslint": "^10.0.1",
+    "dotenv": "^8.0.0",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-config-prettier": "^4.1.0",

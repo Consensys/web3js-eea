@@ -2,7 +2,7 @@ const tape = require("tape");
 const utils = require("ethereumjs-util");
 
 const { rlp } = utils;
-const PrivateTransaction = require("../src/privateTransaction.js");
+const PrivateTransaction = require("../../src/privateTransaction.js");
 const txFixtures = require("./txs.json");
 
 tape("[Transaction]: Basic functions", t => {

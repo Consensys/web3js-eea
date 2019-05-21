@@ -4,11 +4,7 @@ const EventEmitter = require("../solidity/EventEmitter/EventEmitter.json");
 
 const { orion, pantheon } = require("../keys.js");
 
-if (!process.env.CONTRACT_ADDRESS) {
-  throw Error("You need to export CONTRACT_ADDRESS=");
-}
-
-const storeValueFromNode2 = value => {
+const storeValueFromNode2 = (address, value) => {
   const web3 = new EEAClient(new Web3(pantheon.node2.url), 2018);
   web3.eth.Contract(EventEmitter.abi);
 
@@ -20,7 +16,7 @@ const storeValueFromNode2 = value => {
     .slice(2);
 
   const functionCall = {
-    to: process.env.CONTRACT_ADDRESS,
+    to: address,
     data: functionAbi.signature + functionArgs,
     privateFrom: orion.node2.publicKey,
     privateFor: [orion.node1.publicKey],
@@ -41,7 +37,7 @@ const storeValueFromNode2 = value => {
     });
 };
 
-const getValue = (url, privateFrom, privateFor, privateKey) => {
+const getValue = (url, address, privateFrom, privateFor, privateKey) => {
   const web3 = new EEAClient(new Web3(url), 2018);
   web3.eth.Contract(EventEmitter.abi);
 
@@ -50,7 +46,7 @@ const getValue = (url, privateFrom, privateFor, privateKey) => {
   });
 
   const functionCall = {
-    to: process.env.CONTRACT_ADDRESS,
+    to: address,
     data: functionAbi.signature,
     privateFrom,
     privateFor,
@@ -71,35 +67,58 @@ const getValue = (url, privateFrom, privateFor, privateKey) => {
     });
 };
 
-const getValueFromNode1 = () => {
+const getValueFromNode1 = address => {
   return getValue(
     pantheon.node1.url,
+    address,
     orion.node1.publicKey,
     [orion.node2.publicKey],
     pantheon.node1.privateKey
   );
 };
 
-const getValueFromNode2 = () => {
+const getValueFromNode2 = address => {
   return getValue(
     pantheon.node2.url,
+    address,
     orion.node2.publicKey,
     [orion.node1.publicKey],
     pantheon.node2.privateKey
   );
 };
 
-const getValueFromNode3 = () => {
+const getValueFromNode3 = address => {
   return getValue(
     pantheon.node3.url,
+    address,
     orion.node3.publicKey,
     [orion.node1.publicKey],
     pantheon.node3.privateKey
   );
 };
 
-storeValueFromNode2(42)
-  .then(getValueFromNode1)
-  .then(getValueFromNode2)
-  .then(getValueFromNode3)
-  .catch(console.log);
+module.exports = {
+  storeValueFromNode2,
+  getValueFromNode1,
+  getValueFromNode2,
+  getValueFromNode3
+};
+
+if (require.main === module) {
+  if (!process.env.CONTRACT_ADDRESS) {
+    throw Error("You need to export CONTRACT_ADDRESS=");
+  }
+
+  const address = process.env.CONTRACT_ADDRESS;
+  storeValueFromNode2(address, 42)
+    .then(() => {
+      return getValueFromNode1(address);
+    })
+    .then(() => {
+      return getValueFromNode2(address);
+    })
+    .then(() => {
+      return getValueFromNode3(address);
+    })
+    .catch(console.log);
+}
