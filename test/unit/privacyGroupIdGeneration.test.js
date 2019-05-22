@@ -1,6 +1,6 @@
 const tape = require("tape");
-const Enclave = require("../src/index");
-const txFixtures = require("./keySets.json");
+const Enclave = require("../../src/index");
+const txFixtures = require("./support/keySets.json");
 
 tape("[EEA]: Privacy Group Generation", t => {
   t.test("should generate correct privacy group id", st => {

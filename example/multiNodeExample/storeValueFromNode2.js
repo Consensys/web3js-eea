@@ -106,7 +106,9 @@ module.exports = {
 
 if (require.main === module) {
   if (!process.env.CONTRACT_ADDRESS) {
-    throw Error("You need to export CONTRACT_ADDRESS=");
+    throw Error(
+      "You need to export the following variable in your shell environment: CONTRACT_ADDRESS="
+    );
   }
 
   const address = process.env.CONTRACT_ADDRESS;
