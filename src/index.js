@@ -69,11 +69,11 @@ function EEAClient(web3, chainId) {
   };
 
   /**
-   * Get the transaction count
+   * Generate a privacyGroupId
    * @param options Options passed into `eea_sendRawTransaction`
-   * @returns {Promise<transaction count | never>}
+   * @returns String
    */
-  const getTransactionCount = options => {
+  const generatePrivacyGroup = options => {
     const participants = _.chain(options.privateFor || [])
       .concat(options.privateFrom)
       .uniq()
@@ -96,9 +96,16 @@ function EEAClient(web3, chainId) {
 
     const rlp = RLP.encode(participants);
 
-    const privacyGroup = Buffer.from(
-      keccak256(rlp).toString("base64")
-    ).toString("hex");
+    return Buffer.from(keccak256(rlp).toString("base64")).toString("hex");
+  };
+
+  /**
+   * Get the transaction count
+   * @param options Options passed into `eea_sendRawTransaction`
+   * @returns {Promise<transaction count | never>}
+   */
+  const getTransactionCount = options => {
+    const privacyGroup = generatePrivacyGroup(options);
 
     const payload = {
       jsonrpc: "2.0",
@@ -114,6 +121,7 @@ function EEAClient(web3, chainId) {
 
   // eslint-disable-next-line no-param-reassign
   web3.eea = {
+    generatePrivacyGroup,
     getTransactionCount,
     /**
      * Send the Raw transaction to the Pantheon node
