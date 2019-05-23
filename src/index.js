@@ -65,7 +65,7 @@ function EEAClient(web3, chainId) {
       return web3.eth.getTransactionReceipt(txHash);
     };
 
-    return retryOperation(operation, delay, retries);
+    return retryOperation(operation, retries);
   };
 
   /**
