@@ -27,6 +27,12 @@ const getPrivateContractAddress = transactionHash => {
     });
 };
 
-createPrivateEmitterContract()
-  .then(getPrivateContractAddress)
-  .catch(console.log);
+module.exports = () => {
+  return createPrivateEmitterContract()
+    .then(getPrivateContractAddress)
+    .catch(console.error);
+};
+
+if (require.main === module) {
+  module.exports();
+}
