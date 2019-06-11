@@ -1,15 +1,23 @@
+const fs = require("fs");
+const path = require("path");
+
 const Web3 = require("web3");
 const EEAClient = require("../../src");
-const EventEmitter = require("../solidity/EventEmitter/EventEmitter.json");
+const EventEmitterAbi = require("../solidity/EventEmitter/EventEmitter.json")
+  .output.abi;
 
 const { orion, pantheon } = require("../keys.js");
 
+const binary = fs.readFileSync(
+  path.join(__dirname, "../solidity/EventEmitter/EventEmitter.bin")
+);
+
 const web3 = new EEAClient(new Web3(pantheon.node1.url), 2018);
-web3.eth.Contract(EventEmitter.abi);
+web3.eth.Contract(EventEmitterAbi);
 
 const createPrivateEmitterContract = () => {
   const contractOptions = {
-    data: `0x${EventEmitter.binary}`,
+    data: `0x${binary}`,
     privateFrom: orion.node1.publicKey,
     privateFor: [orion.node2.publicKey],
     privateKey: pantheon.node1.privateKey
