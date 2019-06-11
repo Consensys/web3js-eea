@@ -173,7 +173,11 @@ function EEAClient(web3, chainId) {
           return result.data.result;
         })
         .catch(error => {
-          throw JSON.stringify(error.response.data);
+          if (error.response) {
+            throw JSON.stringify(error.response.data);
+          } else {
+            throw error;
+          }
         });
     },
     /**
