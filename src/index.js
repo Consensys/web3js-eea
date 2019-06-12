@@ -23,7 +23,7 @@ function EEAClient(web3, chainId) {
    * @param {int} delay The delay between the retries
    * @returns Promise to resolve the private marker transaction receipt
    */
-  const getMakerTransaction = (txHash, retries, delay) => {
+  const getMarkerTransaction = (txHash, retries, delay) => {
     /* eslint-disable promise/param-names */
     /* eslint-disable promise/avoid-new */
 
@@ -190,7 +190,7 @@ function EEAClient(web3, chainId) {
       retries = 300,
       delay = 1000
     ) => {
-      return getMakerTransaction(txHash, retries, delay)
+      return getMarkerTransaction(txHash, retries, delay)
         .then(() => {
           return axios.post(host, {
             jsonrpc: "2.0",
