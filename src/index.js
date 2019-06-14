@@ -43,7 +43,16 @@ function EEAClient(web3, chainId) {
                 console.log("Waiting for transaction to be mined ...");
                 notified = true;
               }
-              throw Error("Waiting for tx to be mined");
+              if (delay === 0) {
+                throw new Error(
+                  `Timed out after ${retries} attempts waiting for transaction to be mined`
+                );
+              } else {
+                const waitInSeconds = (retries * delay) / 1000;
+                throw new Error(
+                  `Timed out after ${waitInSeconds}s waiting for transaction to be mined`
+                );
+              }
             } else {
               return resolve();
             }
