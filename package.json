@@ -1,6 +1,6 @@
 {
-  "name": "eeajs",
-  "version": "1.0.0",
+  "name": "web3-eea",
+  "version": "0.7.0",
   "description": "EEA JSON-RPC API",
   "main": "index.js",
   "scripts": {
@@ -29,7 +29,7 @@
     "eea",
     "orion"
   ],
-  "author": "pegasyseng",
+  "author": "PegaSysEng <support@pegasys.tech>",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/PegaSysEng/eeajs/issues"
