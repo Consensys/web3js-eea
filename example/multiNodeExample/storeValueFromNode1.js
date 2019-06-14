@@ -1,14 +1,15 @@
 const Web3 = require("web3");
 const EEAClient = require("../../src");
-const EventEmitter = require("../solidity/EventEmitter/EventEmitter.json");
+const EventEmitterAbi = require("../solidity/EventEmitter/EventEmitter.json")
+  .output.abi;
 
 const { orion, pantheon } = require("../keys.js");
 
 const storeValueFromNode1 = (address, value) => {
   const web3 = new EEAClient(new Web3(pantheon.node1.url), 2018);
-  web3.eth.Contract(EventEmitter.abi);
+  web3.eth.Contract(EventEmitterAbi);
 
-  const functionAbi = EventEmitter.abi.find(e => {
+  const functionAbi = EventEmitterAbi.find(e => {
     return e.name === "store";
   });
   const functionArgs = web3.eth.abi
@@ -39,9 +40,9 @@ const storeValueFromNode1 = (address, value) => {
 
 const getValue = (url, address, privateFrom, privateFor, privateKey) => {
   const web3 = new EEAClient(new Web3(url), 2018);
-  web3.eth.Contract(EventEmitter.abi);
+  web3.eth.Contract(EventEmitterAbi);
 
-  const functionAbi = EventEmitter.abi.find(e => {
+  const functionAbi = EventEmitterAbi.find(e => {
     return e.name === "value";
   });
 
