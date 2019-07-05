@@ -114,7 +114,12 @@ function EEAClient(web3, chainId) {
    * @returns {Promise<transaction count | never>}
    */
   const getTransactionCount = options => {
-    const privacyGroup = generatePrivacyGroup(options);
+    let privacyGroup;
+    if (options.privacyGroupId != null) {
+      privacyGroup = options.privacyGroupId;
+    } else {
+      privacyGroup = generatePrivacyGroup(options);
+    }
 
     const payload = {
       jsonrpc: "2.0",
@@ -128,9 +133,71 @@ function EEAClient(web3, chainId) {
     });
   };
 
+  /**
+   * Create a privacy group
+   * @param options Options passed into `eea_sendRawTransaction`
+   * @returns {Promise<transaction count | never>}
+   */
+  const createPrivacyGroup = options => {
+    const payload = {
+      jsonrpc: "2.0",
+      method: "eea_createPrivacyGroup",
+      params: [
+        options.privateFrom,
+        options.name,
+        options.description,
+        options.addresses
+      ],
+      id: 1
+    };
+
+    return axios.post(host, payload).then(result => {
+      return result.data.result;
+    });
+  };
+
+  /**
+   * Delete a privacy group
+   * @param options Options passed into `eea_sendRawTransaction`
+   * @returns {Promise<transaction count | never>}
+   */
+  const deletePrivacyGroup = options => {
+    const payload = {
+      jsonrpc: "2.0",
+      method: "eea_deletePrivacyGroup",
+      params: [options.privateFrom, options.privacyGroupId],
+      id: 1
+    };
+
+    return axios.post(host, payload).then(result => {
+      return result.data.result;
+    });
+  };
+
+  /**
+   * Find privacy groups
+   * @param options Options passed into `eea_sendRawTransaction`
+   * @returns {Promise<transaction count | never>}
+   */
+  const findPrivacyGroup = options => {
+    const payload = {
+      jsonrpc: "2.0",
+      method: "eea_findPrivacyGroup",
+      params: [options.addresses],
+      id: 1
+    };
+
+    return axios.post(host, payload).then(result => {
+      return result.data.result;
+    });
+  };
+
   // eslint-disable-next-line no-param-reassign
   web3.eea = {
     generatePrivacyGroup,
+    createPrivacyGroup,
+    deletePrivacyGroup,
+    findPrivacyGroup,
     getTransactionCount,
     /**
      * Send the Raw transaction to the Pantheon node
