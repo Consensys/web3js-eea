@@ -15,15 +15,16 @@ const createPrivacyGroup = () => {
     name: "web3js-eea",
     description: "test"
   };
-  return web3.eea.createPrivacyGroup(contractOptions);
+  return web3.eea.createPrivacyGroup(contractOptions).then(result => {
+    console.log(`The privacy group created is:`, result);
+    return result;
+  });
 };
 
-module.exports = () => {
-  return createPrivacyGroup()
-    .then(console.log)
-    .catch(console.error);
+module.exports = {
+  createPrivacyGroup
 };
 
 if (require.main === module) {
-  module.exports();
+  createPrivacyGroup();
 }

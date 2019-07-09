@@ -13,22 +13,23 @@ const deletePrivacyGroup = givenPrivacyGroupId => {
     privacyGroupId: givenPrivacyGroupId,
     privateFrom: orion.node1.publicKey
   };
-  return web3.eea.deletePrivacyGroup(contractOptions);
+  return web3.eea.deletePrivacyGroup(contractOptions).then(result => {
+    console.log(`The privacy group deleted is:`, result);
+    return result;
+  });
 };
 
-module.exports = privacyGroupId => {
-  return deletePrivacyGroup(privacyGroupId)
-    .then(console.log)
-    .catch(console.error);
+module.exports = {
+  deletePrivacyGroup
 };
 
 if (require.main === module) {
-  if (process.argv.length.valueOf() !== 3) {
+  if (!process.env.PRIVACY_GROUP_TO_DELETE) {
     throw Error(
-      "You need to pass the privacy group to delete in the parameters"
+      "You need to export the following variable in your shell environment: PRIVACY_GROUP_TO_DELETE="
     );
   }
 
-  const privacyGroupId = process.argv[2];
-  module.exports(privacyGroupId);
+  const privacyGroupId = process.env.PRIVACY_GROUP_TO_DELETE;
+  deletePrivacyGroup(privacyGroupId);
 }

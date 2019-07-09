@@ -5,27 +5,55 @@ const findGroup = require("../../example/privacyGroupManagement/findPrivacyGroup
 const deleteGroup = require("../../example/privacyGroupManagement/deletePrivacyGroup");
 
 test("[MultiNodeExample]: Can manage privacy groups", t => {
-  let RESULT;
+  let PRIVACY_GROUP_ID;
   t.test("can create privacy group", async st => {
-    RESULT = await createGroup();
+    PRIVACY_GROUP_ID = await createGroup.createPrivacyGroup();
 
     st.end();
   });
 
   t.test("can find privacy group", async st => {
-    const result1 = await findGroup();
+    const returnedPrivacyGroup = await findGroup();
 
-    st.equal(RESULT, result1);
-
-    st.end();d
+    st.equal(PRIVACY_GROUP_ID, returnedPrivacyGroup[0].privacyGroupId);
+    st.end();
   });
 
   t.test("can delete privacy group", async st => {
-    const result2 = await deleteGroup();
+    const deletedGroup = await deleteGroup.deletePrivacyGroup(PRIVACY_GROUP_ID);
 
-    const result3 = await findGroup();
+    st.equal(deletedGroup, PRIVACY_GROUP_ID);
+    st.end();
+  });
 
-    // verify the the last find group was unsuccessful
+  t.test("cannot find once deleted", async st => {
+    const returnedPrivacyGroup = await findGroup();
+
+    st.equal(returnedPrivacyGroup.length, 0);
+    st.end();
+  });
+
+  t.test("create twice and delete once", async st => {
+    const newPrivacyGroup1 = await createGroup.createPrivacyGroup();
+    const newPrivacyGroup2 = await createGroup.createPrivacyGroup();
+
+    let privacyGroupList = await findGroup();
+
+    st.equal(privacyGroupList.length, 2);
+
+    st.equal(privacyGroupList.includes(newPrivacyGroup1), true);
+    st.equal(privacyGroupList.includes(newPrivacyGroup2), true);
+
+    const deletedGroup = await deleteGroup.deletePrivacyGroup(newPrivacyGroup1);
+
+    st.equal(deletedGroup, newPrivacyGroup1);
+
+    privacyGroupList = await findGroup();
+
+    st.equal(privacyGroupList.length, 1);
+
+    st.equal(privacyGroupList.includes(newPrivacyGroup1), false);
+    st.equal(privacyGroupList.includes(newPrivacyGroup2), true);
 
     st.end();
   });
