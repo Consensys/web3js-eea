@@ -11,7 +11,7 @@ web3.eth.Contract(EventEmitterAbi);
 const createPrivacyGroup = () => {
   const contractOptions = {
     addresses: [orion.node1.publicKey, orion.node2.publicKey],
-    privateFrom: "A1aVtMxLCUHmBVHXoZzzBrPbW/wj5axDpW9X8l91SGo=",
+    privateFrom: orion.node1.publicKey,
     name: "web3js-eea",
     description: "test"
   };
