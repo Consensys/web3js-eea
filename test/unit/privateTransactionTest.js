@@ -21,9 +21,9 @@ tape("[Transaction]: Basic functions", t => {
       st.equal(`0x${pt.v.toString("hex")}`, tx.raw[6]);
       st.equal(`0x${pt.r.toString("hex")}`, tx.raw[7]);
       st.equal(`0x${pt.s.toString("hex")}`, tx.raw[8]);
-      st.equal(pt.privateFrom.toString(), tx.raw[9]);
+      st.equal(pt.privateFrom.toString("base64"), tx.raw[9]);
       for (let i = 0; i < tx.raw[10].length; i++) {
-        st.equal(pt.privateFor[i].toString(), tx.raw[10][i]);
+        st.equal(pt.privateFor[i].toString("base64"), tx.raw[10][i]);
       }
       st.equal(pt.restriction.toString(), tx.raw[11]);
       transactions.push(pt);
