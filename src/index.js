@@ -105,7 +105,7 @@ function EEAClient(web3, chainId) {
 
     const rlp = RLP.encode(participants);
 
-    return Buffer.from(keccak256(rlp).toString("base64")).toString("hex");
+    return Buffer.from(keccak256(rlp)).toString("base64");
   };
 
   /**
