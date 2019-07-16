@@ -187,6 +187,17 @@ exports.toBuffer = function(v) {
     } else if (typeof v === "string") {
       if (exports.isHexString(v)) {
         v = Buffer.from(exports.padToEven(exports.stripHexPrefix(v)), "hex");
+      } else if (v.match(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/)) {
+      //   ^                        # Start of input
+      //   ([0-9a-zA-Z+/]{4})*      # Groups of 4 valid characters decode
+      //                            # to 24 bits of data for each group
+      //   (                        # Either ending with:
+      //   ([0-9a-zA-Z+/]{2}==)     # two valid characters followed by ==
+      //   |                        # , or
+      //   ([0-9a-zA-Z+/]{3}=)      # three valid characters followed by =
+      //   )?                       # , or nothing
+      //   $                        # End of input
+        v = Buffer.from(v, "base64");
       } else {
         v = Buffer.from(v);
       }
