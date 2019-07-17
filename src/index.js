@@ -232,7 +232,13 @@ function EEAClient(web3, chainId) {
           // eslint-disable-next-line no-underscore-dangle
           tx._chainId = chainId;
           tx.privateFrom = options.privateFrom;
-          tx.privateFor = options.privateFor;
+
+          if (options.privateFor) {
+            tx.privateFor = options.privateFor;
+          }
+          if (options.privacyGroupId) {
+            tx.privacyGroupId = options.privacyGroupId;
+          }
           tx.restriction = "restricted";
           tx.sign(privateKeyBuffer);
 
