@@ -21,8 +21,26 @@ const createPrivacyGroup = () => {
   });
 };
 
+const createPrivacyGroupForNode123 = () => {
+  const contractOptions = {
+    addresses: [
+      orion.node1.publicKey,
+      orion.node2.publicKey,
+      orion.node3.publicKey
+    ],
+    privateFrom: orion.node1.publicKey,
+    name: "web3js-eea",
+    description: "test"
+  };
+  return web3.eea.createPrivacyGroup(contractOptions).then(result => {
+    console.log(`The privacy group created is:`, result);
+    return result;
+  });
+};
+
 module.exports = {
-  createPrivacyGroup
+  createPrivacyGroup,
+  createPrivacyGroupForNode123
 };
 
 if (require.main === module) {
