@@ -4,6 +4,7 @@
   "description": "EEA JSON-RPC API",
   "main": "src/index.js",
   "scripts": {
+    "test": "npm run test:unit && npm run test:integration",
     "test:unit": "tape test/unit/**/*.js",
     "test:integration": "node ./test/integration/support/before.js && tape test/integration/**/*.test.js; node ./test/integration/support/after.js",
     "lint": "eslint ."
