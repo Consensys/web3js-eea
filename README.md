@@ -1,8 +1,20 @@
-# EEA JavaScript libraries - EEAJS
+# web3.js-eea Client Library
 
-EEA JavaScript libraries including examples to [deploy a contract and send private transactions](https://docs.pantheon.pegasys.tech/en/latest/Privacy/Creating-Sending-Private-Transactions/). 
+JavaScript libraries to:
+ 
+* Create and send private transactions 
+* Create, delete, and find privacy groups
 
-## Run Tests
+## Issues 
+
+web3.js-eea issues are tracked in [Jira](https://pegasys1.atlassian.net/secure/Dashboard.jspa?selectPageId=10117) not GitHub. 
+See our [contribution guidelines](CONTRIBUTING.md) for more detail on searching and creating issues.
+
+## Using 
+
+The Pantheon documentation describes how to [use the web3.js libraries](https://docs.pantheon.pegasys.tech/en/stable/Privacy/Private-Transactions/eeajs/). 
+
+## Developing
 
 To run all the tests:
 ```bash
