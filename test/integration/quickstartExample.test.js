@@ -7,13 +7,13 @@ const node2Example = require("../../example/multiNodeExample/storeValueFromNode2
 test("[MultiNodeExample]: Can run quickstart", t => {
   t.test("deploy contract", async st => {
     const contractAddress = await deployContract();
-    st.equal(contractAddress, "0x2f351161a80d74047316899342eedc606b13f9f8");
+    st.equal(contractAddress, "0xebf56429e6500e84442467292183d4d621359838");
     st.end();
   });
 
   t.test("store and gets from node 1", async st => {
     const result = await node1Example.storeValueFromNode1(
-      "0x2f351161a80d74047316899342eedc606b13f9f8",
+      "0xebf56429e6500e84442467292183d4d621359838",
       1000
     );
 
@@ -23,7 +23,7 @@ test("[MultiNodeExample]: Can run quickstart", t => {
     );
 
     const getNode1 = await node1Example.getValueFromNode1(
-      "0x2f351161a80d74047316899342eedc606b13f9f8"
+      "0xebf56429e6500e84442467292183d4d621359838"
     );
 
     st.equal(
@@ -32,7 +32,7 @@ test("[MultiNodeExample]: Can run quickstart", t => {
     );
 
     const getNode2 = await node1Example.getValueFromNode2(
-      "0x2f351161a80d74047316899342eedc606b13f9f8"
+      "0xebf56429e6500e84442467292183d4d621359838"
     );
 
     st.equal(
@@ -41,7 +41,7 @@ test("[MultiNodeExample]: Can run quickstart", t => {
     );
 
     const getNode3 = await node1Example.getValueFromNode3(
-      "0x2f351161a80d74047316899342eedc606b13f9f8"
+      "0xebf56429e6500e84442467292183d4d621359838"
     );
 
     st.equal(getNode3.output, "0x");
@@ -51,7 +51,7 @@ test("[MultiNodeExample]: Can run quickstart", t => {
 
   t.test("store and gets from node 2", async st => {
     const result = await node2Example.storeValueFromNode2(
-      "0x2f351161a80d74047316899342eedc606b13f9f8",
+      "0xebf56429e6500e84442467292183d4d621359838",
       42
     );
 
@@ -61,7 +61,7 @@ test("[MultiNodeExample]: Can run quickstart", t => {
     );
 
     const getNode1 = await node2Example.getValueFromNode1(
-      "0x2f351161a80d74047316899342eedc606b13f9f8"
+      "0xebf56429e6500e84442467292183d4d621359838"
     );
 
     st.equal(
@@ -70,7 +70,7 @@ test("[MultiNodeExample]: Can run quickstart", t => {
     );
 
     const getNode2 = await node2Example.getValueFromNode2(
-      "0x2f351161a80d74047316899342eedc606b13f9f8"
+      "0xebf56429e6500e84442467292183d4d621359838"
     );
 
     st.equal(
@@ -79,7 +79,7 @@ test("[MultiNodeExample]: Can run quickstart", t => {
     );
 
     const getNode3 = await node2Example.getValueFromNode3(
-      "0x2f351161a80d74047316899342eedc606b13f9f8"
+      "0xebf56429e6500e84442467292183d4d621359838"
     );
 
     st.equal(getNode3.output, "0x");

@@ -120,9 +120,15 @@ class PrivateTransaction {
       },
       {
         name: "privateFor",
+        nullable: true,
         allowZero: true, // if you comment out this line test fails (for now)
         bufferArray: true,
         default: [Buffer.from([])]
+      },
+      {
+        name: "privacyGroupId",
+        nullable: true,
+        default: Buffer.from([])
       },
       {
         name: "restriction",
@@ -205,8 +211,22 @@ class PrivateTransaction {
       items = this.raw.slice(0, 6);
     }
 
+    const arr = items.slice();
+
+    if (items[10].length !== 0 && items[11].length === 32) {
+      throw Error(
+        "privacyGroupId and privateFor fields are mutually exclusive"
+      );
+    }
+
+    if (items[11].length === 32) {
+      arr.splice(10, 1);
+    } else {
+      arr.splice(11, 1);
+    }
+
     // create hash
-    return ethUtil.rlphash(items);
+    return ethUtil.rlphash(arr);
   }
 
   /**
