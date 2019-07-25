@@ -213,7 +213,7 @@ class PrivateTransaction {
 
     const arr = items.slice();
 
-    if (items[10].length !== 0 && items[11].length === 32) {
+    if (items[10][0].length !== 0 && items[11].length === 32) {
       throw Error(
         "privacyGroupId and privateFor fields are mutually exclusive"
       );

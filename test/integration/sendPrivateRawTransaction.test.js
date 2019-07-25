@@ -1,58 +1,84 @@
 const test = require("tape");
 
-const fs = require("fs");
-const path = require("path");
-const Web3 = require("web3");
-const createGroup = require("../../example/privacyGroupManagement/createPrivacyGroup");
-const findGroup = require("../../example/privacyGroupManagement/findPrivacyGroup");
-const deleteGroup = require("../../example/privacyGroupManagement/deletePrivacyGroup");
+const deployContract = require("../../example/multiNodeExamplePrivacyGroup/deployContract");
+const node1Example = require("../../example/multiNodeExamplePrivacyGroup/storeValueFromNode1");
+const node2Example = require("../../example/multiNodeExamplePrivacyGroup/storeValueFromNode2");
 
-const EEAClient = require("../../src/");
-const EventEmitterAbi = require("../../example/solidity/EventEmitter/EventEmitter.json")
-  .output.abi;
-const { orion, pantheon } = require("../../example/keys.js");
+test("[MultiNodeExample]: Can run quickstart with privacyGroupId instead of privateFor", t => {
+  let contractAddress;
+  let privacyGroupId;
+  t.test("deploy contract", async st => {
+    const response = await deployContract();
+    ({ contractAddress, privacyGroupId } = response);
+    st.end();
+  });
 
-test("[MultiNodeExample]: Can manage privacy groups", t => {
-  t.test("can create, find and delete privacy group", async st => {
-    const createdGroupId = await createGroup.createPrivacyGroup();
-
-    let returnedPrivacyGroup = await findGroup.findPrivacyGroup();
-
-    const listWithPrivacyGroup = returnedPrivacyGroup.filter(i => {
-      return i.privacyGroupId === createdGroupId;
-    });
-
-    const binary = fs.readFileSync(
-      path.join(
-        __dirname,
-        "../../example/solidity/EventEmitter/EventEmitter.bin"
-      )
+  t.test("store and gets from node 1", async st => {
+    const result = await node1Example.storeValueFromNode1(
+      contractAddress,
+      1000,
+      privacyGroupId
     );
 
-    const web3 = new EEAClient(new Web3(pantheon.node1.url), 2018);
-    web3.eth.Contract(EventEmitterAbi);
+    st.equal(
+      result.logs[0].data,
+      "0x000000000000000000000000fe3b557e8fb62b89f4916b721be55ceb828dbd7300000000000000000000000000000000000000000000000000000000000003e8"
+    );
 
-    const createPrivateEmitterContract = () => {
-      const contractOptions = {
-        data: `0x${binary}`,
-        privateFrom: orion.node1.publicKey,
-        privacyGroupId: listWithPrivacyGroup[0].privacyGroupId,
-        privateKey: pantheon.node1.privateKey
-      };
-      return web3.eea.sendRawTransaction(contractOptions);
-    };
+    const getNode1 = await node1Example.getValueFromNode1(
+      contractAddress,
+      privacyGroupId
+    );
 
-    const result = await createPrivateEmitterContract();
+    st.equal(
+      getNode1.output,
+      "0x00000000000000000000000000000000000000000000000000000000000003e8"
+    );
 
-    const deletedGroup = await deleteGroup.deletePrivacyGroup(createdGroupId);
+    const getNode2 = await node1Example.getValueFromNode2(
+      contractAddress,
+      privacyGroupId
+    );
 
-    returnedPrivacyGroup = await findGroup.findPrivacyGroup();
+    st.equal(
+      getNode2.output,
+      "0x00000000000000000000000000000000000000000000000000000000000003e8"
+    );
 
-    const listWithPrivacyGroupAfterDelete = returnedPrivacyGroup.filter(i => {
-      return i.privacyGroupId === deletedGroup;
-    });
+    st.end();
+  });
 
-    st.equal(listWithPrivacyGroupAfterDelete.length, 0);
+  t.test("store and gets from node 2", async st => {
+    const result = await node2Example.storeValueFromNode2(
+      contractAddress,
+      42,
+      privacyGroupId
+    );
+
+    st.equal(
+      result.logs[0].data,
+      "0x000000000000000000000000627306090abab3a6e1400e9345bc60c78a8bef57000000000000000000000000000000000000000000000000000000000000002a"
+    );
+
+    const getNode1 = await node2Example.getValueFromNode1(
+      contractAddress,
+      privacyGroupId
+    );
+
+    st.equal(
+      getNode1.output,
+      "0x000000000000000000000000000000000000000000000000000000000000002a"
+    );
+
+    const getNode2 = await node2Example.getValueFromNode2(
+      contractAddress,
+      privacyGroupId
+    );
+
+    st.equal(
+      getNode2.output,
+      "0x000000000000000000000000000000000000000000000000000000000000002a"
+    );
 
     st.end();
   });

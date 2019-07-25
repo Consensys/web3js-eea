@@ -696,7 +696,7 @@ exports.defineProperties = function(self, fields, data) {
   self.serialize = function serialize() {
     const arr = self.raw.slice();
 
-    if (self.raw[10].length !== 0
+    if (self.raw[10][0].length !== 0
       && self.raw[11].length === 32) {
       throw Error("privacyGroupId and privateFor fields are mutually exclusive");
     }
