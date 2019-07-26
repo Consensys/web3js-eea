@@ -114,17 +114,17 @@ function EEAClient(web3, chainId) {
    * @returns {Promise<transaction count | never>}
    */
   const getTransactionCount = options => {
-    let privacyGroup;
-    if (options.privacyGroupId != null) {
-      privacyGroup = options.privacyGroupId;
+    let privacyGroupId;
+    if (options.privacyGroupId) {
+      ({ privacyGroupId } = options);
     } else {
-      privacyGroup = generatePrivacyGroup(options);
+      privacyGroupId = generatePrivacyGroup(options);
     }
 
     const payload = {
       jsonrpc: "2.0",
       method: "eea_getTransactionCount",
-      params: [options.from, privacyGroup],
+      params: [options.from, privacyGroupId],
       id: 1
     };
 
@@ -220,7 +220,8 @@ function EEAClient(web3, chainId) {
         .getTransactionCount({
           from,
           privateFrom: options.privateFrom,
-          privateFor: options.privateFor
+          privateFor: options.privateFor,
+          privacyGroupId: options.privacyGroupId
         })
         .then(transactionCount => {
           tx.nonce = options.nonce || transactionCount;
@@ -232,7 +233,13 @@ function EEAClient(web3, chainId) {
           // eslint-disable-next-line no-underscore-dangle
           tx._chainId = chainId;
           tx.privateFrom = options.privateFrom;
-          tx.privateFor = options.privateFor;
+
+          if (options.privateFor) {
+            tx.privateFor = options.privateFor;
+          }
+          if (options.privacyGroupId) {
+            tx.privacyGroupId = options.privacyGroupId;
+          }
           tx.restriction = "restricted";
           tx.sign(privateKeyBuffer);
 

@@ -1,20 +1,23 @@
 const test = require("tape");
 
-const deployContract = require("../../example/multiNodeExample/deployContract");
-const node1Example = require("../../example/multiNodeExample/storeValueFromNode1");
-const node2Example = require("../../example/multiNodeExample/storeValueFromNode2");
+const deployContract = require("../../example/multiNodeExamplePrivacyGroup/deployContract");
+const node1Example = require("../../example/multiNodeExamplePrivacyGroup/storeValueFromNode1");
+const node2Example = require("../../example/multiNodeExamplePrivacyGroup/storeValueFromNode2");
 
-test("[MultiNodeExample]: Can run quickstart", t => {
+test("[MultiNodeExample]: Can run quickstart with privacyGroupId instead of privateFor", t => {
+  let contractAddress;
+  let privacyGroupId;
   t.test("deploy contract", async st => {
-    const contractAddress = await deployContract();
-    st.equal(contractAddress, "0xebf56429e6500e84442467292183d4d621359838");
+    const response = await deployContract();
+    ({ contractAddress, privacyGroupId } = response);
     st.end();
   });
 
   t.test("store and gets from node 1", async st => {
     const result = await node1Example.storeValueFromNode1(
-      "0xebf56429e6500e84442467292183d4d621359838",
-      1000
+      contractAddress,
+      1000,
+      privacyGroupId
     );
 
     st.equal(
@@ -23,7 +26,8 @@ test("[MultiNodeExample]: Can run quickstart", t => {
     );
 
     const getNode1 = await node1Example.getValueFromNode1(
-      "0xebf56429e6500e84442467292183d4d621359838"
+      contractAddress,
+      privacyGroupId
     );
 
     st.equal(
@@ -32,7 +36,8 @@ test("[MultiNodeExample]: Can run quickstart", t => {
     );
 
     const getNode2 = await node1Example.getValueFromNode2(
-      "0xebf56429e6500e84442467292183d4d621359838"
+      contractAddress,
+      privacyGroupId
     );
 
     st.equal(
@@ -40,19 +45,14 @@ test("[MultiNodeExample]: Can run quickstart", t => {
       "0x00000000000000000000000000000000000000000000000000000000000003e8"
     );
 
-    const getNode3 = await node1Example.getValueFromNode3(
-      "0xebf56429e6500e84442467292183d4d621359838"
-    );
-
-    st.equal(getNode3.output, "0x");
-
     st.end();
   });
 
   t.test("store and gets from node 2", async st => {
     const result = await node2Example.storeValueFromNode2(
-      "0xebf56429e6500e84442467292183d4d621359838",
-      42
+      contractAddress,
+      42,
+      privacyGroupId
     );
 
     st.equal(
@@ -61,7 +61,8 @@ test("[MultiNodeExample]: Can run quickstart", t => {
     );
 
     const getNode1 = await node2Example.getValueFromNode1(
-      "0xebf56429e6500e84442467292183d4d621359838"
+      contractAddress,
+      privacyGroupId
     );
 
     st.equal(
@@ -70,19 +71,14 @@ test("[MultiNodeExample]: Can run quickstart", t => {
     );
 
     const getNode2 = await node2Example.getValueFromNode2(
-      "0xebf56429e6500e84442467292183d4d621359838"
+      contractAddress,
+      privacyGroupId
     );
 
     st.equal(
       getNode2.output,
       "0x000000000000000000000000000000000000000000000000000000000000002a"
     );
-
-    const getNode3 = await node2Example.getValueFromNode3(
-      "0xebf56429e6500e84442467292183d4d621359838"
-    );
-
-    st.equal(getNode3.output, "0x");
 
     st.end();
   });
