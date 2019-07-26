@@ -114,13 +114,13 @@ if (require.main === module) {
 
   if (!process.env.PRIVACY_GROUP_ID) {
     throw Error(
-      "You need to export the following variable in your shell environment: CONTRACT_ADDRESS="
+      "You need to export the following variable in your shell environment: PRIVACY_GROUP_ID="
     );
   }
 
   const address = process.env.CONTRACT_ADDRESS;
   const privacyGroupId = process.env.PRIVACY_GROUP_ID;
-  storeValueFromNode1(address, 1000)
+  storeValueFromNode1(address, 1000, privacyGroupId)
     .then(() => {
       return getValueFromNode1(address, privacyGroupId);
     })

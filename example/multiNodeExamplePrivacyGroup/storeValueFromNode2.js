@@ -112,16 +112,23 @@ if (require.main === module) {
     );
   }
 
+  if (!process.env.PRIVACY_GROUP_ID) {
+    throw Error(
+      "You need to export the following variable in your shell environment: PRIVACY_GROUP_ID="
+    );
+  }
+
   const address = process.env.CONTRACT_ADDRESS;
-  storeValueFromNode2(address, 42)
+  const privacyGroupId = process.env.PRIVACY_GROUP_ID;
+  storeValueFromNode2(address, 42, privacyGroupId)
     .then(() => {
-      return getValueFromNode1(address);
+      return getValueFromNode1(address, privacyGroupId);
     })
     .then(() => {
-      return getValueFromNode2(address);
+      return getValueFromNode2(address, privacyGroupId);
     })
     .then(() => {
-      return getValueFromNode3(address);
+      return getValueFromNode3(address, privacyGroupId);
     })
     .catch(console.log);
 }
