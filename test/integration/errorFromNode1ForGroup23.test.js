@@ -21,8 +21,8 @@ test("[MultiNodeExample]: Can manage privacy groups", t => {
 
     const listFindFromNode1 = await findGroup.findPrivacyGroupForNode23();
 
-    // it is not list as it is an error thrown
-    st.false(Array.isArray(listFindFromNode1));
+    // node1 should not see privacyGroup23
+    st.equal(listFindFromNode1.length, 0);
 
     const listFromNode2 = await findGroupNode2.findPrivacyGroupForNode23();
 

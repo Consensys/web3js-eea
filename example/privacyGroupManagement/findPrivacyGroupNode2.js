@@ -12,7 +12,7 @@ const findPrivacyGroupForNode23 = () => {
   const contractOptions = {
     addresses: [orion.node2.publicKey, orion.node3.publicKey]
   };
-  return web3.eea.findPrivacyGroup(contractOptions).then(result => {
+  return web3.priv.findPrivacyGroup(contractOptions).then(result => {
     console.log(`The privacy groups found are:`, result);
     return result;
   });

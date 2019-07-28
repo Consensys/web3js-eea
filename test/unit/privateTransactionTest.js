@@ -1,7 +1,6 @@
 const tape = require("tape");
 const utils = require("ethereumjs-util");
 
-const { rlp } = utils;
 const PrivateTransaction = require("../../src/privateTransaction.js");
 const txFixtures = require("./support/txs.json");
 
@@ -25,7 +24,8 @@ tape("[Transaction]: Basic functions", t => {
       for (let i = 0; i < tx.raw[10].length; i++) {
         st.equal(pt.privateFor[i].toString("base64"), tx.raw[10][i]);
       }
-      st.equal(pt.restriction.toString(), tx.raw[11]);
+      st.equal(pt.privacyGroupId.toString(), tx.raw[11]);
+      st.equal(pt.restriction.toString(), tx.raw[12]);
       transactions.push(pt);
     });
     st.end();
@@ -45,8 +45,8 @@ tape("[Transaction]: Basic functions", t => {
   });
 
   t.test("should serialize", st => {
-    transactions.forEach(tx => {
-      st.deepEqual(tx.serialize(), rlp.encode(tx.raw));
+    transactions.forEach((tx, i) => {
+      st.deepEqual(`0x${tx.serialize().toString("hex")}`, txFixtures[i].rlp);
     });
     st.end();
   });
