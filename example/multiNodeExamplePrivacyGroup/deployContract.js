@@ -3,8 +3,6 @@ const path = require("path");
 
 const Web3 = require("web3");
 const EEAClient = require("../../src");
-const EventEmitterAbi = require("../solidity/EventEmitter/EventEmitter.json")
-  .output.abi;
 
 const createGroup = require("../privacyGroupManagement/createPrivacyGroup");
 
@@ -15,7 +13,6 @@ const binary = fs.readFileSync(
 );
 
 const web3 = new EEAClient(new Web3(pantheon.node1.url), 2018);
-web3.eth.Contract(EventEmitterAbi);
 
 const createGroupId = () => {
   return createGroup.createPrivacyGroup();

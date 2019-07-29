@@ -3,7 +3,7 @@ const path = require("path");
 
 const Web3 = require("web3");
 const EEAClient = require("../src");
-const HumandStandartTokenAbi = require("./solidity/HumanStandardToken/HumanStandardToken.json")
+const HumanStandardTokenAbi = require("./solidity/HumanStandardToken/HumanStandardToken.json")
   .output.abi;
 const ethUtil = require("../src/custom-ethjs-util");
 
@@ -13,18 +13,19 @@ const binary = fs.readFileSync(
 
 const web3 = new EEAClient(new Web3("http://localhost:20000"), 2018);
 
-web3.eth.Contract(HumandStandartTokenAbi); // pass by reference monkey patch
+const contract = new web3.eth.Contract(HumanStandardTokenAbi);
 
 // create HumanStandardToken constructor
-const constructorAbi = HumandStandartTokenAbi.find(e => {
+// eslint-disable-next-line no-underscore-dangl
+const constructorAbi = contract._jsonInterface.find(e => {
   return e.type === "constructor";
 });
 const constructorArgs = web3.eth.abi
   .encodeParameters(constructorAbi.inputs, [
     1000000,
-    "DrumG Technologies Token",
+    "PegaSys Token",
     10,
-    "DrumG"
+    "PegaSys"
   ])
   .slice(2);
 
@@ -55,7 +56,7 @@ web3.eea
     // contract.methods.transfer(["to", "value"]).send(??)
 
     // already 0x prefixed
-    const functionAbi = HumandStandartTokenAbi.find(element => {
+    const functionAbi = contract._jsonInterface.find(element => {
       return element.name === "transfer";
     });
     const transferTo = `0x${ethUtil
