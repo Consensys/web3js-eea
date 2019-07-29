@@ -210,7 +210,7 @@ function EEAClient(web3, chainId) {
      * privateKey : Private Key used to sign transaction with
      * privateFrom : Enclave public key
      * privateFor : Enclave keys to send the transaction to
-     * privacyGroupId : Enclave id representing the reveivers of the transaction
+     * privacyGroupId : Enclave id representing the receivers of the transaction
      * nonce(Optional) : If not provided, will be calculated using `eea_getTransctionCount`
      * to : The address to send the transaction
      * data : Data to be sent in the transaction
