@@ -7,9 +7,10 @@ const { orion, pantheon } = require("../keys.js");
 
 const storeValueFromNode1 = (address, value) => {
   const web3 = new EEAClient(new Web3(pantheon.node1.url), 2018);
-  web3.eth.Contract(EventEmitterAbi);
+  const contract = new web3.eth.Contract(EventEmitterAbi);
 
-  const functionAbi = EventEmitterAbi.find(e => {
+  // eslint-disable-next-line no-underscore-dangl
+  const functionAbi = contract._jsonInterface.find(e => {
     return e.name === "store";
   });
   const functionArgs = web3.eth.abi
@@ -40,9 +41,11 @@ const storeValueFromNode1 = (address, value) => {
 
 const getValue = (url, address, privateFrom, privateFor, privateKey) => {
   const web3 = new EEAClient(new Web3(url), 2018);
-  web3.eth.Contract(EventEmitterAbi);
 
-  const functionAbi = EventEmitterAbi.find(e => {
+  const contract = new web3.eth.Contract(EventEmitterAbi);
+
+  // eslint-disable-next-line no-underscore-dangl
+  const functionAbi = contract._jsonInterface.find(e => {
     return e.name === "value";
   });
 

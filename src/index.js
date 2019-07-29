@@ -9,8 +9,7 @@ function EEAClient(web3, chainId) {
   const GAS_PRICE = 0;
   const GAS_LIMIT = 3000000;
 
-  // eslint-disable-next-line no-underscore-dangle
-  const { host } = web3._currentProvider;
+  const { host } = web3.eth.currentProvider;
 
   if (host == null) {
     throw Error("Only supports http");

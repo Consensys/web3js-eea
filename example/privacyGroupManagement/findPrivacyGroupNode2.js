@@ -1,12 +1,8 @@
 const Web3 = require("web3");
 const EEAClient = require("../../src");
-const EventEmitterAbi = require("../solidity/EventEmitter/EventEmitter.json")
-  .output.abi;
-
 const { orion, pantheon } = require("../keys.js");
 
 const web3 = new EEAClient(new Web3(pantheon.node2.url), 2018);
-web3.eth.Contract(EventEmitterAbi);
 
 const findPrivacyGroupForNode23 = () => {
   const contractOptions = {

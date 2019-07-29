@@ -8,7 +8,7 @@ tape("[EEA]: Privacy Group Generation", t => {
     txFixtures.forEach(pg => {
       const expected = pg.privacyGroupId;
       const input = pg.privacyGroup;
-      const enclave = new Enclave({ _currentProvider: { host: "" } });
+      const enclave = new Enclave({ eth: { currentProvider: { host: "" } } });
       st.equal(
         enclave.priv.generatePrivacyGroup({ privateFrom: input }),
         expected
