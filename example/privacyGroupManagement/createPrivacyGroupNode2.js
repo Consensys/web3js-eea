@@ -15,7 +15,7 @@ const createPrivacyGroupForNode23 = () => {
     name: "web3js-eea",
     description: "test"
   };
-  return web3.eea.createPrivacyGroup(contractOptions).then(result => {
+  return web3.priv.createPrivacyGroup(contractOptions).then(result => {
     console.log(`The privacy group created is:`, result);
     return result;
   });

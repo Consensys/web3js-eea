@@ -10,7 +10,7 @@ tape("[EEA]: Privacy Group Generation", t => {
       const input = pg.privacyGroup;
       const enclave = new Enclave({ _currentProvider: { host: "" } });
       st.equal(
-        enclave.eea.generatePrivacyGroup({ privateFrom: input }),
+        enclave.priv.generatePrivacyGroup({ privateFrom: input }),
         expected
       );
     });

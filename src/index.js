@@ -123,7 +123,7 @@ function EEAClient(web3, chainId) {
 
     const payload = {
       jsonrpc: "2.0",
-      method: "eea_getTransactionCount",
+      method: "priv_getTransactionCount",
       params: [options.from, privacyGroupId],
       id: 1
     };
@@ -141,7 +141,7 @@ function EEAClient(web3, chainId) {
   const createPrivacyGroup = options => {
     const payload = {
       jsonrpc: "2.0",
-      method: "eea_createPrivacyGroup",
+      method: "priv_createPrivacyGroup",
       params: [
         options.privateFrom,
         options.name,
@@ -164,7 +164,7 @@ function EEAClient(web3, chainId) {
   const deletePrivacyGroup = options => {
     const payload = {
       jsonrpc: "2.0",
-      method: "eea_deletePrivacyGroup",
+      method: "priv_deletePrivacyGroup",
       params: [options.privateFrom, options.privacyGroupId],
       id: 1
     };
@@ -182,7 +182,7 @@ function EEAClient(web3, chainId) {
   const findPrivacyGroup = options => {
     const payload = {
       jsonrpc: "2.0",
-      method: "eea_findPrivacyGroup",
+      method: "priv_findPrivacyGroup",
       params: [options.addresses],
       id: 1
     };
@@ -193,12 +193,16 @@ function EEAClient(web3, chainId) {
   };
 
   // eslint-disable-next-line no-param-reassign
-  web3.eea = {
+  web3.priv = {
     generatePrivacyGroup,
     createPrivacyGroup,
     deletePrivacyGroup,
     findPrivacyGroup,
-    getTransactionCount,
+    getTransactionCount
+  };
+
+  // eslint-disable-next-line no-param-reassign
+  web3.eea = {
     /**
      * Send the Raw transaction to the Pantheon node
      * @param options Map to send a raw transction to pantheon
@@ -206,6 +210,7 @@ function EEAClient(web3, chainId) {
      * privateKey : Private Key used to sign transaction with
      * privateFrom : Enclave public key
      * privateFor : Enclave keys to send the transaction to
+     * privacyGroupId : Enclave id representing the receivers of the transaction
      * nonce(Optional) : If not provided, will be calculated using `eea_getTransctionCount`
      * to : The address to send the transaction
      * data : Data to be sent in the transaction
@@ -213,10 +218,13 @@ function EEAClient(web3, chainId) {
      * @returns {Promise<AxiosResponse<any> | never>}
      */
     sendRawTransaction: options => {
+      if (options.privacyGroupId && options.privateFor) {
+        throw Error("privacyGroupId and privateFor are mutually exclusive");
+      }
       const tx = new PrivateTransaction();
       const privateKeyBuffer = Buffer.from(options.privateKey, "hex");
       const from = `0x${privateToAddress(privateKeyBuffer).toString("hex")}`;
-      return web3.eea
+      return web3.priv
         .getTransactionCount({
           from,
           privateFrom: options.privateFrom,

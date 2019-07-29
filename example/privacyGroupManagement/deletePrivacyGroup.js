@@ -13,7 +13,7 @@ const deletePrivacyGroup = givenPrivacyGroupId => {
     privacyGroupId: givenPrivacyGroupId,
     privateFrom: orion.node1.publicKey
   };
-  return web3.eea.deletePrivacyGroup(contractOptions).then(result => {
+  return web3.priv.deletePrivacyGroup(contractOptions).then(result => {
     console.log(`The privacy group deleted is:`, result);
     return result;
   });

@@ -775,7 +775,14 @@ exports.defineProperties = function(self, fields, data) {
     }
 
     if (Array.isArray(data)) {
-      if (data.length > self._fields.length) {
+      if (data.length === 12) {
+        if (data[10].constructor === Array) {
+          data.splice(11, 0, "");
+        } else {
+          data.splice(10, 0, []);
+        }
+      }
+      if (data.length !== self._fields.length) {
         throw new Error("wrong number of fields in data");
       }
 

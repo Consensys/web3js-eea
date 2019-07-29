@@ -48,6 +48,7 @@ const N_DIV_2 = new BN(
  * @param {Buffer} data.s EC signature parameter
  * @param {Buffer} data.privateFrom The enclave public key of the sender
  * @param {Array<Buffer>} data.privateFor The enclave public keys of the receivers
+ * @param {Buffer} data.privacyGroupId The enclave id representing the group of receivers
  * @param {Buffer} data.restriction The transaction type - "restricted" or "unrestricted"
  * @param {Number} data.chainId EIP 155 chainId - mainnet: 1, ropsten:
  * */
