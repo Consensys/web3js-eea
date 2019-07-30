@@ -37,14 +37,13 @@
   },
   "homepage": "https://github.com/PegaSysEng/eeajs#readme",
   "dependencies": {
-    "axios": "^0.18.0",
     "ethereumjs-tx": "^1.3.7",
+    "lodash": "^4.17.15",
     "rlp": "^2.2.3",
-    "web3": "^1.2.0",
-    "lodash": "^4.17.11"
+    "web3": "^1.2.0"
   },
   "devDependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.18.1",
     "babel-eslint": "^10.0.1",
     "dotenv": "^8.0.0",
     "eslint": "^5.16.0",
