@@ -141,12 +141,7 @@ function EEAClient(web3, chainId) {
     const payload = {
       jsonrpc: "2.0",
       method: "priv_createPrivacyGroup",
-      params: [
-        options.privateFrom,
-        options.name,
-        options.description,
-        options.addresses
-      ],
+      params: [options.name, options.description, options.addresses],
       id: 1
     };
 
@@ -164,7 +159,7 @@ function EEAClient(web3, chainId) {
     const payload = {
       jsonrpc: "2.0",
       method: "priv_deletePrivacyGroup",
-      params: [options.privateFrom, options.privacyGroupId],
+      params: [options.privacyGroupId],
       id: 1
     };
 
