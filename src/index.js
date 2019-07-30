@@ -141,13 +141,22 @@ function EEAClient(web3, chainId) {
     const payload = {
       jsonrpc: "2.0",
       method: "priv_createPrivacyGroup",
-      params: [options.name, options.description, options.addresses],
+      params: [options.addresses, options.name, options.description],
       id: 1
     };
 
-    return axios.post(host, payload).then(result => {
-      return result.data.result;
-    });
+    return axios
+      .post(host, payload)
+      .then(result => {
+        return result.data.result;
+      })
+      .catch(error => {
+        if (error.response) {
+          throw JSON.stringify(error.response.data);
+        } else {
+          throw error;
+        }
+      });
   };
 
   /**
