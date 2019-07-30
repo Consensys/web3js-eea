@@ -1,6 +1,6 @@
 {
   "name": "web3-eea",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "EEA JSON-RPC API",
   "main": "src/index.js",
   "scripts": {
