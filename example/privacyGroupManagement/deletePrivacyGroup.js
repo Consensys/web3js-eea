@@ -1,13 +1,12 @@
 const Web3 = require("web3");
 const EEAClient = require("../../src");
-const { orion, pantheon } = require("../keys.js");
+const { pantheon } = require("../keys.js");
 
 const web3 = new EEAClient(new Web3(pantheon.node1.url), 2018);
 
 const deletePrivacyGroup = givenPrivacyGroupId => {
   const contractOptions = {
-    privacyGroupId: givenPrivacyGroupId,
-    privateFrom: orion.node1.publicKey
+    privacyGroupId: givenPrivacyGroupId
   };
   return web3.priv.deletePrivacyGroup(contractOptions).then(result => {
     console.log(`The privacy group deleted is:`, result);

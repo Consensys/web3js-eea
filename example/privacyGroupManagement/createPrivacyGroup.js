@@ -7,7 +7,6 @@ const web3 = new EEAClient(new Web3(pantheon.node1.url), 2018);
 const createPrivacyGroup = () => {
   const contractOptions = {
     addresses: [orion.node1.publicKey, orion.node2.publicKey],
-    privateFrom: orion.node1.publicKey,
     name: "web3js-eea",
     description: "test"
   };
@@ -24,7 +23,6 @@ const createPrivacyGroupForNode123 = () => {
       orion.node2.publicKey,
       orion.node3.publicKey
     ],
-    privateFrom: orion.node1.publicKey,
     name: "web3js-eea",
     description: "test"
   };
