@@ -16,7 +16,7 @@ const web3 = new EEAClient(new Web3("http://localhost:20000"), 2018);
 const contract = new web3.eth.Contract(HumanStandardTokenAbi);
 
 // create HumanStandardToken constructor
-// eslint-disable-next-line no-underscore-dangl
+// eslint-disable-next-line no-underscore-dangle
 const constructorAbi = contract._jsonInterface.find(e => {
   return e.type === "constructor";
 });
@@ -56,6 +56,7 @@ web3.eea
     // contract.methods.transfer(["to", "value"]).send(??)
 
     // already 0x prefixed
+    // eslint-disable-next-line no-underscore-dangle
     const functionAbi = contract._jsonInterface.find(element => {
       return element.name === "transfer";
     });

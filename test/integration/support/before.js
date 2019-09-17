@@ -46,7 +46,7 @@ const runPrivacyQuickstart = () => {
   return exec("cd pantheon-quickstart/privacy && ./run.sh").then(logOutput);
 };
 
-const waitForPantheon = () => {
+const waitForBesu = () => {
   return axios.get("http://localhost:20000", {
     retry: 60 * 5,
     retryDelay: 1000
@@ -56,11 +56,9 @@ const waitForPantheon = () => {
 prepareDirectory()
   .then(cloneQuickStart)
   .then(runPrivacyQuickstart)
-  .then(waitForPantheon)
+  .then(waitForBesu)
   .then(() => {
     // eslint-disable-next-line promise/no-return-wrap
-    return Promise.resolve(
-      console.log("Finished: Pantheon Network is Running")
-    );
+    return Promise.resolve(console.log("Finished: Besu Network is Running"));
   })
   .catch(console.error);

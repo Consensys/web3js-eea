@@ -94,5 +94,4 @@ bigger changes should contain more detail.
 * Reference issues and pull requests liberally
 
 [private@pegasys.tech]: mailto:private@pegasys.tech
-[Gitter]: https://gitter.im/PegaSysEng/pantheon
 [CLA.md]: /CLA.md

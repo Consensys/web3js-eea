@@ -207,8 +207,8 @@ function EEAClient(web3, chainId) {
   // eslint-disable-next-line no-param-reassign
   web3.eea = {
     /**
-     * Send the Raw transaction to the Pantheon node
-     * @param options Map to send a raw transction to pantheon
+     * Send the Raw transaction to the Besu node
+     * @param options Map to send a raw transction to Besu
      * options map can contain the following:
      * privateKey : Private Key used to sign transaction with
      * privateFrom : Enclave public key
