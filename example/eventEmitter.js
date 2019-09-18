@@ -13,7 +13,7 @@ const binary = fs.readFileSync(
 );
 
 const web3 = new EEAClient(new Web3(pantheon.node1.url), 2018);
-web3.eth.Contract(EventEmitterAbi);
+new web3.eth.Contract(EventEmitterAbi);
 
 const createPrivateEmitterContract = () => {
   const contractOptions = {
