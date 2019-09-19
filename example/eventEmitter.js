@@ -27,7 +27,7 @@ const createPrivateEmitterContract = () => {
 
 const getPrivateContractAddress = transactionHash => {
   console.log("Transaction Hash ", transactionHash);
-  return web3.eea
+  return web3.priv
     .getTransactionReceipt(transactionHash, orion.node1.publicKey)
     .then(privateTransactionReceipt => {
       console.log("Private Transaction Receipt\n", privateTransactionReceipt);
@@ -69,7 +69,7 @@ const getValue = contractAddress => {
   return web3.eea
     .sendRawTransaction(functionCall)
     .then(transactionHash => {
-      return web3.eea.getTransactionReceipt(
+      return web3.priv.getTransactionRecipt(
         transactionHash,
         orion.node1.publicKey
       );
@@ -81,7 +81,7 @@ const getValue = contractAddress => {
 };
 
 const getPrivateTransactionReceipt = transactionHash => {
-  return web3.eea
+  return web3.priv
     .getTransactionReceipt(transactionHash, orion.node1.publicKey)
     .then(result => {
       console.log("Transaction Hash:", transactionHash);

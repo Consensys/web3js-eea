@@ -40,7 +40,7 @@ web3.eea
   .sendRawTransaction(contractOptions)
   .then(hash => {
     console.log(`Transaction Hash ${hash}`);
-    return web3.eea.getTransactionReceipt(
+    return web3.priv.getTransactionRecipt(
       hash,
       "A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo="
     );
@@ -82,7 +82,7 @@ web3.eea
   })
   .then(transactionHash => {
     console.log(`Transaction Hash ${transactionHash}`);
-    return web3.eea.getTransactionReceipt(
+    return web3.priv.getTransactionRecipt(
       transactionHash,
       "A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo="
     );
