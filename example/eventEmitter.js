@@ -69,7 +69,7 @@ const getValue = contractAddress => {
   return web3.eea
     .sendRawTransaction(functionCall)
     .then(transactionHash => {
-      return web3.priv.getTransactionRecipt(
+      return web3.priv.getTransactionReceipt(
         transactionHash,
         orion.node1.publicKey
       );
