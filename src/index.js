@@ -141,7 +141,13 @@ function EEAClient(web3, chainId) {
     const payload = {
       jsonrpc: "2.0",
       method: "priv_createPrivacyGroup",
-      params: [options.addresses, options.name, options.description],
+      params: [
+        {
+          addresses: options.addresses,
+          name: options.name,
+          description: options.description
+        }
+      ],
       id: 1
     };
 
