@@ -8,13 +8,13 @@ const logOutput = ({ stdout, stderr }) => {
 };
 
 const stopPrivacyQuickstart = () => {
-  return exec(
-    "cd pantheon-quickstart/privacy && ./stop.sh && ./remove.sh"
-  ).then(logOutput);
+  return exec("cd besu-quickstart/privacy && ./stop.sh && ./remove.sh").then(
+    logOutput
+  );
 };
 
 const removeDirectory = () => {
-  return exec("rm -Rf pantheon-quickstart");
+  return exec("rm -Rf besu-quickstart");
 };
 
 stopPrivacyQuickstart()
