@@ -14,6 +14,7 @@ const binary = fs.readFileSync(
 );
 
 const web3 = new EEAClient(new Web3(pantheon.node1.url), 2018);
+const web3Node2 = new EEAClient(new Web3(pantheon.node2.url), 2018);
 
 const createGroupId = () => {
   return createGroup.createPrivacyGroup();
@@ -29,41 +30,71 @@ const distributeRawContractCreation = privacyGroupId => {
   return web3.priv.distributeRawTransaction(contractOptions);
 };
 
-const generatePrivateMarkerTransaction = enclaveKey => {
-  // const markerTransactionDetails = {
-  //   privateFrom: orion.node1.publicKey,
-  //
-  // }
+const sendPrivacyMarkerTransaction = enclaveKey => {
+  return new Promise((resolve, reject) => {
+    const pantheonAccount = web3.eth.accounts.privateKeyToAccount(
+      `0x${pantheon.node1.privateKey}`
+    );
+    web3.eth
+      .getTransactionCount(pantheonAccount.address, "pending")
+      .then(count => {
+        const rawTx = {
+          nonce: web3.utils.numberToHex(count),
+          from: pantheonAccount.address,
+          to: "0x000000000000000000000000000000000000007e",
+          value: 0,
+          data: enclaveKey,
+          gasPrice: "0xFFFF",
+          gasLimit: "0xFFFF"
+        };
+        const tx = new Tx(rawTx);
+        tx.sign(Buffer.from(pantheon.node1.privateKey, "hex"));
+        const serializedTx = tx.serialize();
+        return web3.eth
+          .sendSignedTransaction(`0x${serializedTx.toString("hex")}`)
+          .on("receipt", r => {
+            resolve(r);
+          });
+      })
+      .catch(e => {
+        reject(e);
+      });
+  });
+};
 
-  const pantheonAccount = web3.eth.accounts.privateKeyToAccount(
-    pantheon.node1.privateKey
-  );
-  const rawTx = {
-    from: pantheonAccount.address,
-    to: "0x000000000000000000000000000000000000007e",
-    value: 0,
-    data: enclaveKey,
-    nonce: "0x00",
-    gasPrice: "0x09184e72a000",
-    gasLimit: "0xFFFF"
-  };
+const getTransactionReceipts = txHash => {
+  return new Promise((resolve, reject) => {
+    web3Node2.eth
+      .getTransactionReceipt(txHash)
+      .then(resolve)
+      .catch(reject);
+  });
+};
 
-  const tx = new Tx(rawTx);
-  tx.sign(new Buffer(pantheon.node1.privateKey, "hex"));
-
-  const serializedTx = tx.serialize();
-  web3.eth
-    .sendSignedTransaction(`0x${serializedTx.toString("hex")}`)
-    .on("receipt", console.log);
+const fetchFromOrion = txHash => {
+  console.log(txHash);
+  console.log("here");
+  web3.eea
+    .getTransactionReceipt(txHash)
+    .then(console.log)
+    .catch(console.error);
+  web3Node2.eea
+    .getTransactionReceipt(txHash)
+    .then(console.log)
+    .catch(console.error);
 };
 
 module.exports = async () => {
   const privacyGroupId = await createGroupId();
   const enclaveKey = await distributeRawContractCreation(privacyGroupId);
-  const privacyMarkerTransactionHash = await generatePrivateMarkerTransaction(
+  const privacyMarkerTransactionResult = await sendPrivacyMarkerTransaction(
     enclaveKey
   );
-  console.log(privacyMarkerTransactionHash);
+  await getTransactionReceipts(privacyMarkerTransactionResult.transactionHash).then(console.log);
+
+  setTimeout(() => {
+    fetchFromOrion(privacyMarkerTransactionResult.transactionHash);
+  }, 10000);
 };
 
 if (require.main === module) {
