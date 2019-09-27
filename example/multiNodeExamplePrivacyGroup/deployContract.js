@@ -30,7 +30,7 @@ const createPrivateEmitterContract = privacyGroupId => {
 
 const getPrivateContractAddress = transactionHash => {
   console.log("Transaction Hash ", transactionHash);
-  return web3.eea
+  return web3.priv
     .getTransactionReceipt(transactionHash, orion.node1.publicKey)
     .then(privateTransactionReceipt => {
       console.log("Private Transaction Receipt\n", privateTransactionReceipt);

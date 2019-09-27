@@ -33,17 +33,17 @@ const logOutput = ({ stdout, stderr }) => {
 };
 
 const prepareDirectory = () => {
-  return exec("rm -Rf pantheon-quickstart");
+  return exec("rm -Rf besu-quickstart");
 };
 
 const cloneQuickStart = () => {
   return exec(
-    "git clone https://github.com/PegaSysEng/pantheon-quickstart.git"
+    "git clone https://github.com/PegaSysEng/besu-quickstart.git"
   ).then(logOutput);
 };
 
 const runPrivacyQuickstart = () => {
-  return exec("cd pantheon-quickstart/privacy && ./run.sh").then(logOutput);
+  return exec("cd besu-quickstart/privacy && ./run.sh").then(logOutput);
 };
 
 const waitForBesu = () => {
