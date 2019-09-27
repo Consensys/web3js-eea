@@ -201,13 +201,69 @@ function EEAClient(web3, chainId) {
     });
   };
 
+  const distributeRawTransaction = options => {
+    if (options.privacyGroupId && options.privateFor) {
+      throw Error("privacyGroupId and privateFor are mutually exclusive");
+    }
+    const tx = new PrivateTransaction();
+    const privateKeyBuffer = Buffer.from(options.privateKey, "hex");
+    const from = `0x${privateToAddress(privateKeyBuffer).toString("hex")}`;
+    return web3.priv
+      .getTransactionCount({
+        from,
+        privateFrom: options.privateFrom,
+        privateFor: options.privateFor,
+        privacyGroupId: options.privacyGroupId
+      })
+      .then(transactionCount => {
+        tx.nonce = options.nonce || transactionCount;
+        tx.gasPrice = GAS_PRICE;
+        tx.gasLimit = GAS_LIMIT;
+        tx.to = options.to;
+        tx.value = 0;
+        tx.data = options.data;
+        // eslint-disable-next-line no-underscore-dangle
+        tx._chainId = chainId;
+        tx.privateFrom = options.privateFrom;
+
+        if (options.privateFor) {
+          tx.privateFor = options.privateFor;
+        }
+        if (options.privacyGroupId) {
+          tx.privacyGroupId = options.privacyGroupId;
+        }
+        tx.restriction = "restricted";
+        tx.sign(privateKeyBuffer);
+
+        const signedRlpEncoded = tx.serialize().toString("hex");
+
+        return axios.post(host, {
+          jsonrpc: "2.0",
+          method: "priv_distributeRawTransaction",
+          params: [signedRlpEncoded],
+          id: 1
+        });
+      })
+      .then(result => {
+        return result.data.result;
+      })
+      .catch(error => {
+        if (error.response) {
+          throw JSON.stringify(error.response.data);
+        } else {
+          throw error;
+        }
+      });
+  }
+
   // eslint-disable-next-line no-param-reassign
   web3.priv = {
     generatePrivacyGroup,
     createPrivacyGroup,
     deletePrivacyGroup,
     findPrivacyGroup,
-    getTransactionCount
+    getTransactionCount,
+    distributeRawTransaction
   };
 
   // eslint-disable-next-line no-param-reassign
