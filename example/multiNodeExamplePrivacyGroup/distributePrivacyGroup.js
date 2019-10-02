@@ -74,15 +74,19 @@ const getTransactionReceipts = txHash => {
 };
 
 const fetchFromOrion = txHash => {
-  console.log(txHash);
-  console.log("here");
-  web3.eea
+  web3.priv
     .getTransactionReceipt(txHash, orion.node1.publicKey)
-    .then(console.log)
+    .then(result => {
+      console.log("Got transaction receipt from orion node 1");
+      return console.log(result);
+    })
     .catch(console.error);
-  web3Node2.eea
+  web3Node2.priv
     .getTransactionReceipt(txHash, orion.node2.publicKey)
-    .then(console.log)
+    .then(result => {
+      console.log("Got transaction receipt from orion node 2");
+      return console.log(result);
+    })
     .catch(console.error);
 };
 
@@ -99,7 +103,7 @@ module.exports = async () => {
 
   setTimeout(() => {
     fetchFromOrion(privacyMarkerTransactionResult.transactionHash);
-  }, 10000);
+  }, 1000);
 };
 
 if (require.main === module) {
