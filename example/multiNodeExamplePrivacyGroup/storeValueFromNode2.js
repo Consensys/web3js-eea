@@ -9,7 +9,7 @@ const storeValueFromNode2 = (address, value, privacyGroupId) => {
   const web3 = new EEAClient(new Web3(pantheon.node2.url), 2018);
   const contract = new web3.eth.Contract(EventEmitterAbi);
 
-  // eslint-disable-next-line no-underscore-dangl
+  // eslint-disable-next-line no-underscore-dangle
   const functionAbi = contract._jsonInterface.find(e => {
     return e.name === "store";
   });
@@ -28,7 +28,7 @@ const storeValueFromNode2 = (address, value, privacyGroupId) => {
     .sendRawTransaction(functionCall)
     .then(transactionHash => {
       console.log("Transaction Hash:", transactionHash);
-      return web3.eea.getTransactionReceipt(
+      return web3.priv.getTransactionReceipt(
         transactionHash,
         orion.node2.publicKey
       );
@@ -43,7 +43,7 @@ const getValue = (url, address, privateFrom, privacyGroupId, privateKey) => {
   const web3 = new EEAClient(new Web3(url), 2018);
   const contract = new web3.eth.Contract(EventEmitterAbi);
 
-  // eslint-disable-next-line no-underscore-dangl
+  // eslint-disable-next-line no-underscore-dangle
   const functionAbi = contract._jsonInterface.find(e => {
     return e.name === "value";
   });
@@ -59,7 +59,7 @@ const getValue = (url, address, privateFrom, privacyGroupId, privateKey) => {
   return web3.eea
     .sendRawTransaction(functionCall)
     .then(transactionHash => {
-      return web3.eea.getTransactionReceipt(
+      return web3.priv.getTransactionReceipt(
         transactionHash,
         orion.node1.publicKey
       );

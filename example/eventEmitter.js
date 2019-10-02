@@ -13,6 +13,7 @@ const binary = fs.readFileSync(
 );
 
 const web3 = new EEAClient(new Web3(pantheon.node1.url), 2018);
+// eslint-disable-next-line no-new
 new web3.eth.Contract(EventEmitterAbi);
 
 const createPrivateEmitterContract = () => {
@@ -27,7 +28,7 @@ const createPrivateEmitterContract = () => {
 
 const getPrivateContractAddress = transactionHash => {
   console.log("Transaction Hash ", transactionHash);
-  return web3.eea
+  return web3.priv
     .getTransactionReceipt(transactionHash, orion.node1.publicKey)
     .then(privateTransactionReceipt => {
       console.log("Private Transaction Receipt\n", privateTransactionReceipt);
@@ -69,7 +70,7 @@ const getValue = contractAddress => {
   return web3.eea
     .sendRawTransaction(functionCall)
     .then(transactionHash => {
-      return web3.eea.getTransactionReceipt(
+      return web3.priv.getTransactionReceipt(
         transactionHash,
         orion.node1.publicKey
       );
@@ -81,7 +82,7 @@ const getValue = contractAddress => {
 };
 
 const getPrivateTransactionReceipt = transactionHash => {
-  return web3.eea
+  return web3.priv
     .getTransactionReceipt(transactionHash, orion.node1.publicKey)
     .then(result => {
       console.log("Transaction Hash:", transactionHash);

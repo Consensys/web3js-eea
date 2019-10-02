@@ -31,6 +31,7 @@ const distributeRawContractCreation = privacyGroupId => {
 };
 
 const sendPrivacyMarkerTransaction = enclaveKey => {
+  // eslint-disable-next-line promise/avoid-new
   return new Promise((resolve, reject) => {
     const pantheonAccount = web3.eth.accounts.privateKeyToAccount(
       `0x${pantheon.node1.privateKey}`
@@ -44,8 +45,8 @@ const sendPrivacyMarkerTransaction = enclaveKey => {
           to: "0x000000000000000000000000000000000000007e",
           value: 0,
           data: enclaveKey,
-          gasPrice: "0xFFFF",
-          gasLimit: "0xFFFF"
+          gasPrice: "0xFFFFF",
+          gasLimit: "0xFFFFF"
         };
         const tx = new Tx(rawTx);
         tx.sign(Buffer.from(pantheon.node1.privateKey, "hex"));
@@ -63,6 +64,7 @@ const sendPrivacyMarkerTransaction = enclaveKey => {
 };
 
 const getTransactionReceipts = txHash => {
+  // eslint-disable-next-line promise/avoid-new
   return new Promise((resolve, reject) => {
     web3Node2.eth
       .getTransactionReceipt(txHash)
@@ -75,11 +77,11 @@ const fetchFromOrion = txHash => {
   console.log(txHash);
   console.log("here");
   web3.eea
-    .getTransactionReceipt(txHash)
+    .getTransactionReceipt(txHash, orion.node1.publicKey)
     .then(console.log)
     .catch(console.error);
   web3Node2.eea
-    .getTransactionReceipt(txHash)
+    .getTransactionReceipt(txHash, orion.node2.publicKey)
     .then(console.log)
     .catch(console.error);
 };
@@ -87,10 +89,13 @@ const fetchFromOrion = txHash => {
 module.exports = async () => {
   const privacyGroupId = await createGroupId();
   const enclaveKey = await distributeRawContractCreation(privacyGroupId);
+  console.log(`Enclave key: ${enclaveKey}`);
   const privacyMarkerTransactionResult = await sendPrivacyMarkerTransaction(
     enclaveKey
   );
-  await getTransactionReceipts(privacyMarkerTransactionResult.transactionHash).then(console.log);
+  await getTransactionReceipts(
+    privacyMarkerTransactionResult.transactionHash
+  ).then(console.log);
 
   setTimeout(() => {
     fetchFromOrion(privacyMarkerTransactionResult.transactionHash);

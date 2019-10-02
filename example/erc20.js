@@ -16,7 +16,7 @@ const web3 = new EEAClient(new Web3("http://localhost:20000"), 2018);
 const contract = new web3.eth.Contract(HumanStandardTokenAbi);
 
 // create HumanStandardToken constructor
-// eslint-disable-next-line no-underscore-dangl
+// eslint-disable-next-line no-underscore-dangle
 const constructorAbi = contract._jsonInterface.find(e => {
   return e.type === "constructor";
 });
@@ -40,7 +40,7 @@ web3.eea
   .sendRawTransaction(contractOptions)
   .then(hash => {
     console.log(`Transaction Hash ${hash}`);
-    return web3.eea.getTransactionReceipt(
+    return web3.priv.getTransactionReceipt(
       hash,
       "A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo="
     );
@@ -56,6 +56,7 @@ web3.eea
     // contract.methods.transfer(["to", "value"]).send(??)
 
     // already 0x prefixed
+    // eslint-disable-next-line no-underscore-dangle
     const functionAbi = contract._jsonInterface.find(element => {
       return element.name === "transfer";
     });
@@ -82,7 +83,7 @@ web3.eea
   })
   .then(transactionHash => {
     console.log(`Transaction Hash ${transactionHash}`);
-    return web3.eea.getTransactionReceipt(
+    return web3.priv.getTransactionReceipt(
       transactionHash,
       "A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo="
     );
