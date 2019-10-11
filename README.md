@@ -12,7 +12,7 @@ See our [contribution guidelines](CONTRIBUTING.md) for more detail on searching 
 
 ## Using 
 
-The Pantheon documentation describes how to [use the web3.js libraries](https://docs.pantheon.pegasys.tech/en/stable/Privacy/Private-Transactions/eeajs/). 
+The Besu documentation describes how to [use the web3.js libraries](https://besu.hyperledger.org/en/latest/Reference/web3js-eea-Methods/). 
 
 ## Developing
 
