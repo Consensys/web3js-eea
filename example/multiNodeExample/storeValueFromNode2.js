@@ -3,13 +3,13 @@ const EEAClient = require("../../src");
 const EventEmitterAbi = require("../solidity/EventEmitter/EventEmitter.json")
   .output.abi;
 
-const { orion, pantheon } = require("../keys.js");
+const { orion, besu } = require("../keys.js");
 
 const storeValueFromNode2 = (address, value) => {
-  const web3 = new EEAClient(new Web3(pantheon.node2.url), 2018);
+  const web3 = new EEAClient(new Web3(besu.node2.url), 2018);
   const contract = new web3.eth.Contract(EventEmitterAbi);
 
-  // eslint-disable-next-line no-underscore-dangl
+  // eslint-disable-next-line no-underscore-dangle
   const functionAbi = contract._jsonInterface.find(e => {
     return e.name === "store";
   });
@@ -22,7 +22,7 @@ const storeValueFromNode2 = (address, value) => {
     data: functionAbi.signature + functionArgs,
     privateFrom: orion.node2.publicKey,
     privateFor: [orion.node1.publicKey],
-    privateKey: pantheon.node2.privateKey
+    privateKey: besu.node2.privateKey
   };
   return web3.eea
     .sendRawTransaction(functionCall)
@@ -43,7 +43,7 @@ const getValue = (url, address, privateFrom, privateFor, privateKey) => {
   const web3 = new EEAClient(new Web3(url), 2018);
   const contract = new web3.eth.Contract(EventEmitterAbi);
 
-  // eslint-disable-next-line no-underscore-dangl
+  // eslint-disable-next-line no-underscore-dangle
   const functionAbi = contract._jsonInterface.find(e => {
     return e.name === "value";
   });
@@ -72,31 +72,31 @@ const getValue = (url, address, privateFrom, privateFor, privateKey) => {
 
 const getValueFromNode1 = address => {
   return getValue(
-    pantheon.node1.url,
+    besu.node1.url,
     address,
     orion.node1.publicKey,
     [orion.node2.publicKey],
-    pantheon.node1.privateKey
+    besu.node1.privateKey
   );
 };
 
 const getValueFromNode2 = address => {
   return getValue(
-    pantheon.node2.url,
+    besu.node2.url,
     address,
     orion.node2.publicKey,
     [orion.node1.publicKey],
-    pantheon.node2.privateKey
+    besu.node2.privateKey
   );
 };
 
 const getValueFromNode3 = address => {
   return getValue(
-    pantheon.node3.url,
+    besu.node3.url,
     address,
     orion.node3.publicKey,
     [orion.node1.publicKey],
-    pantheon.node3.privateKey
+    besu.node3.privateKey
   );
 };
 
