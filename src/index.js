@@ -15,6 +15,61 @@ function EEAClient(web3, chainId) {
     throw Error("Only supports http");
   }
 
+  const genericSendRawTransaction = (options, method) => {
+    if (options.privacyGroupId && options.privateFor) {
+      throw Error("privacyGroupId and privateFor are mutually exclusive");
+    }
+    const tx = new PrivateTransaction();
+    const privateKeyBuffer = Buffer.from(options.privateKey, "hex");
+    const from = `0x${privateToAddress(privateKeyBuffer).toString("hex")}`;
+    return web3.priv
+      .getTransactionCount({
+        from,
+        privateFrom: options.privateFrom,
+        privateFor: options.privateFor,
+        privacyGroupId: options.privacyGroupId
+      })
+      .then(transactionCount => {
+        tx.nonce = options.nonce || transactionCount;
+        tx.gasPrice = GAS_PRICE;
+        tx.gasLimit = GAS_LIMIT;
+        tx.to = options.to;
+        tx.value = 0;
+        tx.data = options.data;
+        // eslint-disable-next-line no-underscore-dangle
+        tx._chainId = chainId;
+        tx.privateFrom = options.privateFrom;
+
+        if (options.privateFor) {
+          tx.privateFor = options.privateFor;
+        }
+        if (options.privacyGroupId) {
+          tx.privacyGroupId = options.privacyGroupId;
+        }
+        tx.restriction = "restricted";
+        tx.sign(privateKeyBuffer);
+
+        const signedRlpEncoded = tx.serialize().toString("hex");
+
+        return axios.post(host, {
+          jsonrpc: "2.0",
+          method,
+          params: [signedRlpEncoded],
+          id: 1
+        });
+      })
+      .then(result => {
+        return result.data.result;
+      })
+      .catch(error => {
+        if (error.response) {
+          throw JSON.stringify(error.response.data);
+        } else {
+          throw error;
+        }
+      });
+  };
+
   /**
    * Returns the Private Marker transaction
    * @param {string} txHash The transaction hash
@@ -202,58 +257,7 @@ function EEAClient(web3, chainId) {
   };
 
   const distributeRawTransaction = options => {
-    if (options.privacyGroupId && options.privateFor) {
-      throw Error("privacyGroupId and privateFor are mutually exclusive");
-    }
-    const tx = new PrivateTransaction();
-    const privateKeyBuffer = Buffer.from(options.privateKey, "hex");
-    const from = `0x${privateToAddress(privateKeyBuffer).toString("hex")}`;
-    return web3.priv
-      .getTransactionCount({
-        from,
-        privateFrom: options.privateFrom,
-        privateFor: options.privateFor,
-        privacyGroupId: options.privacyGroupId
-      })
-      .then(transactionCount => {
-        tx.nonce = options.nonce || transactionCount;
-        tx.gasPrice = GAS_PRICE;
-        tx.gasLimit = GAS_LIMIT;
-        tx.to = options.to;
-        tx.value = 0;
-        tx.data = options.data;
-        // eslint-disable-next-line no-underscore-dangle
-        tx._chainId = chainId;
-        tx.privateFrom = options.privateFrom;
-
-        if (options.privateFor) {
-          tx.privateFor = options.privateFor;
-        }
-        if (options.privacyGroupId) {
-          tx.privacyGroupId = options.privacyGroupId;
-        }
-        tx.restriction = "restricted";
-        tx.sign(privateKeyBuffer);
-
-        const signedRlpEncoded = tx.serialize().toString("hex");
-
-        return axios.post(host, {
-          jsonrpc: "2.0",
-          method: "priv_distributeRawTransaction",
-          params: [signedRlpEncoded],
-          id: 1
-        });
-      })
-      .then(result => {
-        return result.data.result;
-      })
-      .catch(error => {
-        if (error.response) {
-          throw JSON.stringify(error.response.data);
-        } else {
-          throw error;
-        }
-      });
+    return genericSendRawTransaction(options, "priv_distributeRawTransaction");
   };
 
   /**
@@ -295,76 +299,27 @@ function EEAClient(web3, chainId) {
     getTransactionReceipt
   };
 
+  /**
+   * Send the Raw transaction to the Pantheon node
+   * @param options Map to send a raw transction to pantheon
+   * options map can contain the following:
+   * privateKey : Private Key used to sign transaction with
+   * privateFrom : Enclave public key
+   * privateFor : Enclave keys to send the transaction to
+   * privacyGroupId : Enclave id representing the receivers of the transaction
+   * nonce(Optional) : If not provided, will be calculated using `eea_getTransctionCount`
+   * to : The address to send the transaction
+   * data : Data to be sent in the transaction
+   *
+   * @returns {Promise<AxiosResponse<any> | never>}
+   */
+  const sendRawTransaction = options => {
+    return genericSendRawTransaction(options, "eea_sendRawTransaction");
+  };
+
   // eslint-disable-next-line no-param-reassign
   web3.eea = {
-    /**
-     * Send the Raw transaction to the Pantheon node
-     * @param options Map to send a raw transction to pantheon
-     * options map can contain the following:
-     * privateKey : Private Key used to sign transaction with
-     * privateFrom : Enclave public key
-     * privateFor : Enclave keys to send the transaction to
-     * privacyGroupId : Enclave id representing the receivers of the transaction
-     * nonce(Optional) : If not provided, will be calculated using `eea_getTransctionCount`
-     * to : The address to send the transaction
-     * data : Data to be sent in the transaction
-     *
-     * @returns {Promise<AxiosResponse<any> | never>}
-     */
-    sendRawTransaction: options => {
-      if (options.privacyGroupId && options.privateFor) {
-        throw Error("privacyGroupId and privateFor are mutually exclusive");
-      }
-      const tx = new PrivateTransaction();
-      const privateKeyBuffer = Buffer.from(options.privateKey, "hex");
-      const from = `0x${privateToAddress(privateKeyBuffer).toString("hex")}`;
-      return web3.priv
-        .getTransactionCount({
-          from,
-          privateFrom: options.privateFrom,
-          privateFor: options.privateFor,
-          privacyGroupId: options.privacyGroupId
-        })
-        .then(transactionCount => {
-          tx.nonce = options.nonce || transactionCount;
-          tx.gasPrice = GAS_PRICE;
-          tx.gasLimit = GAS_LIMIT;
-          tx.to = options.to;
-          tx.value = 0;
-          tx.data = options.data;
-          // eslint-disable-next-line no-underscore-dangle
-          tx._chainId = chainId;
-          tx.privateFrom = options.privateFrom;
-
-          if (options.privateFor) {
-            tx.privateFor = options.privateFor;
-          }
-          if (options.privacyGroupId) {
-            tx.privacyGroupId = options.privacyGroupId;
-          }
-          tx.restriction = "restricted";
-          tx.sign(privateKeyBuffer);
-
-          const signedRlpEncoded = tx.serialize().toString("hex");
-
-          return axios.post(host, {
-            jsonrpc: "2.0",
-            method: "eea_sendRawTransaction",
-            params: [signedRlpEncoded],
-            id: 1
-          });
-        })
-        .then(result => {
-          return result.data.result;
-        })
-        .catch(error => {
-          if (error.response) {
-            throw JSON.stringify(error.response.data);
-          } else {
-            throw error;
-          }
-        });
-    }
+    sendRawTransaction
   };
 
   return web3;
