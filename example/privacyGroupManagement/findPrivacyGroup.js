@@ -1,8 +1,8 @@
 const Web3 = require("web3");
 const EEAClient = require("../../src");
-const { orion, pantheon } = require("../keys.js");
+const { orion, besu } = require("../keys.js");
 
-const web3 = new EEAClient(new Web3(pantheon.node1.url), 2018);
+const web3 = new EEAClient(new Web3(besu.node1.url), 2018);
 
 const findPrivacyGroup = () => {
   const contractOptions = {

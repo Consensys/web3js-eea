@@ -1,0 +1,30 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/web3js-eea
+    docker:
+    - image: docker:dind
+    steps:
+    - run:
+        name: install system dependencies
+        command: apk add git nodejs npm python make gcc g++ bash docker-compose curl
+    - checkout
+    - restore_cache:
+        key: dependency-cache-{{ checksum "package-lock.json" }}
+    - run:
+        name: install-npm
+        command: npm install
+    - save_cache:
+        key: dependency-cache-{{ checksum "package-lock.json" }}
+        paths:
+        - ./node_modules
+    - setup_remote_docker
+    - run:
+        name: test
+        command: npm test
+workflows:
+  version: 2
+  workflow:
+    jobs:
+    - build
+

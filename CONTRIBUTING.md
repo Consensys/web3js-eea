@@ -28,7 +28,7 @@ you are agreeing to uphold this code. Please report unacceptable behavior. Pleas
 > **Note:** Please don't file an issue to ask a question.  You'll get faster results by using the resources below.
 
 * [Documentation](https://docs.pantheon.pegasys.tech/en/stable/Privacy/Private-Transactions/eeajs/)
-* [Gitter]
+* [RocketChat]
 
 ## How to Contribute
 
@@ -94,5 +94,5 @@ bigger changes should contain more detail.
 * Reference issues and pull requests liberally
 
 [private@pegasys.tech]: mailto:private@pegasys.tech
-[Gitter]: https://gitter.im/PegaSysEng/pantheon
 [CLA.md]: /CLA.md
+[RocketChat]: https://chat.hyperledger.org/channel/besu

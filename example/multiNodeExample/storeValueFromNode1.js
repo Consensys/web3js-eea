@@ -3,10 +3,10 @@ const EEAClient = require("../../src");
 const EventEmitterAbi = require("../solidity/EventEmitter/EventEmitter.json")
   .output.abi;
 
-const { orion, pantheon } = require("../keys.js");
+const { orion, besu } = require("../keys.js");
 
 const storeValueFromNode1 = (address, value) => {
-  const web3 = new EEAClient(new Web3(pantheon.node1.url), 2018);
+  const web3 = new EEAClient(new Web3(besu.node1.url), 2018);
   const contract = new web3.eth.Contract(EventEmitterAbi);
 
   // eslint-disable-next-line no-underscore-dangle
@@ -22,7 +22,7 @@ const storeValueFromNode1 = (address, value) => {
     data: functionAbi.signature + functionArgs,
     privateFrom: orion.node1.publicKey,
     privateFor: [orion.node2.publicKey],
-    privateKey: pantheon.node1.privateKey
+    privateKey: besu.node1.privateKey
   };
   return web3.eea
     .sendRawTransaction(functionCall)
@@ -73,31 +73,31 @@ const getValue = (url, address, privateFrom, privateFor, privateKey) => {
 
 const getValueFromNode1 = address => {
   return getValue(
-    pantheon.node1.url,
+    besu.node1.url,
     address,
     orion.node1.publicKey,
     [orion.node2.publicKey],
-    pantheon.node1.privateKey
+    besu.node1.privateKey
   );
 };
 
 const getValueFromNode2 = address => {
   return getValue(
-    pantheon.node2.url,
+    besu.node2.url,
     address,
     orion.node2.publicKey,
     [orion.node1.publicKey],
-    pantheon.node2.privateKey
+    besu.node2.privateKey
   );
 };
 
 const getValueFromNode3 = address => {
   return getValue(
-    pantheon.node3.url,
+    besu.node3.url,
     address,
     orion.node3.publicKey,
     [orion.node1.publicKey],
-    pantheon.node3.privateKey
+    besu.node3.privateKey
   );
 };
 
