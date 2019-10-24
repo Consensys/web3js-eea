@@ -6,7 +6,9 @@
   "scripts": {
     "test": "npm run test:unit && npm run test:integration",
     "test:unit": "tape test/unit/**/*.js",
-    "test:integration": "node ./test/integration/support/before.js && tape test/integration/**/*.test.js; node ./test/integration/support/after.js",
+    "pretest:integration" : "node ./test/integration/support/after.js && node ./test/integration/support/before.js",
+    "test:integration": "tape test/integration/**/*.test.js",
+    "posttest:integration": "node ./test/integration/support/after.js",
     "lint": "eslint ."
   },
   "husky": {
