@@ -61,7 +61,8 @@
     "prettier": "^1.14.2",
     "tape": "^4.11.0",
     "typedarray-to-buffer": "^3.1.5",
-    "yaeti": "^1.0.2"
+    "yaeti": "^1.0.2",
+    "util.promisify": "^1.0.0"
 
   }
 }
