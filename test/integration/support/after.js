@@ -1,5 +1,7 @@
-const util = require("util");
-const exec = util.promisify(require("child_process").exec);
+//const util = require("util");
+const {promisify} = require('util');
+const execCallback = require('child_process').exec;
+const exec = promisify(execCallback);
 
 const logOutput = ({ stdout, stderr }) => {
   console.log("stdout:", stdout);
