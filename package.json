@@ -4,7 +4,7 @@
   "description": "EEA JSON-RPC API",
   "main": "src/index.js",
   "scripts": {
-    "test": "npm run test:unit && npm run test:integration",
+    "test": "npm run test:integration",
     "test:unit": "tape test/unit/**/*.js",
     "pretest:integration" : "node ./test/integration/support/after.js && node ./test/integration/support/before.js",
     "test:integration": "tape test/integration/**/*.test.js",
@@ -61,8 +61,7 @@
     "prettier": "^1.14.2",
     "tape": "^4.11.0",
     "typedarray-to-buffer": "^3.1.5",
-    "yaeti": "^1.0.2",
-    "util.promisify": "^1.0.0"
+    "yaeti": "^1.0.2"
 
   }
 }
