@@ -59,6 +59,9 @@
     "husky": "^1.3.1",
     "lint-staged": "^8.1.5",
     "prettier": "^1.14.2",
-    "tape": "^4.11.0"
+    "tape": "^4.11.0",
+    "typedarray-to-buffer": "^3.1.5",
+    "yaeti": "^1.0.2"
+
   }
 }
