@@ -2,7 +2,6 @@ version: 2
 jobs:
   build:
     machine:
-      image: ubuntu-1604:201903-01
     working_directory: ~/project
     steps:
     - checkout
@@ -31,6 +30,7 @@ jobs:
     - run:
         name: test
         command: npm test
+
 workflows:
   version: 2
   workflow:
