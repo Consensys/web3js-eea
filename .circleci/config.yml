@@ -1,13 +1,18 @@
 version: 2
 jobs:
   build:
+    machine:
+      image: ubuntu-1604:201903-01
     working_directory: ~/project
-    docker:
-    - image: circleci/node:12.9.0-stretch
     steps:
     - checkout
 #    - restore_cache:
 #        key: dependency-cache-{{ checksum "package-lock.json" }}
+    - run:
+        name: Install Packages
+        command: |
+          sudo apt update
+          sudo apt install -y git nodejs npm python make gcc g++ bash docker-compose curl
     - run:
         name: install-npm
         command: npm install
@@ -15,7 +20,6 @@ jobs:
         key: dependency-cache-{{ checksum "package-lock.json" }}
         paths:
         - ./node_modules
-    - setup_remote_docker
     - run:
         name: test
         command: npm test
