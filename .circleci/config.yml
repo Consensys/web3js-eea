@@ -1,16 +1,25 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/web3js-eea
-    docker:
-    - image: docker:dind
+    machine:
+      image: ubuntu-1604:201903-01 #Ubuntu 16.04, docker 18.09.3, docker-compose 1.23.1
+      docker_layer_caching: true
+    working_directory: ~/project
     steps:
-    - run:
-        name: install system dependencies
-        command: apk add git nodejs npm python make gcc g++ bash docker-compose curl
     - checkout
     - restore_cache:
         key: dependency-cache-{{ checksum "package-lock.json" }}
+    - run:
+        name: Install Packages
+        command: |
+          sudo rm -rf /opt/circleci/.nvm
+          sudo apt update
+          sudo apt install -y git python make gcc g++ bash curl
+          curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+          sudo apt-get install -y nodejs
+    - run:
+        name: npm version
+        command: npm -v
     - run:
         name: install-npm
         command: npm install
@@ -18,13 +27,12 @@ jobs:
         key: dependency-cache-{{ checksum "package-lock.json" }}
         paths:
         - ./node_modules
-    - setup_remote_docker
     - run:
         name: test
         command: npm test
+
 workflows:
   version: 2
   workflow:
     jobs:
     - build
-
