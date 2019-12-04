@@ -1,0 +1,166 @@
+---
+version: '3.4'
+services:
+
+  orion1:
+    image: "pegasyseng/orion:develop"
+    command: ["/config/orion/orion.conf"]
+    volumes:
+      - ./config/orion/networkFiles/orion1:/config/orion/
+
+  orion2:
+    image: "pegasyseng/orion:develop"
+    command: ["/config/orion/orion.conf"]
+    volumes:
+      - ./config/orion/networkFiles/orion2:/config/orion/
+
+  orion3:
+    image: "pegasyseng/orion:develop"
+    command: ["/config/orion/orion.conf"]
+    volumes:
+      - ./config/orion/networkFiles/orion3:/config/orion/
+
+  bootnode:
+    build:
+      context: besu/.
+      args:
+        BESU_VERSION: ${BESU_VERSION}
+    image: quickstart/besu:${BESU_VERSION}
+    environment:
+      - BESU_PUBLIC_KEY_DIRECTORY=${BESU_PUBLIC_KEY_DIRECTORY}
+    entrypoint: /opt/besu/bootnode_start.sh --network=dev --min-gas-price=0 --host-whitelist=*
+    volumes:
+      - public-keys:${BESU_PUBLIC_KEY_DIRECTORY}
+
+  rpcnode:
+    image: quickstart/besu:${BESU_VERSION}
+    environment:
+      - BESU_PUBLIC_KEY_DIRECTORY=${BESU_PUBLIC_KEY_DIRECTORY}
+    command: [
+      "--network=dev",
+      "--rpc-http-enabled",
+      "--rpc-http-host=0.0.0.0",
+      "--rpc-http-port=8545",
+      "--rpc-http-cors-origins=*",
+      "--rpc-http-api=EEA,WEB3,ETH,NET,PRIV",
+      "--rpc-ws-enabled",
+      "--rpc-ws-host=0.0.0.0",
+      "--rpc-ws-port=8546",
+      "--host-whitelist=*",
+      "--min-gas-price=0"]
+    volumes:
+      - public-keys:${BESU_PUBLIC_KEY_DIRECTORY}
+    depends_on:
+      - bootnode
+    ports:
+      - 8545:8545/tcp
+
+  minernode:
+    image: quickstart/besu:${BESU_VERSION}
+    environment:
+      - BESU_PUBLIC_KEY_DIRECTORY=${BESU_PUBLIC_KEY_DIRECTORY}
+    command: [
+      "--network=dev",
+      "--miner-enabled",
+      "--miner-coinbase=0xfe3b557e8fb62b89f4916b721be55ceb828dbd73",
+      "--min-gas-price=0"]
+    volumes:
+      - public-keys:${BESU_PUBLIC_KEY_DIRECTORY}
+    depends_on:
+      - bootnode
+
+  node1:
+    image: quickstart/besu:${BESU_VERSION}
+    environment:
+      - BESU_PUBLIC_KEY_DIRECTORY=${BESU_PUBLIC_KEY_DIRECTORY}
+    command: [
+      "--node-private-key-file=/opt/besu/keys/key",
+      "--network=dev",
+      "--rpc-http-enabled",
+      "--rpc-http-host=0.0.0.0",
+      "--rpc-http-port=8545",
+      "--rpc-http-cors-origins=*",
+      "--rpc-http-api=EEA,WEB3,ETH,NET,PRIV",
+      "--rpc-ws-enabled",
+      "--rpc-ws-host=0.0.0.0",
+      "--rpc-ws-port=8546",
+      "--host-whitelist=*",
+      "--min-gas-price=0",
+      "--privacy-enabled=true",
+      "--privacy-url=http://orion1:8888",
+      "--privacy-public-key-file=/config/orion/orion.pub"]
+    volumes:
+      - public-keys:${BESU_PUBLIC_KEY_DIRECTORY}
+      - ./config/orion/networkFiles/orion1/nodeKey.pub:/config/orion/orion.pub
+      - ./config/besu/networkFiles/node1/keys:/opt/besu/keys
+    depends_on:
+      - bootnode
+      - orion1
+    ports:
+      - 20000:8545/tcp
+      - 20001:8546/tcp
+
+  node2:
+    image: quickstart/besu:${BESU_VERSION}
+    environment:
+      - BESU_PUBLIC_KEY_DIRECTORY=${BESU_PUBLIC_KEY_DIRECTORY}
+    command: [
+      "--node-private-key-file=/opt/besu/keys/key",
+      "--network=dev",
+      "--rpc-http-enabled",
+      "--rpc-http-host=0.0.0.0",
+      "--rpc-http-port=8545",
+      "--rpc-http-cors-origins=*",
+      "--rpc-http-api=EEA,WEB3,ETH,NET,PRIV",
+      "--rpc-ws-enabled",
+      "--rpc-ws-host=0.0.0.0",
+      "--rpc-ws-port=8546",
+      "--host-whitelist=*",
+      "--min-gas-price=0",
+      "--privacy-enabled=true",
+      "--privacy-url=http://orion2:8888",
+      "--privacy-public-key-file=/config/orion/orion.pub"]
+    volumes:
+      - public-keys:${BESU_PUBLIC_KEY_DIRECTORY}
+      - ./config/orion/networkFiles/orion2/nodeKey.pub:/config/orion/orion.pub
+      - ./config/besu/networkFiles/node2/keys:/opt/besu/keys
+    depends_on:
+      - bootnode
+      - orion2
+    ports:
+      - 20002:8545/tcp
+      - 20003:8546/tcp
+
+  node3:
+    image: quickstart/besu:${BESU_VERSION}
+    environment:
+      - BESU_PUBLIC_KEY_DIRECTORY=${BESU_PUBLIC_KEY_DIRECTORY}
+    command: [
+      "--node-private-key-file=/opt/besu/keys/key",
+      "--network=dev",
+      "--rpc-http-enabled",
+      "--rpc-http-host=0.0.0.0",
+      "--rpc-http-port=8545",
+      "--rpc-http-cors-origins=*",
+      "--rpc-http-api=EEA,WEB3,ETH,NET,PRIV",
+      "--rpc-ws-enabled",
+      "--rpc-ws-host=0.0.0.0",
+      "--rpc-ws-port=8546",
+      "--host-whitelist=*",
+      "--min-gas-price=0",
+      "--privacy-enabled=true",
+      "--privacy-url=http://orion3:8888",
+      "--privacy-public-key-file=/config/orion/orion.pub"]
+    volumes:
+      - public-keys:${BESU_PUBLIC_KEY_DIRECTORY}
+      - ./config/orion/networkFiles/orion3/nodeKey.pub:/config/orion/orion.pub
+      - ./config/besu/networkFiles/node3/keys:/opt/besu/keys
+    depends_on:
+      - bootnode
+      - orion3
+    ports:
+      - 20004:8545/tcp
+      - 20005:8546/tcp
+
+volumes:
+  public-keys:
