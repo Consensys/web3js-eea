@@ -13,8 +13,8 @@ const binary = fs.readFileSync(
 );
 
 const web3 = new EEAClient(new Web3(besu.node1.url), 2018);
-web3.eth.Contract(EventEmitterAbi);
 // eslint-disable-next-line no-new
+new web3.eth.Contract(EventEmitterAbi);
 
 const createPrivateEmitterContract = () => {
   const contractOptions = {

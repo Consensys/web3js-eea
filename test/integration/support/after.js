@@ -7,16 +7,8 @@ const logOutput = ({ stdout, stderr }) => {
   return Promise.resolve({});
 };
 
-const stopPrivacyQuickstart = () => {
-  return exec("cd besu-quickstart/privacy && ./stop.sh && ./remove.sh").then(
-    logOutput
-  );
+const stopPrivacyDocker = () => {
+  return exec("cd docker && ./stop.sh && ./remove.sh").then(logOutput);
 };
 
-const removeDirectory = () => {
-  return exec("rm -Rf besu-quickstart");
-};
-
-stopPrivacyQuickstart()
-  .then(removeDirectory)
-  .catch(console.error);
+stopPrivacyDocker().catch(console.error);

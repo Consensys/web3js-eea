@@ -32,18 +32,8 @@ const logOutput = ({ stdout, stderr }) => {
   return Promise.resolve({});
 };
 
-const prepareDirectory = () => {
-  return exec("rm -Rf besu-quickstart");
-};
-
-const cloneQuickStart = () => {
-  return exec(
-    "git clone https://github.com/PegaSysEng/besu-quickstart.git"
-  ).then(logOutput);
-};
-
-const runPrivacyQuickstart = () => {
-  return exec("cd besu-quickstart/privacy && ./run.sh").then(logOutput);
+const runPrivacyDocker = () => {
+  return exec("cd docker && ./run.sh").then(logOutput);
 };
 
 const waitForBesu = () => {
@@ -53,9 +43,7 @@ const waitForBesu = () => {
   });
 };
 
-prepareDirectory()
-  .then(cloneQuickStart)
-  .then(runPrivacyQuickstart)
+runPrivacyDocker()
   .then(waitForBesu)
   .then(() => {
     // eslint-disable-next-line promise/no-return-wrap
