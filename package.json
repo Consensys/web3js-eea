@@ -1,12 +1,12 @@
 {
   "name": "web3-eea",
-  "version": "0.7.2",
+  "version": "0.8.1",
   "description": "EEA JSON-RPC API",
   "main": "src/index.js",
   "scripts": {
     "test": "npm run test:unit && npm run test:integration",
     "test:unit": "tape test/unit/**/*.js",
-    "pretest:integration" : "node ./test/integration/support/after.js && node ./test/integration/support/before.js",
+    "pretest:integration": "node ./test/integration/support/after.js && node ./test/integration/support/before.js",
     "test:integration": "tape test/integration/**/*.test.js",
     "posttest:integration": "node ./test/integration/support/after.js",
     "lint": "eslint ."
