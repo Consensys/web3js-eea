@@ -5,7 +5,7 @@ const Web3 = require("web3");
 const Tx = require("ethereumjs-tx");
 const EEAClient = require("../../src");
 
-const { orion, pantheon } = require("../keys.js");
+const { orion, besu } = require("../keys.js");
 
 const binaryEventEmitter = fs.readFileSync(
   path.join(__dirname, "../solidity/EventEmitter/EventEmitter.bin")
@@ -18,18 +18,18 @@ const binaryCrossContractReader = fs.readFileSync(
   )
 );
 
-const web3 = new EEAClient(new Web3(pantheon.node1.url), 2018);
+const web3 = new EEAClient(new Web3(besu.node1.url), 2018);
 
 const createPublicEventEmitter = () => {
-  const pantheonAccount = web3.eth.accounts.privateKeyToAccount(
-    `0x${pantheon.node1.privateKey}`
+  const besuAccount = web3.eth.accounts.privateKeyToAccount(
+    `0x${besu.node1.privateKey}`
   );
   return web3.eth
-    .getTransactionCount(pantheonAccount.address, "pending")
+    .getTransactionCount(besuAccount.address, "pending")
     .then(count => {
       const rawTx = {
         nonce: web3.utils.numberToHex(count),
-        from: pantheonAccount.address,
+        from: besuAccount.address,
         value: 0,
         to: null,
         data: `0x${binaryEventEmitter}`,
@@ -37,7 +37,7 @@ const createPublicEventEmitter = () => {
         gasLimit: "0xFFFFFF"
       };
       const tx = new Tx(rawTx);
-      tx.sign(Buffer.from(pantheon.node1.privateKey, "hex"));
+      tx.sign(Buffer.from(besu.node1.privateKey, "hex"));
       const serializedTx = tx.serialize();
       return web3.eth.sendSignedTransaction(
         `0x${serializedTx.toString("hex")}`
@@ -54,7 +54,7 @@ const createPrivateCrossContractReader = () => {
     data: `0x${binaryCrossContractReader}`,
     privateFrom: orion.node1.publicKey,
     privateFor: [orion.node2.publicKey],
-    privateKey: pantheon.node1.privateKey
+    privateKey: besu.node1.privateKey
   };
   return web3.eea.sendRawTransaction(contractOptions);
 };
