@@ -6,10 +6,10 @@ const EventEmitter = require("../solidity/EventEmitter/EventEmitter.json")
 const CrossContractReader = require("../solidity/CrossContractReader/CrossContractReader.json")
   .output.abi;
 
-const { orion, pantheon } = require("../keys.js");
+const { orion, besu } = require("../keys.js");
 
 const storeValueFromNode1 = (address, value) => {
-  const web3 = new EEAClient(new Web3(pantheon.node1.url), 2018);
+  const web3 = new EEAClient(new Web3(besu.node1.url), 2018);
   const contract = new web3.eth.Contract(EventEmitter);
 
   // eslint-disable-next-line no-underscore-dangl
@@ -20,15 +20,15 @@ const storeValueFromNode1 = (address, value) => {
     .encodeParameters(functionAbi.inputs, [value])
     .slice(2);
 
-  const pantheonAccount = web3.eth.accounts.privateKeyToAccount(
-    `0x${pantheon.node1.privateKey}`
+  const besuAccount = web3.eth.accounts.privateKeyToAccount(
+    `0x${besu.node1.privateKey}`
   );
   return web3.eth
-    .getTransactionCount(pantheonAccount.address, "pending")
+    .getTransactionCount(besuAccount.address, "pending")
     .then(count => {
       const rawTx = {
         nonce: web3.utils.numberToHex(count),
-        from: pantheonAccount.address,
+        from: besuAccount.address,
         value: 0,
         to: address,
         data: `${functionAbi.signature + functionArgs}`,
@@ -36,7 +36,7 @@ const storeValueFromNode1 = (address, value) => {
         gasLimit: "0xFFFFFFF"
       };
       const tx = new Tx(rawTx);
-      tx.sign(Buffer.from(pantheon.node1.privateKey, "hex"));
+      tx.sign(Buffer.from(besu.node1.privateKey, "hex"));
       const serializedTx = tx.serialize();
       return web3.eth.sendSignedTransaction(
         `0x${serializedTx.toString("hex")}`
@@ -93,12 +93,12 @@ const getValue = (
 
 const getValueFromNode1 = (publicAddress, privateAddress) => {
   return getValue(
-    pantheon.node1.url,
+    besu.node1.url,
     publicAddress,
     privateAddress,
     orion.node1.publicKey,
     [orion.node2.publicKey],
-    pantheon.node1.privateKey
+    besu.node1.privateKey
   );
 };
 
