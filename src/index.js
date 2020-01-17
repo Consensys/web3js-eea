@@ -2,7 +2,9 @@ const axios = require("axios");
 const RLP = require("rlp");
 const _ = require("lodash");
 const { keccak256, privateToAddress } = require("./custom-ethjs-util");
-
+const privacyProxyAbi = require("./solidity/PrivacyProxy.json").contracts[
+  "PrivacyProxy.sol:PrivacyProxy"
+].abi;
 const PrivateTransaction = require("./privateTransaction");
 
 function EEAClient(web3, chainId) {
@@ -320,6 +322,111 @@ function EEAClient(web3, chainId) {
   // eslint-disable-next-line no-param-reassign
   web3.eea = {
     sendRawTransaction
+  };
+
+  const createXPrivacyGroup = options => {
+    const payload = {
+      jsonrpc: "2.0",
+      method: "privx_createPrivacyGroup",
+      params: [
+        {
+          addresses: options.addresses,
+          name: options.name,
+          description: options.description
+        }
+      ],
+      id: 1
+    };
+
+    return axios
+      .post(host, payload)
+      .then(result => {
+        return web3.priv.getTransactionReceipt(
+          result.data.result.transactionHash,
+          ""
+        );
+      })
+      .catch(error => {
+        if (error.response) {
+          throw JSON.stringify(error.response.data);
+        } else {
+          throw error;
+        }
+      });
+  };
+
+  /**
+   * Add members to an on chain privacy group
+   * @param options Map to add the members
+   * options map can contain the following:
+   * privateFrom: Enclave public key
+   * privacyGroupId: Privacy group ID to add to
+   * privateKey: Private Key used to sign transaction with
+   * publicKey: orion public key to retrieve transaction receipt
+   * enclaveKey: enclaveKey to pass to the contract to authenticate with
+   * participants: list of enclaveKey to pass to the contract to add to the group
+   * @returns {Promise<AxiosResponse<any> | never>}
+   */
+  const addToPrivacyGroup = options => {
+    // eslint-disable-next-line no-underscore-dangle
+    const functionAbi = privacyProxyAbi._jsonInterface.find(e => {
+      return e.name === "addToPrivacyGroup";
+    });
+    const functionArgs = web3.eth.abi
+      .encodeParameters(functionAbi.inputs, [
+        options.enclaveKey,
+        options.participants
+      ])
+      .slice(2);
+
+    const functionCall = {
+      to: "0x000000000000000000000000000000000000007d",
+      data: functionAbi.signature + functionArgs,
+      privateFrom: options.privateFrom,
+      privacyGroupId: options.privacyGroupId,
+      privateKey: options.privateKey
+    };
+    return web3.eea.sendRawTransaction(functionCall).then(transactionHash => {
+      console.log("Transaction Hash:", transactionHash);
+      return web3.priv.getTransactionReceipt(
+        transactionHash,
+        options.publicKey
+      );
+    });
+  };
+
+  const removeFromPrivacyGroup = options => {
+    const payload = {
+      jsonrpc: "2.0",
+      method: "privx_removeFromPrivacyGroup",
+      params: [
+        {
+          address: options.addresses,
+          privacyGroupId: options.privacyGroupId
+        }
+      ],
+      id: 1
+    };
+
+    return axios
+      .post(host, payload)
+      .then(result => {
+        return result.data.result;
+      })
+      .catch(error => {
+        if (error.response) {
+          throw JSON.stringify(error.response.data);
+        } else {
+          throw error;
+        }
+      });
+  };
+
+  // eslint-disable-next-line no-param-reassign
+  web3.privx = {
+    createXPrivacyGroup,
+    addToPrivacyGroup,
+    removeFromPrivacyGroup
   };
 
   return web3;
