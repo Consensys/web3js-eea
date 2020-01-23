@@ -14,14 +14,19 @@ contract mortal {
 
 contract greeter is mortal {
     /* define variable greeting of the type string */
-    string greeting;
+    string greeting = "test123";
+    event Approval(string _g);
 
     function setGreeting(string _greeting) public {
         greeting = _greeting;
     }
 
     /* main function */
-    function greet() constant returns (string) {
+    function greet() public constant returns (string) {
         return greeting;
+    }
+
+    function fire() public {
+        emit Approval(greeting);
     }
 }

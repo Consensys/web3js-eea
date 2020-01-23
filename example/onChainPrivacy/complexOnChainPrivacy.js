@@ -10,7 +10,7 @@ const binary = fs.readFileSync(
   path.join(__dirname, "../solidity/Greeter/greeter.bin")
 );
 
-const greeterAbi = require("../solidity/Greeter/Greeter").output.abi;
+const greeterAbi = require("../solidity/Greeter/greeter_meta").output.abi;
 
 const web3Node1 = new EEAClient(new Web3(besu.node1.url), 2018);
 // const web3Node2 = new EEAClient(new Web3(besu.node2.url), 2018);
@@ -56,12 +56,13 @@ const callGreeterFunction = (web3, address, privacyGroupId, method, value) => {
     privateKey: besu.node1.privateKey,
     privacyGroupId
   };
+  console.log(functionCall);
   return web3.eea
     .sendRawTransaction(functionCall)
-    .then(transactionHash => {
-      console.log("Transaction Hash:", transactionHash);
+    .then(privateTxHash => {
+      console.log("Transaction Hash:", privateTxHash);
       return web3.priv.getTransactionReceipt(
-        transactionHash,
+        privateTxHash,
         orion.node1.publicKey
       );
     })
@@ -73,25 +74,27 @@ const callGreeterFunction = (web3, address, privacyGroupId, method, value) => {
 module.exports = async () => {
   const privacyGroupId = crypto.randomBytes(32).toString("base64");
 
+  console.log(privacyGroupId);
+
   const creationResult = await web3Node1.privx.addToPrivacyGroup({
-    participants: [
-      orion.node1.publicKey,
-      orion.node2.publicKey,
-      orion.node3.publicKey
-    ],
+    participants: [orion.node1.publicKey, orion.node2.publicKey],
     enclaveKey: orion.node1.publicKey,
     privateFrom: orion.node1.publicKey,
     privateKey: besu.node1.privateKey,
     privacyGroupId
   });
 
-  const transactionResult = createGreeterContract(
+  console.log(Object.assign(creationResult, { a: "a" }));
+
+  const transactionResult = await createGreeterContract(
     creationResult.privacyGroupId
-  ).then(getPrivateContractAddress);
+  ).then(res => {
+    return getPrivateContractAddress(res);
+  });
 
   const greeterSetResult = await callGreeterFunction(
     web3Node1,
-    transactionResult.contractAddress,
+    transactionResult,
     creationResult.privacyGroupId,
     "setGreeting",
     "test"
@@ -103,7 +106,7 @@ module.exports = async () => {
 
   const greeterGet = await callGreeterFunction(
     web3Node1,
-    transactionResult.contractAddress,
+    transactionResult,
     creationResult.privacyGroupId,
     "greet",
     null
@@ -112,6 +115,18 @@ module.exports = async () => {
   });
 
   console.log(greeterGet);
+
+  const greeterFire = await callGreeterFunction(
+    web3Node1,
+    transactionResult,
+    creationResult.privacyGroupId,
+    "fire",
+    null
+  ).then(r => {
+    return r;
+  });
+
+  console.log(greeterFire);
 
   //
   // node1.priv.distributeRawTransaction({

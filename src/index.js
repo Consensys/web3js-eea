@@ -47,7 +47,17 @@ function EEAClient(web3, chainId) {
           tx.privacyGroupId = options.privacyGroupId;
         }
         tx.restriction = "restricted";
+
         tx.sign(privateKeyBuffer);
+
+        console.log({
+          nonce: transactionCount,
+          privateFrom: tx.privateFrom,
+          to: tx.to,
+          data: options.data,
+          from: tx.getSenderAddress(),
+          privacyGroupId: options.privacyGroupId
+        });
 
         const signedRlpEncoded = tx.serialize().toString("hex");
 
@@ -350,12 +360,13 @@ function EEAClient(web3, chainId) {
       .slice(2);
 
     const functionCall = {
-      to: "0x000000000000000000000000000000000000007d",
+      to: "0x000000000000000000000000000000000000007c",
       data: functionAbi.signature + functionArgs,
       privateFrom: options.enclaveKey,
       privacyGroupId: options.privacyGroupId,
       privateKey: options.privateKey
     };
+    console.log(functionCall);
     return web3.eea.sendRawTransaction(functionCall).then(transactionHash => {
       return web3.priv.getTransactionReceipt(
         transactionHash,

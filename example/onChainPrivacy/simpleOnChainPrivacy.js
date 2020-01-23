@@ -15,10 +15,11 @@ module.exports = async () => {
     privacyGroupId: crypto.randomBytes(32).toString("base64"),
     privateKey: besu.node1.privateKey
   });
+  console.log(creationResult);
 
   const node2Receipt = await node2.priv.getTransactionReceipt(
     creationResult.commitmentHash,
-    ""
+    orion.node2.publicKey
   );
   console.log(node2Receipt);
 };
