@@ -13,7 +13,7 @@ const binary = fs.readFileSync(
 const greeterAbi = require("../solidity/Greeter/greeter_meta").output.abi;
 
 const web3Node1 = new EEAClient(new Web3(besu.node1.url), 2018);
-// const web3Node2 = new EEAClient(new Web3(besu.node2.url), 2018);
+const web3Node2 = new EEAClient(new Web3(besu.node2.url), 2018);
 
 const createGreeterContract = privacyGroupId => {
   const contractOptions = {
@@ -33,7 +33,15 @@ const getPrivateContractAddress = transactionHash => {
     });
 };
 
-const callGreeterFunction = (web3, address, privacyGroupId, method, value) => {
+const callGenericFunctionOnContract = (
+  web3,
+  privateFrom,
+  privateKey,
+  address,
+  privacyGroupId,
+  method,
+  value
+) => {
   const contract = new web3.eth.Contract(greeterAbi);
 
   // eslint-disable-next-line no-underscore-dangle
@@ -52,19 +60,15 @@ const callGreeterFunction = (web3, address, privacyGroupId, method, value) => {
       functionArgs !== null
         ? functionAbi.signature + functionArgs
         : functionAbi.signature,
-    privateFrom: orion.node1.publicKey,
-    privateKey: besu.node1.privateKey,
+    privateFrom,
+    privateKey,
     privacyGroupId
   };
-  console.log(functionCall);
   return web3.eea
     .sendRawTransaction(functionCall)
     .then(privateTxHash => {
       console.log("Transaction Hash:", privateTxHash);
-      return web3.priv.getTransactionReceipt(
-        privateTxHash,
-        orion.node1.publicKey
-      );
+      return web3.priv.getTransactionReceipt(privateTxHash, privateFrom);
     })
     .then(result => {
       return result;
@@ -74,9 +78,7 @@ const callGreeterFunction = (web3, address, privacyGroupId, method, value) => {
 module.exports = async () => {
   const privacyGroupId = crypto.randomBytes(32).toString("base64");
 
-  console.log(privacyGroupId);
-
-  const creationResult = await web3Node1.privx.addToPrivacyGroup({
+  const privacyGroupCreationResult = await web3Node1.privx.addToPrivacyGroup({
     participants: [orion.node1.publicKey, orion.node2.publicKey],
     enclaveKey: orion.node1.publicKey,
     privateFrom: orion.node1.publicKey,
@@ -84,60 +86,55 @@ module.exports = async () => {
     privacyGroupId
   });
 
-  console.log(Object.assign(creationResult, { a: "a" }));
+  console.log(privacyGroupCreationResult);
 
-  const transactionResult = await createGreeterContract(
-    creationResult.privacyGroupId
+  const greeterContractAddress = await createGreeterContract(
+    privacyGroupCreationResult.privacyGroupId
   ).then(res => {
     return getPrivateContractAddress(res);
   });
 
-  const greeterSetResult = await callGreeterFunction(
+  const callGreetFunctionResult = await callGenericFunctionOnContract(
     web3Node1,
-    transactionResult,
-    creationResult.privacyGroupId,
-    "setGreeting",
-    "test"
-  ).then(r => {
-    return r;
-  });
-
-  console.log(greeterSetResult);
-
-  const greeterGet = await callGreeterFunction(
-    web3Node1,
-    transactionResult,
-    creationResult.privacyGroupId,
+    orion.node1.publicKey,
+    besu.node1.privateKey,
+    greeterContractAddress,
+    privacyGroupCreationResult.privacyGroupId,
     "greet",
     null
   ).then(r => {
     return r;
   });
 
-  console.log(greeterGet);
+  console.log(callGreetFunctionResult);
 
-  const greeterFire = await callGreeterFunction(
+  const callSetGreetingFunctionResultFromSecondPartipant = await callGenericFunctionOnContract(
+    web3Node2,
+    orion.node2.publicKey,
+    besu.node2.privateKey,
+    greeterContractAddress,
+    privacyGroupCreationResult.privacyGroupId,
+    "setGreeting",
+    "test"
+  ).then(r => {
+    return r;
+  });
+
+  console.log(callSetGreetingFunctionResultFromSecondPartipant);
+
+  const callFireEventFunctionResult = await callGenericFunctionOnContract(
     web3Node1,
-    transactionResult,
-    creationResult.privacyGroupId,
+    orion.node1.publicKey,
+    besu.node1.privateKey,
+    greeterContractAddress,
+    privacyGroupCreationResult.privacyGroupId,
     "fire",
     null
   ).then(r => {
     return r;
   });
 
-  console.log(greeterFire);
-
-  //
-  // node1.priv.distributeRawTransaction({
-  //
-  // });
-  //
-  // const node2Receipt = await node2.priv.getTransactionReceipt(
-  //   creationResult.transactionHash,
-  //   orion.node2.publicKey
-  // );
-  // console.log(node2Receipt);
+  console.log(callFireEventFunctionResult);
 };
 
 if (require.main === module) {

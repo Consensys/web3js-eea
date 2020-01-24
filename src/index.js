@@ -50,15 +50,6 @@ function EEAClient(web3, chainId) {
 
         tx.sign(privateKeyBuffer);
 
-        console.log({
-          nonce: transactionCount,
-          privateFrom: tx.privateFrom,
-          to: tx.to,
-          data: options.data,
-          from: tx.getSenderAddress(),
-          privacyGroupId: options.privacyGroupId
-        });
-
         const signedRlpEncoded = tx.serialize().toString("hex");
 
         return axios.post(host, {
@@ -336,11 +327,9 @@ function EEAClient(web3, chainId) {
    * Create or add members to an on chain privacy group. If the group does not yet exist, it will be created.
    * @param options Map to add the members
    * options map can contain the following:
-   * privateFrom: Enclave public key
    * privacyGroupId: Privacy group ID to add to
    * privateKey: Private Key used to sign transaction with
-   * publicKey: orion public key to retrieve transaction receipt
-   * enclaveKey: enclaveKey to pass to the contract to authenticate with
+   * enclaveKey: Orion public key
    * participants: list of enclaveKey to pass to the contract to add to the group
    * @returns {Promise<AxiosResponse<any> | never>}
    */
@@ -366,7 +355,6 @@ function EEAClient(web3, chainId) {
       privacyGroupId: options.privacyGroupId,
       privateKey: options.privateKey
     };
-    console.log(functionCall);
     return web3.eea.sendRawTransaction(functionCall).then(transactionHash => {
       return web3.priv.getTransactionReceipt(
         transactionHash,
@@ -375,31 +363,42 @@ function EEAClient(web3, chainId) {
     });
   };
 
+  /**
+   * Remove a member from an on-chain privacy group
+   * @param options Map to add the members
+   * options map can contain the following:
+   * privacyGroupId: Privacy group ID to add to
+   * privateKey: Private Key used to sign transaction with
+   * enclaveKey: Orion public key
+   * participants: list of enclaveKey to pass to the contract to add to the group
+   * @returns {Promise<AxiosResponse<any> | never>}
+   */
   const removeFromPrivacyGroup = options => {
-    const payload = {
-      jsonrpc: "2.0",
-      method: "privx_removeFromPrivacyGroup",
-      params: [
-        {
-          address: options.addresses,
-          privacyGroupId: options.privacyGroupId
-        }
-      ],
-      id: 1
-    };
+    const contract = new web3.eth.Contract(privacyProxyAbi);
+    // eslint-disable-next-line no-underscore-dangle
+    const functionAbi = contract._jsonInterface.find(e => {
+      return e.name === "removeParticipant";
+    });
+    const functionArgs = web3.eth.abi
+      .encodeParameters(functionAbi.inputs, [
+        Buffer.from(options.enclaveKey, "base64"),
+        Buffer.from(options.participant, "base64")
+      ])
+      .slice(2);
 
-    return axios
-      .post(host, payload)
-      .then(result => {
-        return result.data.result;
-      })
-      .catch(error => {
-        if (error.response) {
-          throw JSON.stringify(error.response.data);
-        } else {
-          throw error;
-        }
-      });
+    const functionCall = {
+      to: "0x000000000000000000000000000000000000007c",
+      data: functionAbi.signature + functionArgs,
+      privateFrom: options.enclaveKey,
+      privacyGroupId: options.privacyGroupId,
+      privateKey: options.privateKey
+    };
+    return web3.eea.sendRawTransaction(functionCall).then(transactionHash => {
+      return web3.priv.getTransactionReceipt(
+        transactionHash,
+        options.publicKey
+      );
+    });
   };
 
   // eslint-disable-next-line no-param-reassign
