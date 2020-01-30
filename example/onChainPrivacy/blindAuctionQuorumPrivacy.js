@@ -137,7 +137,7 @@ module.exports = async () => {
 
   console.log(privacyGroupId);
 
-  const creationResult = await web3Node1.privx.addToPrivacyGroup({
+  const creationResult = await web3Node1.privx.createPrivacyGroup({
     participants: [
       orion.node1.publicKey,
       orion.node2.publicKey,

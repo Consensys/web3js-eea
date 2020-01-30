@@ -333,7 +333,7 @@ function EEAClient(web3, chainId) {
    * participants: list of enclaveKey to pass to the contract to add to the group
    * @returns {Promise<AxiosResponse<any> | never>}
    */
-  const addToPrivacyGroup = options => {
+  const createXPrivacyGroup = options => {
     const contract = new web3.eth.Contract(privacyProxyAbi);
     // eslint-disable-next-line no-underscore-dangle
     const functionAbi = contract._jsonInterface.find(e => {
@@ -361,6 +361,34 @@ function EEAClient(web3, chainId) {
         options.publicKey
       );
     });
+  };
+
+  const addToPrivacyGroup = options => {
+    const contract = new web3.eth.Contract(privacyProxyAbi);
+    // eslint-disable-next-line no-underscore-dangle
+    const functionAbi = contract._jsonInterface.find(e => {
+      return e.name === "lock";
+    });
+
+    const functionCall = {
+      to: "0x000000000000000000000000000000000000007c",
+      data: functionAbi.signature,
+      privateFrom: options.enclaveKey,
+      privacyGroupId: options.privacyGroupId,
+      privateKey: options.privateKey
+    };
+    return web3.eea
+      .sendRawTransaction(functionCall)
+      .then(async transactionHash => {
+        const receipt = await web3.priv.getTransactionReceipt(
+          transactionHash,
+          options.publicKey
+        );
+        if (receipt.status === 1) {
+          return createXPrivacyGroup(options);
+        }
+        return null;
+      });
   };
 
   /**
@@ -403,8 +431,9 @@ function EEAClient(web3, chainId) {
 
   // eslint-disable-next-line no-param-reassign
   web3.privx = {
-    addToPrivacyGroup,
-    removeFromPrivacyGroup
+    createPrivacyGroup: createXPrivacyGroup,
+    removeFromPrivacyGroup,
+    addToPrivacyGroup
   };
 
   return web3;

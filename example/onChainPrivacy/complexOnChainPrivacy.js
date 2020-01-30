@@ -78,7 +78,7 @@ const callGenericFunctionOnContract = (
 module.exports = async () => {
   const privacyGroupId = crypto.randomBytes(32).toString("base64");
 
-  const privacyGroupCreationResult = await web3Node1.privx.addToPrivacyGroup({
+  const privacyGroupCreationResult = await web3Node1.privx.createPrivacyGroup({
     participants: [orion.node1.publicKey, orion.node2.publicKey],
     enclaveKey: orion.node1.publicKey,
     privateFrom: orion.node1.publicKey,

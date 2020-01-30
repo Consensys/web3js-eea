@@ -8,7 +8,7 @@ const node1 = new EEAClient(new Web3(besu.node1.url), 2018);
 const node2 = new EEAClient(new Web3(besu.node2.url), 2018);
 
 module.exports = async () => {
-  const onChainPrivacyGroupCreationResult = await node1.privx.addToPrivacyGroup(
+  const onChainPrivacyGroupCreationResult = await node1.privx.createPrivacyGroup(
     {
       participants: [orion.node1.publicKey, orion.node2.publicKey],
       enclaveKey: orion.node1.publicKey,
