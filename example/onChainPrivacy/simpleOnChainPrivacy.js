@@ -24,6 +24,12 @@ module.exports = async () => {
     orion.node2.publicKey
   );
   console.log(receiptFromNode2);
+
+  console.log("Find results:");
+  const findResult = await node2.privx.findPrivacyGroup({
+    addresses: [orion.node1.publicKey, orion.node2.publicKey]
+  });
+  console.log(findResult);
 };
 
 if (require.main === module) {
