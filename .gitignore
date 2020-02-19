@@ -20,3 +20,8 @@ atlassian-ide-plugin.xml
 
 ### JS
 /node_modules/
+
+# MacOS
+.DS_Store
+.AppleDouble
+.LSOverride
