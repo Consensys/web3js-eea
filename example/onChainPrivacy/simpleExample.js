@@ -26,7 +26,7 @@ module.exports = async () => {
   console.log(receiptFromNode2);
 
   console.log("Find results:");
-  const findResult = await node2.privx.findPrivacyGroup({
+  const findResult = await node2.privx.findOnChainPrivacyGroup({
     addresses: [orion.node1.publicKey, orion.node2.publicKey]
   });
   console.log(findResult);

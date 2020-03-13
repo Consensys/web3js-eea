@@ -426,7 +426,7 @@ function EEAClient(web3, chainId) {
    * privacyGroupId: Privacy group ID to add to
    * privateKey: Private Key used to sign transaction with
    * enclaveKey: Orion public key
-   * participants: list of enclaveKey to pass to the contract to add to the group
+   * participant: single enclaveKey to pass to the contract to add to the group
    * @returns {Promise<AxiosResponse<any> | never>}
    */
   const removeFromPrivacyGroup = options => {
@@ -464,10 +464,10 @@ function EEAClient(web3, chainId) {
    * addresses: the members of the privacy group
    * @returns {Promise<privacy group | never>}
    */
-  const findXPrivacyGroup = options => {
+  const findOnChainPrivacyGroup = options => {
     const payload = {
       jsonrpc: "2.0",
-      method: "privx_findPrivacyGroup",
+      method: "privx_findOnChainPrivacyGroup",
       params: [options.addresses],
       id: 1
     };
@@ -480,7 +480,7 @@ function EEAClient(web3, chainId) {
   // eslint-disable-next-line no-param-reassign
   web3.privx = {
     createPrivacyGroup: createXPrivacyGroup,
-    findPrivacyGroup: findXPrivacyGroup,
+    findOnChainPrivacyGroup,
     removeFromPrivacyGroup,
     addToPrivacyGroup,
     setPrivacyGroupLockState
