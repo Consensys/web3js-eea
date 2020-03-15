@@ -412,10 +412,12 @@ function EEAClient(web3, chainId) {
     return setPrivacyGroupLockState(
       Object.assign(options, { lock: true })
     ).then(receipt => {
-      if (receipt.status === 1) {
+      if (receipt.status === "0x1") {
         return createXPrivacyGroup(options);
       }
-      throw Error("Locking the privacy group failed");
+      throw Error(
+        `Locking the privacy group failed, receipt: ${JSON.stringify(receipt)}`
+      );
     });
   };
 

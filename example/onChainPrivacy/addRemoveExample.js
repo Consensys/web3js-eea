@@ -18,12 +18,13 @@ module.exports = async () => {
       privateKey: besu.node1.privateKey
     }
   );
+  console.log("Created new on-chain privacy group:");
   console.log(onChainPrivacyGroupCreationResult);
 
-  console.log("Find results:");
   const findResult = await node2.privx.findOnChainPrivacyGroup({
     addresses: [orion.node1.publicKey, orion.node2.publicKey]
   });
+  console.log("Found privacy group results:");
   console.log(findResult);
 
   const addResult = await node1.privx.addToPrivacyGroup({
@@ -33,13 +34,25 @@ module.exports = async () => {
     privacyGroupId: onChainPrivacyGroupCreationResult.privacyGroupId,
     privateKey: besu.node1.privateKey
   });
+  console.log("Added new node to privacy group:");
   console.log(addResult);
 
   const receiptFromNode3 = await node3.priv.getTransactionReceipt(
     addResult.commitmentHash,
     orion.node3.publicKey
   );
+  console.log("Got transaction receipt from added node:");
   console.log(receiptFromNode3);
+
+  const findResultWithAddedNone = await node2.privx.findOnChainPrivacyGroup({
+    addresses: [
+      orion.node1.publicKey,
+      orion.node2.publicKey,
+      orion.node3.publicKey
+    ]
+  });
+  console.log("Found privacy groups with added node:");
+  console.log(findResultWithAddedNone);
 
   const removeResult = await node1.privx.removeFromPrivacyGroup({
     participant: orion.node3.publicKey,
@@ -48,6 +61,7 @@ module.exports = async () => {
     privacyGroupId: onChainPrivacyGroupCreationResult.privacyGroupId,
     privateKey: besu.node1.privateKey
   });
+  console.log("Removed third participant from privacy group:");
   console.log(removeResult);
 };
 
