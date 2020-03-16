@@ -2,7 +2,7 @@ const axios = require("axios");
 const RLP = require("rlp");
 const _ = require("lodash");
 const { keccak256, privateToAddress } = require("./custom-ethjs-util");
-
+const privacyProxyAbi = require("./solidity/PrivacyProxy.json").output.abi;
 const PrivateTransaction = require("./privateTransaction");
 
 function EEAClient(web3, chainId) {
@@ -47,6 +47,7 @@ function EEAClient(web3, chainId) {
           tx.privacyGroupId = options.privacyGroupId;
         }
         tx.restriction = "restricted";
+
         tx.sign(privateKeyBuffer);
 
         const signedRlpEncoded = tx.serialize().toString("hex");
@@ -240,7 +241,7 @@ function EEAClient(web3, chainId) {
 
   /**
    * Find privacy groups
-   * @param options Options passed into `eea_sendRawTransaction`
+   * @param options Options passed into `findPrivacyGroup`
    * @returns {Promise<transaction count | never>}
    */
   const findPrivacyGroup = options => {
@@ -320,6 +321,171 @@ function EEAClient(web3, chainId) {
   // eslint-disable-next-line no-param-reassign
   web3.eea = {
     sendRawTransaction
+  };
+
+  /**
+   * Either lock or unlock the privacy group for member adding
+   * @param options Map to lock the group
+   * options map can contain the following:
+   * privacyGroupId: Privacy group ID to lock/unlock
+   * privateKey: Private Key used to sign transaction with
+   * enclaveKey: Orion public key
+   * lock: boolean indicating whether to lock or unlock
+   * @returns {Promise<AxiosResponse<any> | never>}
+   */
+  const setPrivacyGroupLockState = options => {
+    const contract = new web3.eth.Contract(privacyProxyAbi);
+    // eslint-disable-next-line no-underscore-dangle
+    const functionAbi = contract._jsonInterface.find(e => {
+      return e.name === (options.lock ? "lock" : "unlock");
+    });
+
+    const functionCall = {
+      to: "0x000000000000000000000000000000000000007c",
+      data: functionAbi.signature,
+      privateFrom: options.enclaveKey,
+      privacyGroupId: options.privacyGroupId,
+      privateKey: options.privateKey
+    };
+
+    return web3.eea
+      .sendRawTransaction(functionCall)
+      .then(async transactionHash => {
+        return web3.priv.getTransactionReceipt(
+          transactionHash,
+          options.publicKey
+        );
+      });
+  };
+
+  /**
+   * Create an on chain privacy group
+   * @param options Map to add the members
+   * options map can contain the following:
+   * privacyGroupId: Privacy group ID to add to
+   * privateKey: Private Key used to sign transaction with
+   * enclaveKey: Orion public key
+   * participants: list of enclaveKey to pass to the contract to add to the group
+   * @returns {Promise<AxiosResponse<any> | never>}
+   */
+  const createXPrivacyGroup = options => {
+    const contract = new web3.eth.Contract(privacyProxyAbi);
+    // eslint-disable-next-line no-underscore-dangle
+    const functionAbi = contract._jsonInterface.find(e => {
+      return e.name === "addParticipants";
+    });
+    const functionArgs = web3.eth.abi
+      .encodeParameters(functionAbi.inputs, [
+        Buffer.from(options.enclaveKey, "base64"),
+        options.participants.map(e => {
+          return Buffer.from(e, "base64");
+        })
+      ])
+      .slice(2);
+
+    const functionCall = {
+      to: "0x000000000000000000000000000000000000007c",
+      data: functionAbi.signature + functionArgs,
+      privateFrom: options.enclaveKey,
+      privacyGroupId: options.privacyGroupId,
+      privateKey: options.privateKey
+    };
+    return web3.eea.sendRawTransaction(functionCall).then(transactionHash => {
+      return web3.priv.getTransactionReceipt(
+        transactionHash,
+        options.publicKey
+      );
+    });
+  };
+
+  /**
+   * Add to an existing on-chain privacy group
+   * @param options Map to add the members
+   * options map can contain the following:
+   * privacyGroupId: Privacy group ID to add to
+   * privateKey: Private Key used to sign transaction with
+   * enclaveKey: Orion public key
+   * participants: list of enclaveKey to pass to the contract to add to the group
+   * @returns {Promise<AxiosResponse<any> | never>}
+   */
+  const addToPrivacyGroup = options => {
+    return setPrivacyGroupLockState(
+      Object.assign(options, { lock: true })
+    ).then(receipt => {
+      if (receipt.status === "0x1") {
+        return createXPrivacyGroup(options);
+      }
+      throw Error(
+        `Locking the privacy group failed, receipt: ${JSON.stringify(receipt)}`
+      );
+    });
+  };
+
+  /**
+   * Remove a member from an on-chain privacy group
+   * @param options Map to add the members
+   * options map can contain the following:
+   * privacyGroupId: Privacy group ID to add to
+   * privateKey: Private Key used to sign transaction with
+   * enclaveKey: Orion public key
+   * participant: single enclaveKey to pass to the contract to add to the group
+   * @returns {Promise<AxiosResponse<any> | never>}
+   */
+  const removeFromPrivacyGroup = options => {
+    const contract = new web3.eth.Contract(privacyProxyAbi);
+    // eslint-disable-next-line no-underscore-dangle
+    const functionAbi = contract._jsonInterface.find(e => {
+      return e.name === "removeParticipant";
+    });
+    const functionArgs = web3.eth.abi
+      .encodeParameters(functionAbi.inputs, [
+        Buffer.from(options.enclaveKey, "base64"),
+        Buffer.from(options.participant, "base64")
+      ])
+      .slice(2);
+
+    const functionCall = {
+      to: "0x000000000000000000000000000000000000007c",
+      data: functionAbi.signature + functionArgs,
+      privateFrom: options.enclaveKey,
+      privacyGroupId: options.privacyGroupId,
+      privateKey: options.privateKey
+    };
+    return web3.eea.sendRawTransaction(functionCall).then(transactionHash => {
+      return web3.priv.getTransactionReceipt(
+        transactionHash,
+        options.publicKey
+      );
+    });
+  };
+
+  /**
+   * Find privacy groups
+   * @param options Map to find the group
+   * options map can contain the following:
+   * addresses: the members of the privacy group
+   * @returns {Promise<privacy group | never>}
+   */
+  const findOnChainPrivacyGroup = options => {
+    const payload = {
+      jsonrpc: "2.0",
+      method: "privx_findOnChainPrivacyGroup",
+      params: [options.addresses],
+      id: 1
+    };
+
+    return axios.post(host, payload).then(result => {
+      return result.data.result;
+    });
+  };
+
+  // eslint-disable-next-line no-param-reassign
+  web3.privx = {
+    createPrivacyGroup: createXPrivacyGroup,
+    findOnChainPrivacyGroup,
+    removeFromPrivacyGroup,
+    addToPrivacyGroup,
+    setPrivacyGroupLockState
   };
 
   return web3;
