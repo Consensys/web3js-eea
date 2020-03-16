@@ -24,7 +24,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PegaSysEng/eeajs.git"
+    "url": "git+https://github.com/PegaSysEng/web3js-eea.git"
   },
   "keywords": [
     "web3",
@@ -35,31 +35,32 @@
   "author": "PegaSysEng <support@pegasys.tech>",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/PegaSysEng/eeajs/issues"
+    "url": "https://github.com/PegaSysEng/web3js-eea/issues"
   },
-  "homepage": "https://github.com/PegaSysEng/eeajs#readme",
+  "homepage": "https://github.com/PegaSysEng/web3js-eea#readme",
   "dependencies": {
-    "ethereumjs-tx": "^1.3.7",
-    "ethereumjs-util": "^6.1.0",
-    "lodash": "^4.17.15",
-    "rlp": "^2.2.3",
-    "web3": "^1.2.0",
-    "axios": "^0.18.1"
+    "ethereumjs-tx": "1.3.7",
+    "ethereumjs-util": "6.1.0",
+    "lodash": "4.17.15",
+    "rlp": "2.2.4",
+    "web3": "1.2.6",
+    "axios": "0.19.2"
   },
   "devDependencies": {
-    "babel-eslint": "^10.0.1",
-    "dotenv": "^8.0.0",
-    "eslint": "^5.16.0",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-config-prettier": "^4.1.0",
-    "eslint-plugin-chai-expect": "^2.0.1",
-    "eslint-plugin-import": "^2.17.2",
-    "eslint-plugin-prettier": "^3.0.1",
-    "eslint-plugin-promise": "^4.1.1",
-    "husky": "^1.3.1",
-    "lint-staged": "^8.1.5",
-    "prettier": "^1.14.2",
-    "tape": "^4.11.0",
+    "babel-eslint": "10.0.1",
+    "dotenv": "8.0.0",
+    "eslint": "5.16.0",
+    "eslint-config-airbnb-base": "13.1.0",
+    "eslint-config-prettier": "4.1.0",
+    "eslint-plugin-chai-expect": "2.0.1",
+    "eslint-plugin-import": "2.17.2",
+    "eslint-plugin-prettier": "3.0.1",
+    "eslint-plugin-promise": "4.1.1",
+    "ethereumjs-util": "6.1.0",
+    "husky": "1.3.1",
+    "lint-staged": "8.1.5",
+    "prettier": "1.14.2",
+    "tape": "4.11.0",
     "typedarray-to-buffer": "3.1.5",
     "yaeti": "1.0.2"
   }
