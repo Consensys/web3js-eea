@@ -54,7 +54,7 @@ const getValue = (url, address, privacyGroupId) => {
     privacyGroupId,
   }
 
-  return web3.priv.privacyCall(functionCall).then(result => {
+  return web3.priv.call(functionCall).then(result => {
     console.log(`Get Value from ${url}:`, result)
     return result
   })
