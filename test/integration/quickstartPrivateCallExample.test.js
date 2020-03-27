@@ -31,7 +31,7 @@ test("[MultiNodeExample]: Can run quickstart with privacyGroupId and private Cal
     )
 
     st.equal(
-      getNode1.output,
+      getNode1,
       "0x00000000000000000000000000000000000000000000000000000000000003e8",
     )
 
@@ -41,7 +41,7 @@ test("[MultiNodeExample]: Can run quickstart with privacyGroupId and private Cal
     )
 
     st.equal(
-      getNode2.output,
+      getNode2,
       "0x00000000000000000000000000000000000000000000000000000000000003e8",
     )
 
@@ -66,7 +66,7 @@ test("[MultiNodeExample]: Can run quickstart with privacyGroupId and private Cal
     )
 
     st.equal(
-      getNode1.output,
+      getNode1,
       "0x000000000000000000000000000000000000000000000000000000000000002a",
     )
 
@@ -76,7 +76,7 @@ test("[MultiNodeExample]: Can run quickstart with privacyGroupId and private Cal
     )
 
     st.equal(
-      getNode2.output,
+      getNode2,
       "0x000000000000000000000000000000000000000000000000000000000000002a",
     )
 
