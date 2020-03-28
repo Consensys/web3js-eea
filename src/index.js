@@ -300,7 +300,6 @@ function EEAClient(web3, chainId) {
    * @returns {Promise<AxiosResponse<T>>}
    */
   const call = options => {
-
     const txCall = {};
     txCall.to = options.to;
     txCall.data = options.data;
