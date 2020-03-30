@@ -289,6 +289,42 @@ function EEAClient(web3, chainId) {
       });
   };
 
+  /**
+   * Invokes a private contract function locally
+   * @param options Options passed into `priv_call`
+   * options map can contain the following:
+   * privacyGroupId : Enclave id representing the receivers of the transactio
+   * to : Contract address,
+   * data : Encoded function call (signature + data)
+   * blockNumber: Blocknumber  efaults to "latest"
+   * @returns {Promise<AxiosResponse<T>>}
+   */
+  const call = options => {
+    const txCall = {};
+    txCall.to = options.to;
+    txCall.data = options.data;
+
+    const payload = {
+      jsonrpc: "2.0",
+      method: "priv_call",
+      params: [options.privacyGroupId, txCall, options.blockNumber || "latest"],
+      id: 1
+    };
+
+    return axios
+      .post(host, payload)
+      .then(result => {
+        return result.data.result;
+      })
+      .catch(error => {
+        if (error.response) {
+          throw JSON.stringify(error.response.data);
+        } else {
+          throw error;
+        }
+      });
+  };
+
   // eslint-disable-next-line no-param-reassign
   web3.priv = {
     generatePrivacyGroup,
@@ -297,7 +333,8 @@ function EEAClient(web3, chainId) {
     findPrivacyGroup,
     distributeRawTransaction,
     getTransactionCount,
-    getTransactionReceipt
+    getTransactionReceipt,
+    call
   };
 
   /**
