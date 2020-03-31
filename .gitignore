@@ -25,3 +25,7 @@ atlassian-ide-plugin.xml
 .DS_Store
 .AppleDouble
 .LSOverride
+
+# testing
+coverage/
+.nyc_output/
