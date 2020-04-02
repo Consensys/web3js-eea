@@ -1,8 +1,9 @@
 const fs = require("fs");
 const path = require("path");
 
+const artifactDir = path.join(__dirname, "../../../example/solidity");
 const eventEmitterBytecode = fs.readFileSync(
-  path.join(__dirname, "../../example/solidity/EventEmitter/EventEmitter.bin")
+  path.join(artifactDir, "EventEmitter/EventEmitter.bin")
 );
 
 const parseError = error => {
