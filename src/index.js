@@ -325,6 +325,33 @@ function EEAClient(web3, chainId) {
       });
   };
 
+  /**
+   * Get the private transaction.
+   * @param {string} transactionHash Transaction Hash of the marker transaction
+   * @returns {Promise<AxiosResponse<any> | never>}
+   */
+  const getTransaction = transactionHash => {
+    const payload = {
+      jsonrpc: "2.0",
+      method: "priv_getPrivateTransaction",
+      params: [transactionHash],
+      id: 1
+    };
+
+    return axios
+      .post(host, payload)
+      .then(result => {
+        return result.data.result;
+      })
+      .catch(error => {
+        if (error.response) {
+          throw JSON.stringify(error.response.data);
+        } else {
+          throw error;
+        }
+      });
+  };
+
   // eslint-disable-next-line no-param-reassign
   web3.priv = {
     generatePrivacyGroup,
@@ -334,6 +361,7 @@ function EEAClient(web3, chainId) {
     distributeRawTransaction,
     getTransactionCount,
     getTransactionReceipt,
+    getTransaction,
     call
   };
 
