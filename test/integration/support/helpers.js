@@ -6,6 +6,15 @@ const eventEmitterBytecode = fs.readFileSync(
   path.join(artifactDir, "EventEmitter/EventEmitter.bin")
 );
 
+const eventEmitterArtifacts = JSON.parse(
+  fs.readFileSync(path.join(artifactDir, "EventEmitter/EventEmitter.json"))
+);
+const eventEmitterAbi = eventEmitterArtifacts.output.abi;
+
+const privacyArtifactDir = path.join(__dirname, "../../../src/solidity");
+const privacyInterfaceAbi = JSON.parse(
+  fs.readFileSync(path.join(privacyArtifactDir, "PrivacyInterface.abi"))
+);
 const parseError = error => {
   const e = JSON.parse(error);
   return e.error;
@@ -14,6 +23,10 @@ const parseError = error => {
 module.exports = {
   parseError,
   contracts: {
-    eventEmitter: { bytecode: eventEmitterBytecode }
+    eventEmitter: { abi: eventEmitterAbi, bytecode: eventEmitterBytecode },
+    privacyInterface: {
+      abi: privacyInterfaceAbi,
+      address: "0x000000000000000000000000000000000000007c"
+    }
   }
 };
