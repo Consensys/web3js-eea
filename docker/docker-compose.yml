@@ -73,6 +73,7 @@ services:
     image: quickstart/besu:${BESU_VERSION}
     environment:
       - BESU_PUBLIC_KEY_DIRECTORY=${BESU_PUBLIC_KEY_DIRECTORY}
+      - BESU_PRIVACY_ONCHAIN_GROUPS_ENABLED=${BESU_PRIVACY_ONCHAIN_GROUPS_ENABLED}
     command: [
       "--node-private-key-file=/opt/besu/keys/key",
       "--network=dev",
@@ -104,6 +105,7 @@ services:
     image: quickstart/besu:${BESU_VERSION}
     environment:
       - BESU_PUBLIC_KEY_DIRECTORY=${BESU_PUBLIC_KEY_DIRECTORY}
+      - BESU_PRIVACY_ONCHAIN_GROUPS_ENABLED=${BESU_PRIVACY_ONCHAIN_GROUPS_ENABLED}
     command: [
       "--node-private-key-file=/opt/besu/keys/key",
       "--network=dev",
@@ -135,6 +137,7 @@ services:
     image: quickstart/besu:${BESU_VERSION}
     environment:
       - BESU_PUBLIC_KEY_DIRECTORY=${BESU_PUBLIC_KEY_DIRECTORY}
+      - BESU_PRIVACY_ONCHAIN_GROUPS_ENABLED=${BESU_PRIVACY_ONCHAIN_GROUPS_ENABLED}
     command: [
       "--node-private-key-file=/opt/besu/keys/key",
       "--network=dev",
