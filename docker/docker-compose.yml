@@ -3,19 +3,19 @@ version: '3.4'
 services:
 
   orion1:
-    image: "pegasyseng/orion:develop"
+    image: "pegasyseng/orion:latest"
     command: ["/config/orion/orion.conf"]
     volumes:
       - ./config/orion/networkFiles/orion1:/config/orion/
 
   orion2:
-    image: "pegasyseng/orion:develop"
+    image: "pegasyseng/orion:latest"
     command: ["/config/orion/orion.conf"]
     volumes:
       - ./config/orion/networkFiles/orion2:/config/orion/
 
   orion3:
-    image: "pegasyseng/orion:develop"
+    image: "pegasyseng/orion:latest"
     command: ["/config/orion/orion.conf"]
     volumes:
       - ./config/orion/networkFiles/orion3:/config/orion/
