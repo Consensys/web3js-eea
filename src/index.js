@@ -7,12 +7,6 @@ function EEAClient(web3, chainId) {
   const GAS_PRICE = 0;
   const GAS_LIMIT = 3000000;
 
-  const { host } = web3.eth.currentProvider;
-
-  if (host == null) {
-    throw Error("Only supports http");
-  }
-
   /* eslint-disable no-param-reassign */
   // Initialize the extensions
   web3.priv = {};
