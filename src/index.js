@@ -1,9 +1,7 @@
-const axios = require("axios");
-const RLP = require("rlp");
-const _ = require("lodash");
-const { keccak256, privateToAddress } = require("./custom-ethjs-util");
+const { privateToAddress } = require("./custom-ethjs-util");
 const privacyProxyAbi = require("./solidity/PrivacyProxy.json").output.abi;
 const PrivateTransaction = require("./privateTransaction");
+const { generatePrivacyGroup } = require("./privacyGroup");
 
 function EEAClient(web3, chainId) {
   const GAS_PRICE = 0;
@@ -15,6 +13,77 @@ function EEAClient(web3, chainId) {
     throw Error("Only supports http");
   }
 
+  /* eslint-disable no-param-reassign */
+  // Initialize the extensions
+  web3.priv = {};
+  web3.eea = {};
+  web3.privx = {};
+  /* eslint-enable no-param-reassign */
+
+  // INTERNAL ==========
+  web3.extend({
+    property: "privInternal",
+    methods: [
+      // eea
+      {
+        name: "sendRawTransaction",
+        call: "eea_sendRawTransaction",
+        params: 1
+      },
+      // priv
+      {
+        name: "call",
+        call: "priv_call",
+        params: 3,
+        inputFormatter: [
+          null, // privacyGroupId
+          null, // tx
+          web3.extend.formatters.inputDefaultBlockNumberFormatter
+        ]
+      },
+      {
+        name: "getTransactionCount",
+        call: "priv_getTransactionCount",
+        params: 2,
+        outputFormatter: output => {
+          return parseInt(output, 16);
+        }
+      },
+      {
+        name: "getTransactionReceipt",
+        call: "priv_getTransactionReceipt",
+        params: 2
+      },
+      {
+        name: "findPrivacyGroup",
+        call: "priv_findPrivacyGroup",
+        params: 1
+      },
+      {
+        name: "deletePrivacyGroup",
+        call: "priv_deletePrivacyGroup",
+        params: 1
+      },
+      // privx
+      {
+        name: "findOnChainPrivacyGroup",
+        call: "privx_findOnChainPrivacyGroup",
+        params: 1
+      }
+    ]
+  });
+
+  /**
+   * Send a transaction to `eea_sendRawTransaction` or `priv_distributeRawTransaction`
+   * @param options Used to create the private transaction
+   * - options.privateKey
+   * - options.privateFrom
+   * - options.privacyGroupId
+   * - options.privateFor
+   * - options.nonce
+   * - options.to
+   * - options.data
+   */
   const genericSendRawTransaction = (options, method) => {
     if (options.privacyGroupId && options.privateFor) {
       throw Error("privacyGroupId and privateFor are mutually exclusive");
@@ -52,22 +121,18 @@ function EEAClient(web3, chainId) {
 
         const signedRlpEncoded = tx.serialize().toString("hex");
 
-        return axios.post(host, {
-          jsonrpc: "2.0",
-          method,
-          params: [signedRlpEncoded],
-          id: 1
-        });
-      })
-      .then(result => {
-        return result.data.result;
-      })
-      .catch(error => {
-        if (error.response) {
-          throw JSON.stringify(error.response.data);
-        } else {
-          throw error;
+        let result;
+        if (method === "eea_sendRawTransaction") {
+          result = web3.privInternal.sendRawTransaction(signedRlpEncoded);
+        } else if (method === "priv_distributeRawTransaction") {
+          result = web3.priv.distributeRawTransaction(signedRlpEncoded);
         }
+
+        if (result != null) {
+          return result;
+        }
+
+        throw new Error(`Unknown method ${method}`);
       });
   };
 
@@ -132,36 +197,22 @@ function EEAClient(web3, chainId) {
     return retryOperation(operation, retries);
   };
 
-  /**
-   * Generate a privacyGroupId
-   * @param options Options passed into `eea_sendRawTransaction`
-   * @returns String
-   */
-  const generatePrivacyGroup = options => {
-    const participants = _.chain(options.privateFor || [])
-      .concat(options.privateFrom)
-      .uniq()
-      .map(publicKey => {
-        const buffer = Buffer.from(publicKey, "base64");
-        let result = 1;
-        buffer.forEach(value => {
-          // eslint-disable-next-line no-bitwise
-          result = (31 * result + ((value << 24) >> 24)) & 0xffffffff;
-        });
-        return { b64: publicKey, buf: buffer, hash: result };
-      })
-      .sort((a, b) => {
-        return a.hash - b.hash;
-      })
-      .map(x => {
-        return x.buf;
-      })
-      .value();
-
-    const rlp = RLP.encode(participants);
-
-    return Buffer.from(keccak256(rlp)).toString("base64");
-  };
+  // PRIV ==========
+  web3.extend({
+    property: "priv",
+    methods: [
+      {
+        name: "createPrivacyGroup",
+        call: "priv_createPrivacyGroup",
+        params: 1
+      },
+      {
+        name: "getTransaction",
+        call: "priv_getPrivateTransaction",
+        params: 1
+      }
+    ]
+  });
 
   /**
    * Get the transaction count
@@ -176,85 +227,29 @@ function EEAClient(web3, chainId) {
       privacyGroupId = generatePrivacyGroup(options);
     }
 
-    const payload = {
-      jsonrpc: "2.0",
-      method: "priv_getTransactionCount",
-      params: [options.from, privacyGroupId],
-      id: 1
-    };
-
-    return axios.post(host, payload).then(result => {
-      return parseInt(result.data.result, 16);
-    });
-  };
-
-  /**
-   * Create a privacy group
-   * @param options Options passed into `eea_sendRawTransaction`
-   * @returns {Promise<transaction count | never>}
-   */
-  const createPrivacyGroup = options => {
-    const payload = {
-      jsonrpc: "2.0",
-      method: "priv_createPrivacyGroup",
-      params: [
-        {
-          addresses: options.addresses,
-          name: options.name,
-          description: options.description
-        }
-      ],
-      id: 1
-    };
-
-    return axios
-      .post(host, payload)
-      .then(result => {
-        return result.data.result;
-      })
-      .catch(error => {
-        if (error.response) {
-          throw JSON.stringify(error.response.data);
-        } else {
-          throw error;
-        }
-      });
+    return web3.privInternal.getTransactionCount(options.from, privacyGroupId);
   };
 
   /**
    * Delete a privacy group
-   * @param options Options passed into `eea_sendRawTransaction`
+   * @param options Options passed into `deletePrivacyGroup`
+   * - options.privacyGroupId
    * @returns {Promise<transaction count | never>}
    */
   const deletePrivacyGroup = options => {
-    const payload = {
-      jsonrpc: "2.0",
-      method: "priv_deletePrivacyGroup",
-      params: [options.privacyGroupId],
-      id: 1
-    };
-
-    return axios.post(host, payload).then(result => {
-      return result.data.result;
-    });
+    // TODO: remove this function and pass arguments individually (breaks API)
+    return web3.privInternal.deletePrivacyGroup(options.privacyGroupId);
   };
 
   /**
    * Find privacy groups
    * @param options Options passed into `findPrivacyGroup`
+   * - options.addresses
    * @returns {Promise<transaction count | never>}
    */
   const findPrivacyGroup = options => {
-    const payload = {
-      jsonrpc: "2.0",
-      method: "priv_findPrivacyGroup",
-      params: [options.addresses],
-      id: 1
-    };
-
-    return axios.post(host, payload).then(result => {
-      return result.data.result;
-    });
+    // TODO: remove this function and pass arguments individually(breaks API)
+    return web3.privInternal.findPrivacyGroup(options.addresses);
   };
 
   const distributeRawTransaction = options => {
@@ -275,28 +270,19 @@ function EEAClient(web3, chainId) {
     retries = 300,
     delay = 1000
   ) => {
-    return getMarkerTransaction(txHash, retries, delay)
-      .then(() => {
-        return axios.post(host, {
-          jsonrpc: "2.0",
-          method: "priv_getTransactionReceipt",
-          params: [txHash, enclavePublicKey],
-          id: 1
-        });
-      })
-      .then(result => {
-        return result.data.result;
-      });
+    return getMarkerTransaction(txHash, retries, delay).then(() => {
+      return web3.privInternal.getTransactionReceipt(txHash, enclavePublicKey);
+    });
   };
 
   /**
    * Invokes a private contract function locally
    * @param options Options passed into `priv_call`
    * options map can contain the following:
-   * privacyGroupId : Enclave id representing the receivers of the transactio
-   * to : Contract address,
-   * data : Encoded function call (signature + data)
-   * blockNumber: Blocknumber  efaults to "latest"
+   * - privacyGroupId : Enclave id representing the receivers of the transaction
+   * - to : Contract address,
+   * - data : Encoded function call (signature + data)
+   * - blockNumber: Blocknumber defaults to "latest"
    * @returns {Promise<AxiosResponse<T>>}
    */
   const call = options => {
@@ -304,78 +290,36 @@ function EEAClient(web3, chainId) {
     txCall.to = options.to;
     txCall.data = options.data;
 
-    const payload = {
-      jsonrpc: "2.0",
-      method: "priv_call",
-      params: [options.privacyGroupId, txCall, options.blockNumber || "latest"],
-      id: 1
-    };
-
-    return axios
-      .post(host, payload)
-      .then(result => {
-        return result.data.result;
-      })
-      .catch(error => {
-        if (error.response) {
-          throw JSON.stringify(error.response.data);
-        } else {
-          throw error;
-        }
-      });
+    return web3.privInternal.call(
+      options.privacyGroupId,
+      txCall,
+      options.blockNumber
+    );
   };
 
-  /**
-   * Get the private transaction.
-   * @param {string} transactionHash Transaction Hash of the marker transaction
-   * @returns {Promise<AxiosResponse<any> | never>}
-   */
-  const getTransaction = transactionHash => {
-    const payload = {
-      jsonrpc: "2.0",
-      method: "priv_getPrivateTransaction",
-      params: [transactionHash],
-      id: 1
-    };
-
-    return axios
-      .post(host, payload)
-      .then(result => {
-        return result.data.result;
-      })
-      .catch(error => {
-        if (error.response) {
-          throw JSON.stringify(error.response.data);
-        } else {
-          throw error;
-        }
-      });
-  };
-
-  // eslint-disable-next-line no-param-reassign
-  web3.priv = {
+  Object.assign(web3.priv, {
     generatePrivacyGroup,
-    createPrivacyGroup,
     deletePrivacyGroup,
     findPrivacyGroup,
     distributeRawTransaction,
     getTransactionCount,
     getTransactionReceipt,
-    getTransaction,
     call
-  };
+  });
+
+  // EEA ==========
 
   /**
    * Send the Raw transaction to the Besu node
-   * @param options Map to send a raw transction to besu
+   * @param options Map to send a raw transaction to besu
    * options map can contain the following:
-   * privateKey : Private Key used to sign transaction with
-   * privateFrom : Enclave public key
-   * privateFor : Enclave keys to send the transaction to
-   * privacyGroupId : Enclave id representing the receivers of the transaction
-   * nonce(Optional) : If not provided, will be calculated using `eea_getTransctionCount`
-   * to : The address to send the transaction
-   * data : Data to be sent in the transaction
+   * - privateKey : Private Key used to sign transaction with
+   * - privateFrom : Enclave public key
+   * - privateFor : Enclave keys to send the transaction to
+   * - privacyGroupId : Enclave id representing the receivers of the transaction
+   * - nonce(Optional) : If not provided, will be calculated using `eea_getTransctionCount`
+   * - to : The address to send the transaction
+   * - data : Data to be sent in the transaction
    *
    * @returns {Promise<AxiosResponse<any> | never>}
    */
@@ -383,10 +327,11 @@ function EEAClient(web3, chainId) {
     return genericSendRawTransaction(options, "eea_sendRawTransaction");
   };
 
-  // eslint-disable-next-line no-param-reassign
-  web3.eea = {
+  Object.assign(web3.eea, {
     sendRawTransaction
-  };
+  });
+
+  // PRIVX ==========
 
   /**
    * Either lock or unlock the privacy group for member adding
@@ -532,26 +477,17 @@ function EEAClient(web3, chainId) {
    * @returns {Promise<privacy group | never>}
    */
   const findOnChainPrivacyGroup = options => {
-    const payload = {
-      jsonrpc: "2.0",
-      method: "privx_findOnChainPrivacyGroup",
-      params: [options.addresses],
-      id: 1
-    };
-
-    return axios.post(host, payload).then(result => {
-      return result.data.result;
-    });
+    // TODO: remove this function and pass arguments individually (breaks API)
+    return web3.privInternal.findOnChainPrivacyGroup(options.addresses);
   };
 
-  // eslint-disable-next-line no-param-reassign
-  web3.privx = {
+  Object.assign(web3.privx, {
     createPrivacyGroup: createXPrivacyGroup,
     findOnChainPrivacyGroup,
     removeFromPrivacyGroup,
     addToPrivacyGroup,
     setPrivacyGroupLockState
-  };
+  });
 
   return web3;
 }

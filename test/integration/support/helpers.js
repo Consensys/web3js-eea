@@ -16,8 +16,10 @@ const privacyInterfaceAbi = JSON.parse(
   fs.readFileSync(path.join(privacyArtifactDir, "PrivacyInterface.abi"))
 );
 const parseError = error => {
-  const e = JSON.parse(error);
-  return e.error;
+  const prefix = "Returned error: ";
+  const start = error.message.indexOf(prefix) + prefix.length;
+  const msg = error.message.substr(start);
+  return { message: msg };
 };
 
 module.exports = {
