@@ -1,6 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 
+const { ContractFactory } = require("./contractFactory");
+
 const artifactDir = path.join(__dirname, "../../../example/solidity");
 const eventEmitterBytecode = fs.readFileSync(
   path.join(artifactDir, "EventEmitter/EventEmitter.bin")
@@ -30,5 +32,6 @@ module.exports = {
       abi: privacyInterfaceAbi,
       address: "0x000000000000000000000000000000000000007c"
     }
-  }
+  },
+  ContractFactory
 };
