@@ -67,15 +67,8 @@ test("getPrivateTransaction", async t => {
   t.test("should get error from non-member node", async st => {
     st.plan(1);
 
-    // TODO: Once https://github.com/hyperledger/besu/issues/586 is fixed, we
-    // expect a null value instead of an error here
-    try {
-      await node3Client.priv.getTransaction(publicHash);
-      st.fail("Should have gotten error");
-    } catch (error) {
-      const e = parseError(error);
-      st.strictEqual(e.message, "EnclavePayloadNotFound");
-    }
+    const result = await node3Client.priv.getTransaction(publicHash);
+    st.strictEqual(result, null, "null result");
 
     st.end();
   });
