@@ -2,10 +2,15 @@ const { privateToAddress } = require("./custom-ethjs-util");
 const privacyProxyAbi = require("./solidity/PrivacyProxy.json").output.abi;
 const PrivateTransaction = require("./privateTransaction");
 const { generatePrivacyGroup } = require("./privacyGroup");
+const { PrivateSubscription } = require("./privateSubscription");
 
 function EEAClient(web3, chainId) {
   const GAS_PRICE = 0;
   const GAS_LIMIT = 3000000;
+
+  if (web3.currentProvider == null) {
+    throw new Error("Missing provider");
+  }
 
   /* eslint-disable no-param-reassign */
   // Initialize the extensions
@@ -215,6 +220,33 @@ function EEAClient(web3, chainId) {
           web3.extend.formatters.inputDefaultBlockNumberFormatter
         ],
         outputFormatter: web3.extend.outputLogFormatter
+      },
+      {
+        name: "createFilter",
+        call: "priv_newFilter",
+        params: 3,
+        inputFormatter: [
+          null,
+          null,
+          web3.extend.formatters.inputDefaultBlockNumberFormatter
+        ]
+      },
+      {
+        name: "getFilterLogs",
+        call: "priv_getFilterLogs",
+        params: 2,
+        outputFormatter: web3.extend.outputLogFormatter
+      },
+      {
+        name: "getFilterChanges",
+        call: "priv_getFilterChanges",
+        params: 2,
+        outputFormatter: web3.extend.outputLogFormatter
+      },
+      {
+        name: "uninstallFilter",
+        call: "priv_uninstallFilter",
+        params: 2
       }
     ]
   });
@@ -302,6 +334,26 @@ function EEAClient(web3, chainId) {
     );
   };
 
+  /**
+   * Subscribe to new logs matching a filter
+   * @param {string} privacyGroupId
+   * @param {*} filter
+   * @param {function} callback
+   */
+  const subscribe = async (privacyGroupId, filter, callback) => {
+    const sub = new PrivateSubscription(web3, privacyGroupId, filter);
+
+    let filterId;
+    try {
+      filterId = await sub.subscribe();
+      callback(undefined, filterId);
+    } catch (error) {
+      callback(error);
+    }
+
+    return sub;
+  };
+
   Object.assign(web3.priv, {
     generatePrivacyGroup,
     deletePrivacyGroup,
@@ -309,7 +361,8 @@ function EEAClient(web3, chainId) {
     distributeRawTransaction,
     getTransactionCount,
     getTransactionReceipt,
-    call
+    call,
+    subscribe
   });
 
   // EEA ==========
