@@ -29,3 +29,6 @@ atlassian-ide-plugin.xml
 # testing
 coverage/
 .nyc_output/
+
+# temporary files
+example/eventLogs/params.json
