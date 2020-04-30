@@ -241,13 +241,18 @@ test("On chain privacy", async t => {
     st.test(
       "non-member node should NOT be able to write to the contract",
       async sst => {
-        const result = await writeValue(
-          node3Client,
-          orion.node3.publicKey,
-          besu.node3.privateKey,
-          3
-        );
-        sst.strictEqual(result.status, "0x0", "failed tx");
+        try {
+          await writeValue(
+            node3Client,
+            orion.node3.publicKey,
+            besu.node3.privateKey,
+            3
+          );
+          sst.fail("Non-member node was able to write to the contract");
+        } catch (error) {
+          sst.pass("Non-member could not write");
+        }
+
         sst.end();
       }
     );
