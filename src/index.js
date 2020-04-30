@@ -204,6 +204,17 @@ function EEAClient(web3, chainId) {
         name: "getTransaction",
         call: "priv_getPrivateTransaction",
         params: 1
+      },
+      {
+        name: "getPastLogs",
+        call: "priv_getLogs",
+        params: 3,
+        inputFormatter: [
+          null,
+          null,
+          web3.extend.formatters.inputDefaultBlockNumberFormatter
+        ],
+        outputFormatter: web3.extend.outputLogFormatter
       }
     ]
   });
