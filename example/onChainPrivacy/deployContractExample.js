@@ -1,6 +1,5 @@
 const fs = require("fs");
 const path = require("path");
-const crypto = require("crypto");
 const Web3 = require("web3");
 const EEAClient = require("../../src");
 
@@ -76,14 +75,11 @@ const callGenericFunctionOnContract = (
 };
 
 module.exports = async () => {
-  const privacyGroupId = crypto.randomBytes(32).toString("base64");
-
   const privacyGroupCreationResult = await web3Node1.privx.createPrivacyGroup({
     participants: [orion.node1.publicKey, orion.node2.publicKey],
     enclaveKey: orion.node1.publicKey,
     privateFrom: orion.node1.publicKey,
-    privateKey: besu.node1.privateKey,
-    privacyGroupId
+    privateKey: besu.node1.privateKey
   });
 
   console.log(privacyGroupCreationResult);

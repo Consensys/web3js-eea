@@ -1,3 +1,5 @@
+const crypto = require("crypto");
+
 const { privateToAddress } = require("./custom-ethjs-util");
 const privacyProxyAbi = require("./solidity/PrivacyProxy.json").output.abi;
 const PrivateTransaction = require("./privateTransaction");
@@ -451,11 +453,15 @@ function EEAClient(web3, chainId) {
       ])
       .slice(2);
 
+    // Generate a random ID if one was not passed in
+    const privacyGroupId =
+      options.privacyGroupId || crypto.randomBytes(32).toString("base64");
+
     const functionCall = {
       to: "0x000000000000000000000000000000000000007c",
       data: functionAbi.signature + functionArgs,
       privateFrom: options.enclaveKey,
-      privacyGroupId: options.privacyGroupId,
+      privacyGroupId,
       privateKey: options.privateKey
     };
     return web3.eea.sendRawTransaction(functionCall).then(transactionHash => {
