@@ -16,12 +16,12 @@ test("On chain privacy", async t => {
 
   const privacyContractAddress = contracts.privacyInterface.address;
 
-  const privacyGroupId = crypto.randomBytes(32).toString("base64");
+  let privacyGroupId;
   const participants = [orion.node1.publicKey];
 
   const privacyOptions = {
     enclaveKey: orion.node1.publicKey,
-    privacyGroupId,
+    privacyGroupId: undefined, // set later
     privateKey: besu.node1.privateKey
   };
 
@@ -29,8 +29,14 @@ test("On chain privacy", async t => {
   t.test("should create privacy group", async st => {
     const receipt = await node1Client.privx.createPrivacyGroup({
       participants,
-      ...privacyOptions
+      enclaveKey: orion.node1.publicKey,
+      privateKey: besu.node1.privateKey
     });
+
+    ({ privacyGroupId } = receipt);
+    // assign privacy group ID for later use
+    privacyOptions.privacyGroupId = privacyGroupId;
+
     st.strictEqual(
       receipt.privateFrom,
       orion.node1.publicKey,
@@ -42,15 +48,41 @@ test("On chain privacy", async t => {
       participants.length,
       "emits ParticipantAdded for each participant"
     );
-    st.strictEqual(
-      receipt.privacyGroupId,
-      privacyGroupId,
-      "privacy group ID matches"
-    );
+    st.isNotEqual(receipt.privacyGroupId, null, "has privacy group");
     st.strictEqual(receipt.to, privacyContractAddress, "to privacy contract");
 
     st.end();
   });
+
+  t.test(
+    "should create privacy group with a specified privacyGroupId",
+    async st => {
+      // Generate a privacyGroupId
+      const id = crypto.randomBytes(32).toString("base64");
+
+      const receipt = await node1Client.privx.createPrivacyGroup({
+        participants,
+        ...privacyOptions,
+        privacyGroupId: id
+      });
+
+      st.strictEqual(
+        receipt.privateFrom,
+        orion.node1.publicKey,
+        "sender matches"
+      );
+      st.strictEqual(receipt.status, "0x1", "status is successful");
+      st.strictEqual(
+        receipt.logs.length,
+        participants.length,
+        "emits ParticipantAdded for each participant"
+      );
+      st.strictEqual(receipt.privacyGroupId, id, "privacy group ID matches");
+      st.strictEqual(receipt.to, privacyContractAddress, "to privacy contract");
+
+      st.end();
+    }
+  );
 
   // findOnChainPrivacyGroup
   t.test("should find privacy group after creation", async st => {
