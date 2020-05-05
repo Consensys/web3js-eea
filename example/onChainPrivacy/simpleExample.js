@@ -1,4 +1,3 @@
-const crypto = require("crypto");
 const Web3 = require("web3");
 const EEAClient = require("../../src");
 
@@ -13,7 +12,6 @@ module.exports = async () => {
       participants: [orion.node1.publicKey, orion.node2.publicKey],
       enclaveKey: orion.node1.publicKey,
       privateFrom: orion.node1.publicKey,
-      privacyGroupId: crypto.randomBytes(32).toString("base64"),
       privateKey: besu.node1.privateKey
     }
   );
