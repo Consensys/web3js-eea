@@ -11,26 +11,185 @@ const Event = {
   ERROR: "error"
 };
 
-function PrivateSubscription(web3, privacyGroupId, filter) {
-  const providerType = web3.currentProvider.constructor.name;
-  if (providerType === "HttpProvider") {
-    this.protocol = Protocol.HTTP;
-  } else if (providerType === "WebsocketProvider") {
-    this.protocol = Protocol.WEBSOCKET;
-  } else {
-    throw new Error(
-      "Current protocol does not support subscriptions. Use HTTP or WebSockets."
-    );
-  }
+/**
+ * Manage a specific type of subscription
+ * @param {PrivateSubscription} subscription
+ */
+function SubscriptionManager(subscription) {
+  this.subscription = subscription;
+  this.web3 = subscription.web3;
 
+  return this;
+}
+
+/**
+ * Manage polling subscriptions over HTTP
+ * @param {PrivateSubscription} subscription
+ */
+function HttpSubscription(subscription) {
+  SubscriptionManager.call(this, subscription);
+
+  this.privacyGroupId = subscription.privacyGroupId;
+  this.filter = subscription.filter;
+  this.timeout = null;
+
+  return this;
+}
+HttpSubscription.prototype = Object.create(SubscriptionManager.prototype);
+HttpSubscription.prototype.constructor = HttpSubscription;
+
+HttpSubscription.prototype.subscribe = async function subscribe(
+  privacyGroupId,
+  filter,
+  blockId
+) {
+  // install filter
+  this.subscription.filterId = await this.web3.priv.createFilter(
+    privacyGroupId,
+    filter,
+    blockId
+  );
+
+  // wait for new logs
+  await this.pollForLogs(privacyGroupId, this.subscription.filterId);
+};
+
+HttpSubscription.prototype.pollForLogs = async function pollForLogs(
+  privacyGroupId,
+  filterId,
+  ms = 1000
+) {
+  const fetchLogs = async () => {
+    try {
+      const logs = await this.web3.priv.getFilterChanges(
+        privacyGroupId,
+        filterId
+      );
+      logs.forEach(log => {
+        this.subscription.emit("data", log);
+      });
+      // continue
+      this.timeout = setTimeout(() => {
+        this.pollForLogs(privacyGroupId, filterId, ms);
+      }, ms);
+    } catch (error) {
+      this.subscription.emit("error", error);
+    }
+  };
+
+  fetchLogs();
+};
+
+HttpSubscription.prototype.unsubscribe = async function unsubscribe(
+  privacyGroupId,
+  filterId,
+  callback
+) {
+  return this.web3.priv
+    .uninstallFilter(privacyGroupId, filterId)
+    .then(() => {
+      if (this.timeout != null) {
+        clearTimeout(this.timeout);
+      }
+      this.subscription.reset();
+
+      if (callback != null) {
+        callback(null, true);
+      }
+      return filterId;
+    })
+    .catch(error => {
+      if (callback != null) {
+        callback(error);
+      }
+      return error;
+    });
+};
+
+/**
+ * Manage pub-sub subscriptions over WebSocket
+ * @param {PrivateSubscription} subscription
+ */
+function WebSocketSubscription(subscription) {
+  SubscriptionManager.call(this, subscription);
+  return this;
+}
+WebSocketSubscription.prototype = Object.create(SubscriptionManager.prototype);
+WebSocketSubscription.prototype.constructor = WebSocketSubscription;
+
+WebSocketSubscription.prototype.subscribe = async function subscribe(
+  privacyGroupId,
+  filter
+) {
+  // Register provider events to forward to the caller
+  this.web3.currentProvider
+    .on("connect", () => {
+      this.subscription.emit(Event.CONNECTED);
+    })
+    .on("data", data => {
+      // Log is in `params` key of JSON-RPC response
+      this.subscription.emit(Event.DATA, data.params);
+    })
+    .on("error", e => {
+      this.subscription.emit(Event.ERROR, e);
+    });
+
+  // start subscription
+  this.subscription.filterId = await this.web3.privInternal.subscribe(
+    privacyGroupId,
+    "logs",
+    filter
+  );
+};
+
+WebSocketSubscription.prototype.unsubscribe = async function unsubscribe(
+  privacyGroupId,
+  filterId,
+  callback
+) {
+  return this.web3.privInternal
+    .unsubscribe(privacyGroupId, filterId)
+    .then(result => {
+      this.subscription.reset();
+
+      callback(null, result);
+      return result;
+    })
+    .catch(error => {
+      if (callback != null) {
+        callback(error);
+      }
+      return error;
+    });
+};
+
+/**
+ * Controls the lifecycle of a private subscription
+ * @param {*} web3
+ * @param {*} privacyGroupId
+ * @param {*} filter
+ */
+function PrivateSubscription(web3, privacyGroupId, filter) {
   this.privacyGroupId = privacyGroupId;
   this.filter = filter;
 
   this.web3 = web3;
   this.filterId = null;
 
-  this.timer = undefined;
   this.getPast = false;
+
+  const providerType = web3.currentProvider.constructor.name;
+  if (providerType === "HttpProvider") {
+    this.protocol = Protocol.HTTP;
+    this.manager = new HttpSubscription(this);
+  } else if (providerType === "WebsocketProvider") {
+    this.protocol = Protocol.WEBSOCKET;
+    this.manager = new WebSocketSubscription(this);
+  } else {
+    throw new Error(
+      "Current protocol does not support subscriptions. Use HTTP or WebSockets."
+    );
+  }
 
   return this;
 }
@@ -46,36 +205,10 @@ PrivateSubscription.prototype.subscribe = async function subscribe() {
     this.getPast = true;
   }
 
-  if (this.protocol === Protocol.HTTP) {
-    // install filter
-    this.filterId = await this.web3.priv.createFilter(
-      this.privacyGroupId,
-      this.filter,
-      this.blockId
-    );
-
-    // wait for new logs
-    await this.pollForLogs();
-  } else if (this.protocol === Protocol.WEBSOCKET) {
-    // Register provider events to forward to the caller
-    this.web3.currentProvider
-      .on("connect", () => {
-        this.emit(Event.CONNECTED);
-      })
-      .on("data", data => {
-        // Log is in `params` key of JSON-RPC response
-        this.emit(Event.DATA, data.params);
-      })
-      .on("error", e => {
-        this.emit(Event.ERROR, e);
-      });
-
-    // start subscription
-    this.filterId = await this.web3.privInternal.subscribe(
-      this.privacyGroupId,
-      "logs",
-      this.filter
-    );
+  // Sets this.filterId
+  await this.manager.subscribe(this.privacyGroupId, this.filter, this.blockId);
+  if (this.filterId == null) {
+    throw new Error("Failed to set filter ID");
   }
 
   return this.filterId;
@@ -102,79 +235,14 @@ PrivateSubscription.prototype.on = function on(eventName, callback) {
   return this;
 };
 
-PrivateSubscription.prototype.pollForLogs = async function pollForLogs(
-  ms = 1000
-) {
-  const fetchLogs = async () => {
-    try {
-      const logs = await this.web3.priv.getFilterChanges(
-        this.privacyGroupId,
-        this.filterId
-      );
-      logs.forEach(log => {
-        this.emit("data", log);
-      });
-      // continue
-      this.timeout = setTimeout(() => {
-        this.pollForLogs(ms);
-      }, ms);
-    } catch (error) {
-      this.emit("error", error);
-    }
-  };
-
-  fetchLogs();
-};
-
 PrivateSubscription.prototype.reset = function reset() {
-  if (this.timeout != null) {
-    clearTimeout(this.timeout);
-  }
-
   this.removeAllListeners();
 };
 
 PrivateSubscription.prototype.unsubscribe = async function unsubscribe(
   callback
 ) {
-  const id = this.filterId;
-
-  let operation = Promise.resolve();
-  if (this.protocol === Protocol.HTTP) {
-    operation = this.web3.priv
-      .uninstallFilter(this.privacyGroupId, this.filterId)
-      .then(() => {
-        this.reset();
-
-        if (callback != null) {
-          callback(null, true);
-        }
-        return id;
-      })
-      .catch(error => {
-        if (callback != null) {
-          callback(error);
-        }
-        return error;
-      });
-  } else if (this.protocol === Protocol.WEBSOCKET) {
-    operation = this.web3.privInternal
-      .unsubscribe(this.privacyGroupId, this.filterId)
-      .then(result => {
-        this.reset();
-
-        callback(null, result);
-        return result;
-      })
-      .catch(error => {
-        if (callback != null) {
-          callback(error);
-        }
-        return error;
-      });
-  }
-
-  return operation;
+  return this.manager.unsubscribe(this.privacyGroupId, this.filterId, callback);
 };
 
 module.exports = {
