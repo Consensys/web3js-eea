@@ -65,6 +65,16 @@ function EEAClient(web3, chainId) {
         call: "priv_deletePrivacyGroup",
         params: 1
       },
+      {
+        name: "subscribe",
+        call: "priv_subscribe",
+        params: 3 // type, privacyGroupId, filter
+      },
+      {
+        name: "unsubscribe",
+        call: "priv_unsubscribe",
+        params: 2 // privacyGroupId, filterId
+      },
       // privx
       {
         name: "findOnChainPrivacyGroup",
