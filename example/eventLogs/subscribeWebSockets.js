@@ -9,11 +9,11 @@ const node = new EEAClient(new Web3(besu.node1.wsUrl), 2018);
 const params = JSON.parse(fs.readFileSync(path.join(__dirname, "params.json")));
 
 async function run() {
-  const { privacyGroupId, contractAddress: address } = params;
+  const { privacyGroupId, contractAddress: address, blockNumber } = params;
 
   const filter = {
-    address
-    // fromBlock: 1
+    address,
+    fromBlock: blockNumber
   };
 
   console.log("Installing filter", filter);
@@ -32,7 +32,12 @@ async function run() {
       // Add handlers for incoming events
       subscription
         .on("data", log => {
-          console.log("LOG =>", log.params);
+          if (log.result != null) {
+            // Logs from subscription are nested in `result` key
+            console.log("LOG =>", log.result);
+          } else {
+            console.log("LOG =>", log);
+          }
         })
         .on("error", console.error);
 

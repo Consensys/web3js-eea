@@ -9,12 +9,12 @@ const node = new EEAClient(new Web3(besu.node1.url), 2018);
 const params = JSON.parse(fs.readFileSync(path.join(__dirname, "params.json")));
 
 async function run() {
-  const { privacyGroupId, contractAddress: address } = params;
+  const { privacyGroupId, contractAddress: address, blockNumber } = params;
   console.log(params);
 
   const filter = {
     address,
-    fromBlock: 1
+    fromBlock: blockNumber
   };
 
   console.log("Installing filter", filter);
