@@ -33,18 +33,12 @@ test("getLogs", async t => {
 
   const contract = await factory.privateDeploy(privacyGroupId);
   const { deployReceipt } = contract;
-  const deploy1Tx = await node1Client.eth.getTransaction(
-    deployReceipt.commitmentHash
-  );
   const contract1Address = deployReceipt.contractAddress;
   console.log(deployReceipt);
 
   // send some transactions from member 1
   await contract.send("store", [1]);
   const send2Receipt = await contract.send("store", [2]);
-  const send2Tx = await node1Client.eth.getTransaction(
-    send2Receipt.commitmentHash
-  );
 
   // send some transactions from member 2
   factory.connect(
@@ -68,9 +62,6 @@ test("getLogs", async t => {
 
   // send a transaction to the second contract
   const send4Receipt = await contract2.send("store", [4]);
-  const send4Tx = await node1Client.eth.getTransaction(
-    send4Receipt.commitmentHash
-  );
 
   t.test("accessibility", async st => {
     const logCount = 4;
@@ -111,17 +102,17 @@ test("getLogs", async t => {
 
     st.test("should get logs to a given block number", async sst => {
       const logs1 = await node1Client.priv.getPastLogs(privacyGroupId, {
-        toBlock: deploy1Tx.blockNumber
+        toBlock: deployReceipt.blockNumber
       });
       sst.strictEqual(logs1.length, 0, "sees logs to deploy tx");
 
       const logs2 = await node1Client.priv.getPastLogs(privacyGroupId, {
-        toBlock: send2Tx.blockNumber
+        toBlock: send2Receipt.blockNumber
       });
       sst.strictEqual(logs2.length, 2, "sees logs to send tx 2");
 
       const logs4 = await node1Client.priv.getPastLogs(privacyGroupId, {
-        toBlock: send4Tx.blockNumber
+        toBlock: send4Receipt.blockNumber
       });
       sst.strictEqual(logs4.length, 4, "sees logs to send tx 4");
 
@@ -130,19 +121,19 @@ test("getLogs", async t => {
 
     st.test("should get logs from a given block number", async sst => {
       const logs1 = await node1Client.priv.getPastLogs(privacyGroupId, {
-        fromBlock: deploy1Tx.blockNumber
+        fromBlock: deployReceipt.blockNumber
       });
       sst.strictEqual(logs1.length, 4, "sees all logs from deploy tx");
 
       // skip 1
       const logs2 = await node1Client.priv.getPastLogs(privacyGroupId, {
-        fromBlock: send2Tx.blockNumber
+        fromBlock: send2Receipt.blockNumber
       });
       sst.strictEqual(logs2.length, 3, "sees logs from send tx 2");
 
       // skip 3
       const logs4 = await node1Client.priv.getPastLogs(privacyGroupId, {
-        fromBlock: send4Tx.blockNumber
+        fromBlock: send4Receipt.blockNumber
       });
       sst.strictEqual(logs4.length, 1, "sees logs from send tx 4");
 
