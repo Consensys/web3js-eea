@@ -23,22 +23,25 @@ function SubscriptionManager(subscription) {
 }
 
 /**
- * Manage polling subscriptions over HTTP
+ * Manage creating/destroying filter and polling for new logs
+ * using `priv_getFilterChanges`
  * @param {PrivateSubscription} subscription
  */
-function HttpSubscription(subscription) {
+function PollingSubscription(subscription, pollingInterval) {
   SubscriptionManager.call(this, subscription);
 
   this.privacyGroupId = subscription.privacyGroupId;
   this.filter = subscription.filter;
   this.timeout = null;
+  // How frequently to poll for new logs, in milliseconds
+  this.pollingInterval = pollingInterval || 1000;
 
   return this;
 }
-HttpSubscription.prototype = Object.create(SubscriptionManager.prototype);
-HttpSubscription.prototype.constructor = HttpSubscription;
+PollingSubscription.prototype = Object.create(SubscriptionManager.prototype);
+PollingSubscription.prototype.constructor = PollingSubscription;
 
-HttpSubscription.prototype.subscribe = async function subscribe(
+PollingSubscription.prototype.subscribe = async function subscribe(
   privacyGroupId,
   filter,
   blockId
@@ -54,10 +57,9 @@ HttpSubscription.prototype.subscribe = async function subscribe(
   await this.pollForLogs(privacyGroupId, this.subscription.filterId);
 };
 
-HttpSubscription.prototype.pollForLogs = async function pollForLogs(
+PollingSubscription.prototype.pollForLogs = async function pollForLogs(
   privacyGroupId,
-  filterId,
-  ms = 1000
+  filterId
 ) {
   const fetchLogs = async () => {
     try {
@@ -70,8 +72,8 @@ HttpSubscription.prototype.pollForLogs = async function pollForLogs(
       });
       // continue
       this.timeout = setTimeout(() => {
-        this.pollForLogs(privacyGroupId, filterId, ms);
-      }, ms);
+        this.pollForLogs(privacyGroupId, filterId);
+      }, this.pollingInterval);
     } catch (error) {
       this.subscription.emit("error", error);
     }
@@ -80,7 +82,7 @@ HttpSubscription.prototype.pollForLogs = async function pollForLogs(
   fetchLogs();
 };
 
-HttpSubscription.prototype.unsubscribe = async function unsubscribe(
+PollingSubscription.prototype.unsubscribe = async function unsubscribe(
   privacyGroupId,
   filterId,
   callback
@@ -107,17 +109,17 @@ HttpSubscription.prototype.unsubscribe = async function unsubscribe(
 };
 
 /**
- * Manage pub-sub subscriptions over WebSocket
+ * Manage persistent pub-sub subscriptions over WebSocket
  * @param {PrivateSubscription} subscription
  */
-function WebSocketSubscription(subscription) {
+function PubSubSubscription(subscription) {
   SubscriptionManager.call(this, subscription);
   return this;
 }
-WebSocketSubscription.prototype = Object.create(SubscriptionManager.prototype);
-WebSocketSubscription.prototype.constructor = WebSocketSubscription;
+PubSubSubscription.prototype = Object.create(SubscriptionManager.prototype);
+PubSubSubscription.prototype.constructor = PubSubSubscription;
 
-WebSocketSubscription.prototype.subscribe = async function subscribe(
+PubSubSubscription.prototype.subscribe = async function subscribe(
   privacyGroupId,
   filter
 ) {
@@ -142,7 +144,7 @@ WebSocketSubscription.prototype.subscribe = async function subscribe(
   );
 };
 
-WebSocketSubscription.prototype.unsubscribe = async function unsubscribe(
+PubSubSubscription.prototype.unsubscribe = async function unsubscribe(
   privacyGroupId,
   filterId,
   callback
@@ -181,10 +183,14 @@ function PrivateSubscription(web3, privacyGroupId, filter) {
   const providerType = web3.currentProvider.constructor.name;
   if (providerType === "HttpProvider") {
     this.protocol = Protocol.HTTP;
-    this.manager = new HttpSubscription(this);
+    this.manager = new PollingSubscription(
+      this,
+      this.web3.priv.subscriptionPollingInterval
+    );
+    // TODO: handle WebSockets if the node doesn't support priv_subscribe
   } else if (providerType === "WebsocketProvider") {
     this.protocol = Protocol.WEBSOCKET;
-    this.manager = new WebSocketSubscription(this);
+    this.manager = new PubSubSubscription(this);
   } else {
     throw new Error(
       "Current protocol does not support subscriptions. Use HTTP or WebSockets."

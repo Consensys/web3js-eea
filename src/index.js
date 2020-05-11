@@ -16,7 +16,9 @@ function EEAClient(web3, chainId) {
 
   /* eslint-disable no-param-reassign */
   // Initialize the extensions
-  web3.priv = {};
+  web3.priv = {
+    subscriptionPollingInterval: 1000
+  };
   web3.eea = {};
   web3.privx = {};
   /* eslint-enable no-param-reassign */
