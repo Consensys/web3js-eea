@@ -10,12 +10,14 @@ const params = JSON.parse(fs.readFileSync(path.join(__dirname, "params.json")));
 
 async function run() {
   const { privacyGroupId, contractAddress: address, blockNumber } = params;
-  console.log(params);
 
   const filter = {
     address,
     fromBlock: blockNumber
   };
+
+  // Set the polling interval to something fairly high
+  node.priv.subscriptionPollingInterval = 5000;
 
   console.log("Installing filter", filter);
 
