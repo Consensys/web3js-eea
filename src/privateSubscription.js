@@ -57,6 +57,13 @@ PollingSubscription.prototype.subscribe = async function subscribe(
   await this.pollForLogs(privacyGroupId, this.subscription.filterId);
 };
 
+PollingSubscription.prototype.getPastLogs = async function getPastLogs(
+  privacyGroupId,
+  filterId
+) {
+  return this.web3.priv.getFilterLogs(privacyGroupId, filterId);
+};
+
 PollingSubscription.prototype.pollForLogs = async function pollForLogs(
   privacyGroupId,
   filterId
@@ -144,6 +151,11 @@ PubSubSubscription.prototype.subscribe = async function subscribe(
   );
 };
 
+PubSubSubscription.prototype.getPastLogs = async function getPastLogs() {
+  // noop - subscriptions don't get past logs
+  return Promise.resolve([]);
+};
+
 PubSubSubscription.prototype.unsubscribe = async function unsubscribe(
   privacyGroupId,
   filterId,
@@ -228,8 +240,8 @@ PrivateSubscription.prototype.on = function on(eventName, callback) {
   if (this.getPast && eventName === "data") {
     // Execute asynchronously so we can return immediately
     // eslint-disable-next-line promise/catch-or-return
-    this.web3.priv
-      .getPastLogs(this.privacyGroupId, this.filter)
+    this.manager
+      .getPastLogs(this.privacyGroupId, this.filterId)
       .then(pastLogs => {
         pastLogs.forEach(log => {
           this.emit("data", log);

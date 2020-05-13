@@ -350,9 +350,15 @@ function EEAClient(web3, chainId) {
 
   /**
    * Subscribe to new logs matching a filter
+   *
+   * If the provider supports subscriptions, it uses `priv_subscribe`, otherwise
+   * it uses polling and `priv_getFilterChanges` to get new logs. Returns an
+   * error to the callback if there is a problem subscribing or creating the filter.
    * @param {string} privacyGroupId
    * @param {*} filter
-   * @param {function} callback
+   * @param {function} callback returns the filter/subscription ID, or an error
+   * @return {PrivateSubscription} a subscription object that manages the
+   * lifecycle of the filter or subscription
    */
   const subscribe = async (privacyGroupId, filter, callback) => {
     const sub = new PrivateSubscription(web3, privacyGroupId, filter);
