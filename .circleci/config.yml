@@ -1,4 +1,11 @@
-version: 2
+---
+version: 2.1
+
+executors:
+  node_executor:
+    docker:
+      - image: circleci/node:12.9.0-stretch
+
 jobs:
   build:
     machine:
@@ -31,8 +38,24 @@ jobs:
         name: test
         command: npm test
 
+  publishDoc:
+    executor: node_executor
+    steps:
+    - checkout
+    - restore_cache:
+        key: dependency-cache-{{ checksum "package-lock.json" }}
+    - run:
+        name: install-npm
+        command: npm install
+    - run:
+        name: build doc
+        command: npm run generate-docs
+
 workflows:
   version: 2
   workflow:
     jobs:
     - build
+    - publishDoc:
+        requires:
+          - build
