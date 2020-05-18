@@ -47,15 +47,38 @@ jobs:
     - run:
         name: install-npm
         command: npm install
+    - save_cache:
+        paths:
+          - ./node_modules
+        key: dependency-cache-{{ checksum "package-lock.json" }}
     - run:
         name: build doc
         command: npm run generate-docs
+    - add_ssh_keys:
+        fingerprints:
+          - 'b4:b3:84:2a:8d:25:45:39:f4:b1:86:4d:d4:db:fb:b4'
+    - run:
+        name: Set Git user params
+        command: |
+          git config --global user.name $CIRCLE_USERNAME
+          git config --global user.email "${CIRCLE_USERNAME}@users.noreply.github.com"
+    - deploy:
+        name: Commit and push docs changes
+        command: |
+          git add docs/*
+          git commit -m "Automated SDK documentation update" \
+                     -m "[skip ci] Circle CI build ${CIRCLE_BUILD_NUM}, see ${CIRCLE_BUILD_URL}" \
+                     -m "Branch: ${CIRCLE_BRANCH}, commit: ${CIRCLE_SHA1}, tag:${CIRCLE_TAG-none}"
+          git push
 
 workflows:
   version: 2
   workflow:
     jobs:
-    - build
+    # - build
     - publishDoc:
-        requires:
-          - build
+        # requires:
+        #   - build
+        # filters:
+        #   branches:
+        #     only: master

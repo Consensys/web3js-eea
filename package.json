@@ -20,7 +20,7 @@
     "network:up": "node ./test/integration/support/after.js && node ./test/integration/support/before.js",
     "network:down": "node ./test/integration/support/after.js",
     "lint": "eslint .",
-    "generate-docs": "node_modules/.bin/jsdoc --configure jsdoc.json --verbose"
+    "generate-docs": "node_modules/.bin/jsdoc --configure jsdoc.json --verbose && rm -Rf docs/latest || true && mv docs/web3-eea/$npm_package_version docs/latest && rm -Rf docs/web3-eea"
   },
   "husky": {
     "hooks": {
