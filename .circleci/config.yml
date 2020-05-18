@@ -20,8 +20,8 @@ jobs:
         name: Install Packages
         command: |
           sudo rm -rf /opt/circleci/.nvm
-          sudo apt update
-          sudo apt install -y git python make gcc g++ bash curl
+          sudo apt-get update
+          sudo apt-get install -y git python make gcc g++ bash curl
           curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
           sudo apt-get install -y nodejs
     - run:
