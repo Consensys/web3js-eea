@@ -69,7 +69,7 @@ jobs:
           git commit -m "Automated SDK documentation update" \
                      -m "[skip ci] Circle CI build ${CIRCLE_BUILD_NUM}, see ${CIRCLE_BUILD_URL}" \
                      -m "Branch: ${CIRCLE_BRANCH}, commit: ${CIRCLE_SHA1}, tag:${CIRCLE_TAG-none}"
-          git push
+          git push origin
 
 workflows:
   version: 2
