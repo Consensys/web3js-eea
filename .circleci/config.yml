@@ -76,10 +76,10 @@ workflows:
   version: 2
   workflow:
     jobs:
-    # - build
+    - build
     - publishDoc #:
-        # requires:
-        #   - build
-        # filters:
-        #   branches:
-        #     only: master
+        requires:
+          - build
+        filters:
+          branches:
+            only: master
