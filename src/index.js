@@ -63,6 +63,11 @@ function EEAClient(web3, chainId) {
         params: 2
       },
       {
+        name: "distributeRawTransaction",
+        call: "priv_distributeRawTransaction",
+        params: 1
+      },
+      {
         name: "findPrivacyGroup",
         call: "priv_findPrivacyGroup",
         params: 1
@@ -143,7 +148,7 @@ function EEAClient(web3, chainId) {
         if (method === "eea_sendRawTransaction") {
           result = web3.privInternal.sendRawTransaction(signedRlpEncoded);
         } else if (method === "priv_distributeRawTransaction") {
-          result = web3.priv.distributeRawTransaction(signedRlpEncoded);
+          result = web3.privInternal.distributeRawTransaction(signedRlpEncoded);
         }
 
         if (result != null) {
