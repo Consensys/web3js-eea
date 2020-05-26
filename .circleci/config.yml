@@ -118,14 +118,14 @@ jobs:
         command: |
           git config --global user.name $CIRCLE_USERNAME
           git config --global user.email "${CIRCLE_USERNAME}@users.noreply.github.com"
-    - run:
-        name: WIP
+    - deploy:
+        name: Commit and push docs changes
         command: |
           # TODO for testing only
           cp -r docs /tmp/workspace/docs
 
           # publishing happens by pushing files to gh-pages branch
-          readonly BRANCH='gh-pages'
+          readonly BRANCH='test-gh-pages'
 
           # check if branch exists on origin and if not exits with error.
           # the branch should be manually created and protected to be used.
@@ -146,15 +146,12 @@ jobs:
           ls -la
           git status
 
-    # - deploy:
-    #     name: Commit and push docs changes
-    #     command: |
-    #       git add docs/*
-    #       git commit -m "Automated SDK documentation update" \
-    #                  -m "[skip ci] Circle CI build ${CIRCLE_BUILD_NUM}, see ${CIRCLE_BUILD_URL}" \
-    #                  -m "Branch: ${CIRCLE_BRANCH}, commit: ${CIRCLE_SHA1}, tag:${CIRCLE_TAG-none}"
-    #       git push --set-upstream origin ${CIRCLE_BRANCH}
-    #       git push origin
+          git add *
+          git commit -m "Automated SDK documentation update" \
+                     -m "[skip ci] Circle CI build ${CIRCLE_BUILD_NUM}, see ${CIRCLE_BUILD_URL}" \
+                     -m "Branch: ${CIRCLE_BRANCH}, commit: ${CIRCLE_SHA1}, tag:${CIRCLE_TAG-none}"
+          git push --set-upstream origin $BRANCH
+          git push origin
 
 workflows:
   version: 2
