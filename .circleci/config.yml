@@ -121,6 +121,9 @@ jobs:
     - run:
         name: WIP
         command: |
+          # TODO for testing only
+          cp docs /tmp/workspace/docs
+
           readonly BRANCH='gh-pages'
           git ls-remote --heads --exit-code origin $BRANCH
           if [ $? != 0 ]; then
