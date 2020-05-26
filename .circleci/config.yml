@@ -121,9 +121,8 @@ jobs:
     - deploy:
         name: Commit and push docs changes
         command: |
-
           # publishing happens by pushing files to gh-pages branch
-          readonly BRANCH='test-gh-pages'
+          readonly BRANCH='test-gh-pages' # TODO change to gh-pages before PR merge
 
           # check if branch exists on origin and if not exits with error.
           # the branch should be manually created and protected to be used.
@@ -141,13 +140,21 @@ jobs:
           # cp with T option to override existing content, specially usefull for latest
           cp -aT /tmp/workspace/docs/. .
 
-          ls -la
-          git status
+          # add a readme to make sure devs understand that this publishing branch is generated
+          # by CI (use template readme) and remove the current readme that is only for source dir
+          rm README.md
+          mv TARGET_README.md README.md
 
+          # add all new copied content of the workspace to git
           git add *
+
+          # commit with infos on the triggering task and branch
+          # use [skip ci] to prevent CI from runnning on this branch as no CI is configured
           git commit -m "Automated SDK documentation update" \
                      -m "[skip ci] Circle CI build ${CIRCLE_BUILD_NUM}, see ${CIRCLE_BUILD_URL}" \
                      -m "Branch: ${CIRCLE_BRANCH}, commit: ${CIRCLE_SHA1}, tag:${CIRCLE_TAG-none}"
+
+          # push changes to the Github Pages publishing branch on origin repos
           git push --set-upstream origin $BRANCH
           git push origin
 
@@ -156,14 +163,20 @@ workflows:
   workflow:
     jobs:
     - build
-    # - integrationTests
-    # - onChainTests
+    - integrationTests
+        requires:
+          - build
+    - onChainTests
+        requires:
+          - build
     - generateDoc:
         requires:
           - build
     - publishDoc:
         requires:
+          - integrationTests
+          - onChainTests
           - generateDoc
-        # filters:
+        # filters: # TODO activate before PR merge
         #   branches:
         #     only: master
