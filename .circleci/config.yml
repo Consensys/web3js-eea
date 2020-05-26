@@ -96,9 +96,9 @@ jobs:
         command: npm run generate-docs
     - run:
         name: archive doc
-        command: tar -czf web3-eea-sdk-doc.tgz ./docs/web3-eea
+        command: tar -czf web3-eea-sdk-doc.tgz ./docs/out/web3-eea
     - store_artifacts:
-        path: ./docs.tgz
+        path: ./web3-eea-sdk-doc.tgz
     - run:
         name: organise doc dirs
         command: node .circleci/organise_doc.js --rootdir=$(pwd) --tag="${CIRCLE_TAG}"
