@@ -133,7 +133,7 @@ jobs:
 
           git checkout "$BRANCH"
 
-          cp /tmp/workspace/docs/* .
+          cp -r /tmp/workspace/docs/* .
 
           ls -la
           git status
