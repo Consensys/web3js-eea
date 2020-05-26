@@ -122,7 +122,7 @@ jobs:
     - run:
         name: WIP
         command: |
-          ls /tmp/workspace/docs
+          # ls /tmp/workspace/docs
           git remote
           # git ls-remote --heads origin gh-pages
     # - deploy:
