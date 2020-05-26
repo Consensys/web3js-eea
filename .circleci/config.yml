@@ -38,14 +38,14 @@ jobs:
         name: test
         command: npm test
 
-  publishDoc:
+  generateDoc:
     executor: node_executor
     steps:
     - checkout
     - restore_cache:
         key: dependency-cache-{{ checksum "package-lock.json" }}
     - run:
-        name: install-npm
+        name: install packages
         command: npm install
     - save_cache:
         paths:
@@ -54,6 +54,18 @@ jobs:
     - run:
         name: build doc
         command: npm run generate-docs
+    - store_artifacts:
+        path: ./docs
+    - persist_to_workspace:
+        root: ~/project
+        paths:
+          - ./docs
+
+  publishDoc:
+    executor: node_executor
+    - attach_workspace:
+      at: /tmp/workspace
+    steps:
     - add_ssh_keys:
         fingerprints:
           - 'b4:b3:84:2a:8d:25:45:39:f4:b1:86:4d:d4:db:fb:b4'
@@ -62,24 +74,31 @@ jobs:
         command: |
           git config --global user.name $CIRCLE_USERNAME
           git config --global user.email "${CIRCLE_USERNAME}@users.noreply.github.com"
-    - deploy:
-        name: Commit and push docs changes
+    - run:
+        name: WIP
         command: |
-          git add docs/*
-          git commit -m "Automated SDK documentation update" \
-                     -m "[skip ci] Circle CI build ${CIRCLE_BUILD_NUM}, see ${CIRCLE_BUILD_URL}" \
-                     -m "Branch: ${CIRCLE_BRANCH}, commit: ${CIRCLE_SHA1}, tag:${CIRCLE_TAG-none}"
-          git push --set-upstream origin ${CIRCLE_BRANCH}
-          git push origin
+          ls /tmp/workspace/docs
+          git ls-remote --heads "${CIRCLE_REPOSITORY_URL}" gh-pages
+    # - deploy:
+    #     name: Commit and push docs changes
+    #     command: |
+    #       git add docs/*
+    #       git commit -m "Automated SDK documentation update" \
+    #                  -m "[skip ci] Circle CI build ${CIRCLE_BUILD_NUM}, see ${CIRCLE_BUILD_URL}" \
+    #                  -m "Branch: ${CIRCLE_BRANCH}, commit: ${CIRCLE_SHA1}, tag:${CIRCLE_TAG-none}"
+    #       git push --set-upstream origin ${CIRCLE_BRANCH}
+    #       git push origin
 
 workflows:
   version: 2
   workflow:
     jobs:
     - build
+    - generateDoc
     - publishDoc:
         requires:
           - build
+          - generateDoc
         filters:
           branches:
             only: master
