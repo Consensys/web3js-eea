@@ -123,7 +123,7 @@ jobs:
         name: WIP
         command: |
           ls /tmp/workspace/docs
-          git ls-remote --heads "${CIRCLE_REPOSITORY_URL}" gh-pages
+          git ls-remote --heads origin gh-pages
     # - deploy:
     #     name: Commit and push docs changes
     #     command: |
@@ -138,10 +138,10 @@ workflows:
   version: 2
   workflow:
     jobs:
-    - build
-    - generateDoc:
-        requires:
-          - build
+    # - build
+    - generateDoc #:
+        # requires:
+        #   - build
     - publishDoc:
         requires:
           - generateDoc
