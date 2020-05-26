@@ -26,7 +26,7 @@ jobs:
         key: dependency-cache-{{ checksum "package-lock.json" }}
     - run:
         name: build and unit tests
-        command: npm test:unit
+        command: npm run test:unit
 
   integrationTests:
     executor: docker_executor
@@ -51,7 +51,7 @@ jobs:
         - ./node_modules
     - run:
         name: Integration tests
-        command: npm test:integration
+        command: npm run test:integration
 
   onChainTests:
     executor: docker_executor
@@ -76,7 +76,7 @@ jobs:
         - ./node_modules
     - run:
         name: Integration tests
-        command: npm test:integration
+        command: npm run test:integration
 
   generateDoc:
     executor: node_executor
