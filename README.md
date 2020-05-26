@@ -1,2 +1,0 @@
-# eeajs
-EEA JavaScript libraries.
