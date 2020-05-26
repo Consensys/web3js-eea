@@ -95,10 +95,13 @@ jobs:
         name: build doc
         command: npm run generate-docs
     - run:
-        name: archive doc artifact
-        command: tar -czf docs.tgz ./docs
+        name: archive doc
+        command: tar -czf web3-eea-sdk-doc.tgz ./docs/web3-eea
     - store_artifacts:
         path: ./docs.tgz
+    - run:
+        name: organise doc dirs
+        command: node .circleci/organise_doc.js --rootdir=$(pwd) --tag="${CIRCLE_TAG}"
     - persist_to_workspace:
         root: ~/project
         paths:
@@ -163,10 +166,10 @@ workflows:
   workflow:
     jobs:
     - build
-    - integrationTests
+    - integrationTests:
         requires:
           - build
-    - onChainTests
+    - onChainTests:
         requires:
           - build
     - generateDoc:

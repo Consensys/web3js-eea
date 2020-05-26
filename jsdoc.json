@@ -12,7 +12,7 @@
         "plugins/markdown"
     ],
     "opts": {
-        "destination": "./docs/",
+        "destination": "./docs/out",
         "encoding": "utf8",
         "private": true,
         "recurse": true,
