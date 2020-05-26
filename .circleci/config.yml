@@ -109,6 +109,7 @@ jobs:
     steps:
     # no checkout of the current branch here as we are going to checkout gh-pages branch
     # so we only attach the previously saved workspace to be able to copy generated files from it.
+    - checkout
     - attach_workspace:
         at: /tmp/workspace
     - add_ssh_keys:
@@ -123,8 +124,7 @@ jobs:
         name: WIP
         command: |
           # ls /tmp/workspace/docs
-          git remote
-          # git ls-remote --heads origin gh-pages
+          git ls-remote --heads origin gh-pages
     # - deploy:
     #     name: Commit and push docs changes
     #     command: |
