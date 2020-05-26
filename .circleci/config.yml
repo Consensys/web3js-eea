@@ -99,11 +99,12 @@ workflows:
   workflow:
     jobs:
     - build
-    - generateDoc
-    - publishDoc:
+    - generateDoc:
         requires:
           - build
+    - publishDoc:
+        requires:
           - generateDoc
-        filters:
-          branches:
-            only: master
+        # filters:
+        #   branches:
+        #     only: master
