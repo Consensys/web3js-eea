@@ -124,16 +124,24 @@ jobs:
           # TODO for testing only
           cp -r docs /tmp/workspace/docs
 
+          # publishing happens by pushing files to gh-pages branch
           readonly BRANCH='gh-pages'
+
+          # check if branch exists on origin and if not exits with error.
+          # the branch should be manually created and protected to be used.
           git ls-remote --heads --exit-code origin $BRANCH
           if [ $? != 0 ]; then
               echo "Error: ${BRANCH} branch doesn't exist on ${CIRCLE_REPOSITORY_URL}"
               exit 1
           fi
 
+          # switch to the publishing branch
           git checkout "$BRANCH"
 
-          cp -r /tmp/workspace/docs/* .
+          # copy the content of the docs folder built on the previous job and attached
+          # using workspace on temp location
+          # cp with T option to override existing content, specially usefull for latest
+          cp -TR /tmp/workspace/docs/* .
 
           ls -la
           git status
