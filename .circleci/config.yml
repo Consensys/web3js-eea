@@ -141,7 +141,7 @@ jobs:
           # copy the content of the docs folder built on the previous job and attached
           # using workspace on temp location
           # cp with T option to override existing content, specially usefull for latest
-          cp -TR /tmp/workspace/docs/* .
+          cp -aT /tmp/workspace/docs/. .
 
           ls -la
           git status
