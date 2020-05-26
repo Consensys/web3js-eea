@@ -122,7 +122,7 @@ jobs:
         name: WIP
         command: |
           # TODO for testing only
-          cp docs /tmp/workspace/docs
+          cp -r docs /tmp/workspace/docs
 
           readonly BRANCH='gh-pages'
           git ls-remote --heads --exit-code origin $BRANCH
