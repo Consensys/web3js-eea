@@ -5,13 +5,31 @@ executors:
   node_executor:
     docker:
       - image: circleci/node:12.9.0-stretch
-
-jobs:
-  build:
+  docker_executor:
     machine:
       image: ubuntu-1604:202004-01 #Ubuntu 16.04, docker 19.03.8, docker-compose 1.25.5
       docker_layer_caching: true
-    working_directory: ~/project
+
+jobs:
+  build:
+    executor: node_executor
+    steps:
+    - checkout
+    - restore_cache:
+        key: dependency-cache-{{ checksum "package-lock.json" }}
+    - run:
+        name: install packages
+        command: npm install
+    - save_cache:
+        paths:
+          - ./node_modules
+        key: dependency-cache-{{ checksum "package-lock.json" }}
+    - run:
+        name: build and unit tests
+        command: npm test:unit
+
+  integrationTests:
+    executor: docker_executor
     steps:
     - checkout
     - restore_cache:
@@ -25,8 +43,30 @@ jobs:
           curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
           sudo apt-get install -y nodejs
     - run:
-        name: npm version
-        command: npm -v
+        name: install-npm
+        command: npm install
+    - save_cache:
+        key: dependency-cache-{{ checksum "package-lock.json" }}
+        paths:
+        - ./node_modules
+    - run:
+        name: Integration tests
+        command: npm test:integration
+
+  onChainTests:
+    executor: docker_executor
+    steps:
+    - checkout
+    - restore_cache:
+        key: dependency-cache-{{ checksum "package-lock.json" }}
+    - run:
+        name: Install Packages
+        command: |
+          sudo rm -rf /opt/circleci/.nvm
+          sudo apt-get update
+          sudo apt-get install -y git python make gcc g++ bash curl
+          curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+          sudo apt-get install -y nodejs
     - run:
         name: install-npm
         command: npm install
@@ -35,8 +75,8 @@ jobs:
         paths:
         - ./node_modules
     - run:
-        name: test
-        command: npm test
+        name: Integration tests
+        command: npm test:integration
 
   generateDoc:
     executor: node_executor
