@@ -124,7 +124,7 @@ jobs:
         name: WIP
         command: |
           readonly BRANCH='gh-pages'
-          git ls-remote --heads --exit-code upstream $BRANCH
+          git ls-remote --heads --exit-code origin $BRANCH
           if [ $? != 0 ]; then
               echo "Error: ${BRANCH} branch doesn't exist on ${CIRCLE_REPOSITORY_URL}"
               exit 1
