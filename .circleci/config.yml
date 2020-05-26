@@ -54,8 +54,11 @@ jobs:
     - run:
         name: build doc
         command: npm run generate-docs
+    - run:
+        name: archive doc artifact
+        command: tar -czf docs.tgz ./docs
     - store_artifacts:
-        path: ./docs
+        path: ./docs.tgz
     - persist_to_workspace:
         root: ~/project
         paths:
@@ -67,7 +70,7 @@ jobs:
     # no checkout of the current branch here as we are going to checkout gh-pages branch
     # so we only attach the previously saved workspace to be able to copy generated files from it.
     - attach_workspace:
-      at: /tmp/workspace
+        at: /tmp/workspace
     - add_ssh_keys:
         fingerprints:
           - 'b4:b3:84:2a:8d:25:45:39:f4:b1:86:4d:d4:db:fb:b4'
