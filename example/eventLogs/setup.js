@@ -32,13 +32,14 @@ async function run() {
       return node.priv.getTransactionReceipt(hash, enclaveKey);
     });
 
-  const { contractAddress } = deployReceipt;
+  const { contractAddress, blockNumber } = deployReceipt;
   console.log("deployed", contractAddress);
 
   // save to file
   const params = {
     privacyGroupId,
-    contractAddress
+    contractAddress,
+    blockNumber
   };
 
   fs.writeFileSync(path.join(__dirname, "params.json"), JSON.stringify(params));
