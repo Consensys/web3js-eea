@@ -107,8 +107,6 @@ jobs:
   publishDoc:
     executor: node_executor
     steps:
-    # no checkout of the current branch here as we are going to checkout gh-pages branch
-    # so we only attach the previously saved workspace to be able to copy generated files from it.
     - checkout
     - attach_workspace:
         at: /tmp/workspace
@@ -118,13 +116,25 @@ jobs:
     - run:
         name: Set Git user params
         command: |
-          git config --global user.name $CIRCLE_USERNAME
-          git config --global user.email "${CIRCLE_USERNAME}@users.noreply.github.com"
+          # git config --global user.name $CIRCLE_USERNAME
+          # git config --global user.email "${CIRCLE_USERNAME}@users.noreply.github.com"
+          git config --global user.name nico
+          git config --global user.email "nmassart@users.noreply.github.com"
     - run:
         name: WIP
         command: |
-          # ls /tmp/workspace/docs
-          git ls-remote --heads origin gh-pages
+          readonly BRANCH='gh-pages'
+          git ls-remote --heads --exit-code upstream $BRANCH
+          if [ $? != 0 ]; then
+              echo "Error: ${BRANCH} branch doesn't exist on ${CIRCLE_REPOSITORY_URL}"
+              exit 1
+          fi
+
+          git checkout "$BRANCH"
+          git pull
+
+          ls -la
+
     # - deploy:
     #     name: Commit and push docs changes
     #     command: |
