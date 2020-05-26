@@ -5,7 +5,7 @@ executors:
   node_executor:
     docker:
       - image: circleci/node:12.9.0-stretch
-  docker_executor:
+  docker_tests_executor:
     machine:
       image: ubuntu-1604:202004-01 #Ubuntu 16.04, docker 19.03.8, docker-compose 1.25.5
       docker_layer_caching: true
@@ -29,7 +29,7 @@ jobs:
         command: npm run test:unit
 
   integrationTests:
-    executor: docker_executor
+    executor: docker_tests_executor
     steps:
     - checkout
     - restore_cache:
@@ -54,7 +54,7 @@ jobs:
         command: npm run test:integration
 
   onChainTests:
-    executor: docker_executor
+    executor: docker_tests_executor
     steps:
     - checkout
     - restore_cache:
@@ -121,8 +121,6 @@ jobs:
     - deploy:
         name: Commit and push docs changes
         command: |
-          # TODO for testing only
-          cp -r docs /tmp/workspace/docs
 
           # publishing happens by pushing files to gh-pages branch
           readonly BRANCH='test-gh-pages'
@@ -157,13 +155,15 @@ workflows:
   version: 2
   workflow:
     jobs:
-    # - build
-    # - generateDoc:
-    #     requires:
-    #       - build
-    - publishDoc #:
-        # requires:
-        #   - generateDoc
+    - build
+    # - integrationTests
+    # - onChainTests
+    - generateDoc:
+        requires:
+          - build
+    - publishDoc:
+        requires:
+          - generateDoc
         # filters:
         #   branches:
         #     only: master
