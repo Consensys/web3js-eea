@@ -63,9 +63,11 @@ jobs:
 
   publishDoc:
     executor: node_executor
+    steps:
+    # no checkout of the current branch here as we are going to checkout gh-pages branch
+    # so we only attach the previously saved workspace to be able to copy generated files from it.
     - attach_workspace:
       at: /tmp/workspace
-    steps:
     - add_ssh_keys:
         fingerprints:
           - 'b4:b3:84:2a:8d:25:45:39:f4:b1:86:4d:d4:db:fb:b4'
