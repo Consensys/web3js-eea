@@ -149,12 +149,12 @@ jobs:
           mv TARGET_README.md README.md
 
           # add all new copied content of the workspace to git
-          git add *
+          git add .
 
           # commit with infos on the triggering task and branch
           # use [skip ci] to prevent CI from runnning on this branch as no CI is configured
           git commit -m "Automated SDK documentation update" \
-                     -m "[skip ci] Circle CI build ${CIRCLE_BUILD_NUM}, see ${CIRCLE_BUILD_URL}" \
+                     -m "[ci skip] Circle CI build ${CIRCLE_BUILD_NUM}, see ${CIRCLE_BUILD_URL}" \
                      -m "Branch: ${CIRCLE_BRANCH}, commit: ${CIRCLE_SHA1}, tag:${CIRCLE_TAG-none}"
 
           # push changes to the Github Pages publishing branch on origin repos
