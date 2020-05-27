@@ -5,4 +5,4 @@
 Sources for this content can be found on /docs directory on
 [master](https://github.com/PegaSysEng/web3js-eea/tree/master) and its children branches.
 
-Actual up to date generated doc is available at https://pegasyseng.github.io/web3js-eea/
+The actual up to date generated doc is available at https://pegasyseng.github.io/web3js-eea/
