@@ -180,6 +180,8 @@ workflows:
           - integrationTests
           - onChainTests
           - generateDoc
-        # filters: # TODO activate before PR merge
-        #   branches:
-        #     only: master
+        filters:
+          # branches: # TODO activate before PR merge
+          #   only: master
+          tags:
+            only: /.*/
