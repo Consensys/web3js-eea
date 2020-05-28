@@ -164,7 +164,6 @@ workflows:
   version: 2
   workflow:
     jobs:
-    - nvm
     - build
     - integrationTests:
         requires:
