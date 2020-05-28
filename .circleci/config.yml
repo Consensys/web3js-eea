@@ -101,7 +101,7 @@ jobs:
         key: node-cache-{{ checksum "package-lock.json" }}
     - run:
         name: build doc
-        command: npm run generate-docs
+        command: npm run generate:doc
     - run:
         name: archive doc
         command: tar -czf web3-eea-sdk-doc.tgz ./docs/out/web3-eea
@@ -133,15 +133,9 @@ jobs:
         name: Commit and push docs changes
         command: |
           # publishing happens by pushing files to gh-pages branch
-          readonly BRANCH='test-gh-pages' # TODO change to gh-pages before PR merge
-
-          # check if branch exists on origin and if not exits with error.
-          # the branch should be manually created and protected to be used.
-          git ls-remote --heads --exit-code origin $BRANCH
-          if [ $? != 0 ]; then
-              echo "Error: ${BRANCH} branch doesn't exist on ${CIRCLE_REPOSITORY_URL}"
-              exit 1
-          fi
+          # retrieve branch to publish to from CIrcle CI env vars and fallback on test-gh-pages
+          # if no var defined
+          [ -n "$BRANCH_OVERRIDE" ] && readonly BRANCH="$BRANCH_OVERRIDE" || readonly BRANCH='test-gh-pages'
 
           # switch to the publishing branch
           git checkout "$BRANCH"
@@ -152,8 +146,7 @@ jobs:
           cp -aT /tmp/workspace/docs/. .
 
           # add a readme to make sure devs understand that this publishing branch is generated
-          # by CI (use template readme) and replace the current readme that is only for source dir
-          rm README.md
+          # by CI (use template readme), mv replaces the current readme that is only for source dir
           mv TARGET_README.md README.md
 
           # add all new copied content of the workspace to git
