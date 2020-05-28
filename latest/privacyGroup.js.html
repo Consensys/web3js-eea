@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>privacyGroup.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="EEAClient.html">EEAClient</a><ul class='methods'><li data-type='method'><a href="EEAClient.html#.deletePrivacyGroup">deletePrivacyGroup</a></li><li data-type='method'><a href="EEAClient.html#.getMarkerTransaction">getMarkerTransaction</a></li><li data-type='method'><a href="EEAClient.html#.getTransactionCount">getTransactionCount</a></li><li data-type='method'><a href="EEAClient.html#~addToPrivacyGroup">addToPrivacyGroup</a></li><li data-type='method'><a href="EEAClient.html#~call">call</a></li><li data-type='method'><a href="EEAClient.html#~createXPrivacyGroup">createXPrivacyGroup</a></li><li data-type='method'><a href="EEAClient.html#~findOnChainPrivacyGroup">findOnChainPrivacyGroup</a></li><li data-type='method'><a href="EEAClient.html#~findPrivacyGroup">findPrivacyGroup</a></li><li data-type='method'><a href="EEAClient.html#~genericSendRawTransaction">genericSendRawTransaction</a></li><li data-type='method'><a href="EEAClient.html#~getTransactionReceipt">getTransactionReceipt</a></li><li data-type='method'><a href="EEAClient.html#~removeFromPrivacyGroup">removeFromPrivacyGroup</a></li><li data-type='method'><a href="EEAClient.html#~sendRawTransaction">sendRawTransaction</a></li><li data-type='method'><a href="EEAClient.html#~setPrivacyGroupLockState">setPrivacyGroupLockState</a></li><li data-type='method'><a href="EEAClient.html#~subscribe">subscribe</a></li></ul></li><li><a href="PrivateTransaction.html">PrivateTransaction</a><ul class='methods'><li data-type='method'><a href="PrivateTransaction.html#.serialize">serialize</a></li><li data-type='method'><a href="PrivateTransaction.html#.toJSON">toJSON</a></li><li data-type='method'><a href="PrivateTransaction.html#getBaseFee">getBaseFee</a></li><li data-type='method'><a href="PrivateTransaction.html#getChainId">getChainId</a></li><li data-type='method'><a href="PrivateTransaction.html#getDataFee">getDataFee</a></li><li data-type='method'><a href="PrivateTransaction.html#getSenderAddress">getSenderAddress</a></li><li data-type='method'><a href="PrivateTransaction.html#getSenderPublicKey">getSenderPublicKey</a></li><li data-type='method'><a href="PrivateTransaction.html#getUpfrontCost">getUpfrontCost</a></li><li data-type='method'><a href="PrivateTransaction.html#hash">hash</a></li><li data-type='method'><a href="PrivateTransaction.html#sign">sign</a></li><li data-type='method'><a href="PrivateTransaction.html#toCreationAddress">toCreationAddress</a></li><li data-type='method'><a href="PrivateTransaction.html#validate">validate</a></li><li data-type='method'><a href="PrivateTransaction.html#verifySignature">verifySignature</a></li></ul></li></ul><h3>Global</h3><ul><li><a href="global.html#defineProperties">defineProperties</a></li><li><a href="global.html#generatePrivacyGroup">generatePrivacyGroup</a></li><li><a href="global.html#PollingSubscription">PollingSubscription</a></li><li><a href="global.html#PrivateSubscription">PrivateSubscription</a></li><li><a href="global.html#PubSubSubscription">PubSubSubscription</a></li><li><a href="global.html#SubscriptionManager">SubscriptionManager</a></li><li><a href="global.html#toBuffer">toBuffer</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">privacyGroup.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const RLP = require("rlp");
+const _ = require("lodash");
+const { keccak256 } = require("./custom-ethjs-util");
+
+/**
+ * Generate a privacyGroupId
+ * @param options Options passed into `eea_sendRawTransaction`
+ * @returns String
+ */
+const generatePrivacyGroup = options => {
+  const participants = _.chain(options.privateFor || [])
+    .concat(options.privateFrom)
+    .uniq()
+    .map(publicKey => {
+      const buffer = Buffer.from(publicKey, "base64");
+      let result = 1;
+      buffer.forEach(value => {
+        // eslint-disable-next-line no-bitwise
+        result = (31 * result + ((value &lt;&lt; 24) >> 24)) &amp; 0xffffffff;
+      });
+      return { b64: publicKey, buf: buffer, hash: result };
+    })
+    .sort((a, b) => {
+      return a.hash - b.hash;
+    })
+    .map(x => {
+      return x.buf;
+    })
+    .value();
+
+  const rlp = RLP.encode(participants);
+
+  return Buffer.from(keccak256(rlp)).toString("base64");
+};
+
+module.exports = {
+  generatePrivacyGroup
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.4</a> on Thu May 28 2020 23:03:35 GMT+0000 (Coordinated Universal Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>
