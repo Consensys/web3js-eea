@@ -12,8 +12,13 @@ executors:
 
 commands:
   prepare_docker_machine:
-    description: "install all packages required by Ubuntu Docker machines"
+    description: "checkout, install all packages required by Ubuntu Docker machines and handle cache"
     steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - node-cache-{{ checksum "package-lock.json" }}
+            - node-cache-
       - run:
           name: install base packages
           command: |
@@ -29,9 +34,13 @@ commands:
       - run:
           name: install node packages
           command: npm ci
-jobs:
-  build:
-    executor: node_executor
+      - save_cache:
+          paths:
+            - ~/.npm
+          key: node-cache-{{ checksum "package-lock.json" }}
+
+  prepare_node:
+    description: "checkout, install all packages and handle cache"
     steps:
     - checkout
     - restore_cache:
@@ -45,6 +54,11 @@ jobs:
         paths:
           - ~/.npm
         key: node-cache-{{ checksum "package-lock.json" }}
+jobs:
+  build:
+    executor: node_executor
+    steps:
+    - prepare_node
     - run:
         name: build and unit tests
         command: npm run test:unit
@@ -52,16 +66,7 @@ jobs:
   integrationTests:
     executor: docker_tests_executor
     steps:
-    - checkout
-    - restore_cache:
-        keys:
-          - node-cache-{{ checksum "package-lock.json" }}
-          - node-cache-
     - prepare_docker_machine
-    - save_cache:
-        paths:
-          - ~/.npm
-        key: node-cache-{{ checksum "package-lock.json" }}
     - run:
         name: Integration tests
         command: npm run test:integration
@@ -69,35 +74,15 @@ jobs:
   onChainTests:
     executor: docker_tests_executor
     steps:
-    - checkout
-    - restore_cache:
-        keys:
-          - node-cache-{{ checksum "package-lock.json" }}
-          - node-cache-
     - prepare_docker_machine
-    - save_cache:
-        paths:
-          - ~/.npm
-        key: node-cache-{{ checksum "package-lock.json" }}
     - run:
-        name: Integration tests
-        command: npm run test:integration
+        name: On chain tests
+        command: npm run test:onchain
 
   generateDoc:
     executor: node_executor
     steps:
-    - checkout
-    - restore_cache:
-        keys:
-          - node-cache-{{ checksum "package-lock.json" }}
-          - node-cache-
-    - run:
-        name: install packages
-        command: npm ci
-    - save_cache:
-        paths:
-          - ~/.npm
-        key: node-cache-{{ checksum "package-lock.json" }}
+    - prepare_node
     - run:
         name: build doc
         command: npm run generate:doc
