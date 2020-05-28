@@ -4,7 +4,7 @@ version: 2.1
 executors:
   node_executor:
     docker:
-      - image: circleci/node:12.9.0-stretch
+      - image: circleci/node:14-buster
   docker_tests_executor:
     machine:
       image: ubuntu-1604:202004-01 #Ubuntu 16.04, docker 19.03.8, docker-compose 1.25.5
