@@ -10,6 +10,25 @@ executors:
       image: ubuntu-1604:202004-01 #Ubuntu 16.04, docker 19.03.8, docker-compose 1.25.5
       docker_layer_caching: true
 
+commands:
+  prepareDockerMachine:
+    description: "install all packages required by Ubuntu Docker machines"
+    steps:
+      - run:
+          name: install base packages
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y git python make gcc g++ bash curl
+      - run:
+          name: install node
+          command: |
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+            export NVM_DIR="/opt/circleci/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm install node
+      - run:
+          name: install node packages
+          command: npm ci
 jobs:
   build:
     executor: node_executor
@@ -38,16 +57,7 @@ jobs:
         keys:
           - node-cache-{{ checksum "package-lock.json" }}
           - node-cache-
-    - run:
-        name: Install Packages
-        command: |
-          sudo apt-get update
-          sudo apt-get install -y git python make gcc g++ bash curl
-          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
-          nvm install node
-    - run:
-        name: install packages
-        command: npm ci
+    - prepareDockerMachine
     - save_cache:
         paths:
           - ~/.npm
@@ -64,16 +74,7 @@ jobs:
         keys:
           - node-cache-{{ checksum "package-lock.json" }}
           - node-cache-
-    - run:
-        name: Install Packages
-        command: |
-          sudo apt-get update
-          sudo apt-get install -y git python make gcc g++ bash curl
-          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
-          nvm install node
-    - run:
-        name: install packages
-        command: npm ci
+    - prepareDockerMachine
     - save_cache:
         paths:
           - ~/.npm
