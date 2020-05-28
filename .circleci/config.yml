@@ -16,14 +16,16 @@ jobs:
     steps:
     - checkout
     - restore_cache:
-        key: dependency-cache-{{ checksum "package-lock.json" }}
+        keys:
+          - node-cache-{{ checksum "package-lock.json" }}
+          - node-cache-
     - run:
         name: install packages
-        command: npm install
+        command: npm ci
     - save_cache:
         paths:
-          - ./node_modules
-        key: dependency-cache-{{ checksum "package-lock.json" }}
+          - ~/.npm
+        key: node-cache-{{ checksum "package-lock.json" }}
     - run:
         name: build and unit tests
         command: npm run test:unit
@@ -33,7 +35,9 @@ jobs:
     steps:
     - checkout
     - restore_cache:
-        key: dependency-cache-{{ checksum "package-lock.json" }}
+        keys:
+          - node-cache-{{ checksum "package-lock.json" }}
+          - node-cache-
     - run:
         name: Install Packages
         command: |
@@ -43,12 +47,12 @@ jobs:
           curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
           sudo apt-get install -y nodejs
     - run:
-        name: install-npm
-        command: npm install
+        name: install packages
+        command: npm ci
     - save_cache:
-        key: dependency-cache-{{ checksum "package-lock.json" }}
         paths:
-        - ./node_modules
+          - ~/.npm
+        key: node-cache-{{ checksum "package-lock.json" }}
     - run:
         name: Integration tests
         command: npm run test:integration
@@ -58,7 +62,9 @@ jobs:
     steps:
     - checkout
     - restore_cache:
-        key: dependency-cache-{{ checksum "package-lock.json" }}
+        keys:
+          - node-cache-{{ checksum "package-lock.json" }}
+          - node-cache-
     - run:
         name: Install Packages
         command: |
@@ -68,12 +74,12 @@ jobs:
           curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
           sudo apt-get install -y nodejs
     - run:
-        name: install-npm
-        command: npm install
+        name: install packages
+        command: npm ci
     - save_cache:
-        key: dependency-cache-{{ checksum "package-lock.json" }}
         paths:
-        - ./node_modules
+          - ~/.npm
+        key: node-cache-{{ checksum "package-lock.json" }}
     - run:
         name: Integration tests
         command: npm run test:integration
@@ -83,14 +89,16 @@ jobs:
     steps:
     - checkout
     - restore_cache:
-        key: dependency-cache-{{ checksum "package-lock.json" }}
+        keys:
+          - node-cache-{{ checksum "package-lock.json" }}
+          - node-cache-
     - run:
         name: install packages
-        command: npm install
+        command: npm ci
     - save_cache:
         paths:
-          - ./node_modules
-        key: dependency-cache-{{ checksum "package-lock.json" }}
+          - ~/.npm
+        key: node-cache-{{ checksum "package-lock.json" }}
     - run:
         name: build doc
         command: npm run generate-docs
@@ -144,9 +152,12 @@ jobs:
           cp -aT /tmp/workspace/docs/. .
 
           # add a readme to make sure devs understand that this publishing branch is generated
-          # by CI (use template readme) and remove the current readme that is only for source dir
+          # by CI (use template readme) and replace the current readme that is only for source dir
           rm README.md
           mv TARGET_README.md README.md
+
+          # remove doc template not usefull on gh pages
+          rm layout.tmpl
 
           # add all new copied content of the workspace to git
           git add .
@@ -180,8 +191,6 @@ workflows:
           - integrationTests
           - onChainTests
           - generateDoc
-        filters:
+        # filters:
           # branches: # TODO activate before PR merge
           #   only: master
-          tags:
-            only: /.*/
