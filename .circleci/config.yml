@@ -1,38 +1,172 @@
-version: 2
-jobs:
-  build:
+---
+version: 2.1
+
+executors:
+  node_executor:
+    docker:
+      - image: circleci/node:14-buster
+  docker_tests_executor:
     machine:
       image: ubuntu-1604:202004-01 #Ubuntu 16.04, docker 19.03.8, docker-compose 1.25.5
       docker_layer_caching: true
-    working_directory: ~/project
+
+commands:
+  prepare_docker_machine:
+    description: "checkout, install all packages required by Ubuntu Docker machines and handle cache"
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - node-cache-{{ checksum "package-lock.json" }}
+            - node-cache-
+      - run:
+          name: install base packages
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y git python make gcc g++ bash curl
+      - run:
+          name: install node
+          command: |
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+            export NVM_DIR="/opt/circleci/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm install node
+      - run:
+          name: install node packages
+          command: npm ci
+      - save_cache:
+          paths:
+            - ~/.npm
+          key: node-cache-{{ checksum "package-lock.json" }}
+
+  prepare_node:
+    description: "checkout, install all packages and handle cache"
     steps:
     - checkout
     - restore_cache:
-        key: dependency-cache-{{ checksum "package-lock.json" }}
+        keys:
+          - node-cache-{{ checksum "package-lock.json" }}
+          - node-cache-
     - run:
-        name: Install Packages
-        command: |
-          sudo rm -rf /opt/circleci/.nvm
-          sudo apt-get update
-          sudo apt-get install -y git python make gcc g++ bash curl
-          curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
-          sudo apt-get install -y nodejs
-    - run:
-        name: npm version
-        command: npm -v
-    - run:
-        name: install-npm
-        command: npm install
+        name: install packages
+        command: npm ci
     - save_cache:
-        key: dependency-cache-{{ checksum "package-lock.json" }}
         paths:
-        - ./node_modules
+          - ~/.npm
+        key: node-cache-{{ checksum "package-lock.json" }}
+jobs:
+  build:
+    executor: node_executor
+    steps:
+    - prepare_node
     - run:
-        name: test
-        command: npm test
+        name: build and unit tests
+        command: npm run test:unit
+
+  integrationTests:
+    executor: docker_tests_executor
+    steps:
+    - prepare_docker_machine
+    - run:
+        name: Integration tests
+        command: npm run test:integration
+
+  onChainTests:
+    executor: docker_tests_executor
+    steps:
+    - prepare_docker_machine
+    - run:
+        name: On chain tests
+        command: npm run test:onchain
+
+  generateDoc:
+    executor: node_executor
+    steps:
+    - prepare_node
+    - run:
+        name: build doc
+        command: npm run generate:doc
+    - run:
+        name: archive doc
+        command: tar -czf web3-eea-sdk-doc.tgz ./docs/out/web3-eea
+    - store_artifacts:
+        path: ./web3-eea-sdk-doc.tgz
+    - run:
+        name: organise doc dirs
+        command: node .circleci/organise_doc.js --rootdir=$(pwd) --tag="${CIRCLE_TAG}"
+    - persist_to_workspace:
+        root: ~/project
+        paths:
+          - ./docs
+
+  publishDoc:
+    executor: node_executor
+    steps:
+    - checkout
+    - attach_workspace:
+        at: /tmp/workspace
+    - add_ssh_keys:
+        fingerprints:
+          - 'b4:b3:84:2a:8d:25:45:39:f4:b1:86:4d:d4:db:fb:b4'
+    - run:
+        name: Set Git user params
+        command: |
+          git config --global user.name $CIRCLE_USERNAME
+          git config --global user.email "${CIRCLE_USERNAME}@users.noreply.github.com"
+    - deploy:
+        name: Commit and push docs changes
+        command: |
+          # publishing happens by pushing files to gh-pages branch
+          # retrieve branch to publish to from CIrcle CI env vars and fallback on test-gh-pages
+          # if no var defined
+          [ -n "$BRANCH_OVERRIDE" ] && readonly BRANCH="$BRANCH_OVERRIDE" || readonly BRANCH='test-gh-pages'
+
+          # switch to the publishing branch
+          git checkout "$BRANCH"
+
+          # copy the content of the docs folder built on the previous job and attached
+          # using workspace on temp location
+          # cp with T option to override existing content, specially usefull for latest
+          cp -aT /tmp/workspace/docs/. .
+
+          # add a readme to make sure devs understand that this publishing branch is generated
+          # by CI (use template readme), mv replaces the current readme that is only for source dir
+          mv TARGET_README.md README.md
+
+          # add all new copied content of the workspace to git
+          git add .
+
+          # commit with infos on the triggering task and branch
+          # use [skip ci] to prevent CI from runnning on this branch as no CI is configured
+          git commit -m "Automated SDK documentation update" \
+                     -m "[ci skip] Circle CI build ${CIRCLE_BUILD_NUM}, see ${CIRCLE_BUILD_URL}" \
+                     -m "Branch: ${CIRCLE_BRANCH}, commit: ${CIRCLE_SHA1}, tag:${CIRCLE_TAG-none}"
+
+          # push changes to the Github Pages publishing branch on origin repos
+          git push --set-upstream origin $BRANCH
+          git push origin
 
 workflows:
   version: 2
   workflow:
     jobs:
     - build
+    - integrationTests:
+        requires:
+          - build
+    - onChainTests:
+        requires:
+          - build
+    - generateDoc:
+        requires:
+          - build
+    - publishDoc:
+        requires:
+          - integrationTests
+          - onChainTests
+          - generateDoc
+        filters:
+          branches:
+            only: master
+          tags:
+            only: /.*/

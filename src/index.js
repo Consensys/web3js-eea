@@ -6,6 +6,11 @@ const PrivateTransaction = require("./privateTransaction");
 const { generatePrivacyGroup } = require("./privacyGroup");
 const { PrivateSubscription } = require("./privateSubscription");
 
+/**
+ * Handles elements
+ * @name EEAClient
+ * @class EEAClient
+ */
 function EEAClient(web3, chainId) {
   const GAS_PRICE = 0;
   const GAS_LIMIT = 3000000;
@@ -160,6 +165,7 @@ function EEAClient(web3, chainId) {
    * @param {int} retries Number of retries to be made to get the private marker transaction receipt
    * @param {int} delay The delay between the retries
    * @returns Promise to resolve the private marker transaction receipt
+   * @memberOf EEAClient
    */
   const getMarkerTransaction = (txHash, retries, delay) => {
     /* eslint-disable promise/param-names */
@@ -273,7 +279,8 @@ function EEAClient(web3, chainId) {
   /**
    * Get the transaction count
    * @param options Options passed into `eea_sendRawTransaction`
-   * @returns {Promise<transaction count | never>}
+   * @returns Promise<transaction count | never>
+   * @memberOf EEAClient
    */
   const getTransactionCount = options => {
     let privacyGroupId;
@@ -290,7 +297,8 @@ function EEAClient(web3, chainId) {
    * Delete a privacy group
    * @param options Options passed into `deletePrivacyGroup`
    * - options.privacyGroupId
-   * @returns {Promise<transaction count | never>}
+   * @returns Promise<transaction count | never>
+   * @memberOf EEAClient
    */
   const deletePrivacyGroup = options => {
     // TODO: remove this function and pass arguments individually (breaks API)
@@ -301,7 +309,7 @@ function EEAClient(web3, chainId) {
    * Find privacy groups
    * @param options Options passed into `findPrivacyGroup`
    * - options.addresses
-   * @returns {Promise<transaction count | never>}
+   * @returns Promise<transaction count | never>
    */
   const findPrivacyGroup = options => {
     // TODO: remove this function and pass arguments individually(breaks API)
@@ -335,10 +343,10 @@ function EEAClient(web3, chainId) {
    * Invokes a private contract function locally
    * @param options Options passed into `priv_call`
    * options map can contain the following:
-   * - privacyGroupId : Enclave id representing the receivers of the transaction
-   * - to : Contract address,
-   * - data : Encoded function call (signature + data)
-   * - blockNumber: Blocknumber defaults to "latest"
+   * - **privacyGroupId:** Enclave id representing the receivers of the transaction
+   * - **to:** Contract address,
+   * - **data:** Encoded function call (signature + data)
+   * - **blockNumber:** Blocknumber defaults to "latest"
    * @returns {Promise<AxiosResponse<T>>}
    */
   const call = options => {
@@ -420,10 +428,10 @@ function EEAClient(web3, chainId) {
    * Either lock or unlock the privacy group for member adding
    * @param options Map to lock the group
    * options map can contain the following:
-   * privacyGroupId: Privacy group ID to lock/unlock
-   * privateKey: Private Key used to sign transaction with
-   * enclaveKey: Orion public key
-   * lock: boolean indicating whether to lock or unlock
+   * - **privacyGroupId:** Privacy group ID to lock/unlock
+   * - **privateKey:** Private Key used to sign transaction with
+   * - **enclaveKey:** Orion public key
+   * - **lock:** boolean indicating whether to lock or unlock
    * @returns {Promise<AxiosResponse<any> | never>}
    */
   const setPrivacyGroupLockState = options => {
@@ -455,10 +463,10 @@ function EEAClient(web3, chainId) {
    * Create an on chain privacy group
    * @param options Map to add the members
    * options map can contain the following:
-   * privacyGroupId: Privacy group ID to add to
-   * privateKey: Private Key used to sign transaction with
-   * enclaveKey: Orion public key
-   * participants: list of enclaveKey to pass to the contract to add to the group
+   * - **privacyGroupId:** Privacy group ID to add to
+   * - **privateKey:** Private Key used to sign transaction with
+   * - **enclaveKey:** Orion public key
+   * - **participants:** list of enclaveKey to pass to the contract to add to the group
    * @returns {Promise<AxiosResponse<any> | never>}
    */
   const createXPrivacyGroup = options => {
@@ -499,10 +507,11 @@ function EEAClient(web3, chainId) {
    * Add to an existing on-chain privacy group
    * @param options Map to add the members
    * options map can contain the following:
-   * privacyGroupId: Privacy group ID to add to
-   * privateKey: Private Key used to sign transaction with
-   * enclaveKey: Orion public key
-   * participants: list of enclaveKey to pass to the contract to add to the group
+   *
+   * - **privacyGroupId:** Privacy group ID to add to
+   * - **privateKey:** Private Key used to sign transaction with
+   * - **enclaveKey:** Orion public key
+   * - **participants:** list of enclaveKey to pass to the contract to add to the group
    * @returns {Promise<AxiosResponse<any> | never>}
    */
   const addToPrivacyGroup = options => {
@@ -522,10 +531,10 @@ function EEAClient(web3, chainId) {
    * Remove a member from an on-chain privacy group
    * @param options Map to add the members
    * options map can contain the following:
-   * privacyGroupId: Privacy group ID to add to
-   * privateKey: Private Key used to sign transaction with
-   * enclaveKey: Orion public key
-   * participant: single enclaveKey to pass to the contract to add to the group
+   * - **privacyGroupId:** Privacy group ID to add to
+   * - **privateKey:** Private Key used to sign transaction with
+   * - **enclaveKey:** Orion public key
+   * - **participant:** single enclaveKey to pass to the contract to add to the group
    * @returns {Promise<AxiosResponse<any> | never>}
    */
   const removeFromPrivacyGroup = options => {
@@ -560,8 +569,8 @@ function EEAClient(web3, chainId) {
    * Find privacy groups
    * @param options Map to find the group
    * options map can contain the following:
-   * addresses: the members of the privacy group
-   * @returns {Promise<privacy group | never>}
+   * - **addresses:** the members of the privacy group
+   * @returns Promise<privacy group | never>
    */
   const findOnChainPrivacyGroup = options => {
     // TODO: remove this function and pass arguments individually (breaks API)

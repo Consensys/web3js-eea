@@ -33,3 +33,6 @@ coverage/
 
 # temporary files
 example/eventLogs/params.json
+
+# doc generation
+/.circleci/process.yml
