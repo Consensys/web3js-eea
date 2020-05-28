@@ -156,9 +156,6 @@ jobs:
           rm README.md
           mv TARGET_README.md README.md
 
-          # remove doc template not usefull on gh pages
-          rm layout.tmpl
-
           # add all new copied content of the workspace to git
           git add .
 
