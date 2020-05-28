@@ -11,7 +11,7 @@ executors:
       docker_layer_caching: true
 
 commands:
-  prepareDockerMachine:
+  prepare_docker_machine:
     description: "install all packages required by Ubuntu Docker machines"
     steps:
       - run:
@@ -57,7 +57,7 @@ jobs:
         keys:
           - node-cache-{{ checksum "package-lock.json" }}
           - node-cache-
-    - prepareDockerMachine
+    - prepare_docker_machine
     - save_cache:
         paths:
           - ~/.npm
@@ -74,7 +74,7 @@ jobs:
         keys:
           - node-cache-{{ checksum "package-lock.json" }}
           - node-cache-
-    - prepareDockerMachine
+    - prepare_docker_machine
     - save_cache:
         paths:
           - ~/.npm
