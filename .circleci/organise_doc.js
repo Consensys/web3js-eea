@@ -16,10 +16,14 @@ const jsDocOutputDir = jsdocOpts.destination
 
 // root dir is the absolute path to use, provided by CI
 const rootDir = args.rootdir
+if (rootDir === '' || rootDir == null){
+  console.error('rootDir argument must be defined');
+  process.exit(1);
+}
 // the tag being built and empty or null if none
 const tag = args.tag
 
-// if no tag, doc sill gon in latest directory
+// if no tag, doc will go in latest directory by default
 const targetDir = (tag === '' || tag == null) ? 'latest' : tag
 
 // source directories where JSdoc put the doc
