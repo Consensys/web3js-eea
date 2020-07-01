@@ -34,10 +34,10 @@ you are agreeing to uphold this code. Please report unacceptable behavior. Pleas
 
 ### Reporting Bugs
 #### Before Submitting A Bug
-* Ensure the bug is not already reported by searching our [Jira](https://pegasys1.atlassian.net/secure/Dashboard.jspa?selectPageId=10000).
+* Ensure the bug is not already reported by searching [GitHub issues] (https://github.com/PegaSysEng/web3js-eea/issues).
 
 #### How Do I Submit a (Good) Bug?
-Bugs are tracked as [Jira issues](https://pegasys1.atlassian.net/secure/Dashboard.jspa?selectPageId=10000).
+Bugs are tracked as [GitHub issues] (https://github.com/PegaSysEng/web3js-eea/issues).
 
 * If you are unable to find an open issue addressing the problem, open a new one. Be sure to include a
 **title and clear description**, as much relevant information as possible, and a **code sample** or
@@ -60,7 +60,7 @@ happens and under which conditions it normally happens.
 suggested. If it has, add a comment to the existing issue instead of opening a new one.
 
 #### How Do I Submit A (Good) Enhancement Suggestion?
-Enhancement suggestions are tracked as in [Jira](https://pegasys1.atlassian.net/secure/Dashboard.jspa?selectPageId=10000). Create an issue on and provide
+Enhancement suggestions are tracked as [GitHub issues] (https://github.com/PegaSysEng/web3js-eea/issues). Create an issue on and provide
 the following information:
 
 * Use a **clear and descriptive title** for the issue to identify the suggestion.
