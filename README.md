@@ -7,7 +7,7 @@ JavaScript libraries to:
 
 ## Issues 
 
-web3.js-eea issues are tracked in [Jira](https://pegasys1.atlassian.net/secure/Dashboard.jspa?selectPageId=10117) not GitHub. 
+web3.js-eea issues are tracked in GitHub. 
 See our [contribution guidelines](CONTRIBUTING.md) for more detail on searching and creating issues.
 
 ## Using 
