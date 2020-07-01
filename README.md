@@ -8,7 +8,7 @@ JavaScript libraries to:
 ## Issues 
 
 web3.js-eea issues are tracked in GitHub. 
-See our [contribution guidelines](CONTRIBUTING.md) for more detail on searching and creating issues.
+See our [contribution guidelines](https://github.com/PegaSysEng/web3js-eea/blob/master/CONTRIBUTING.md) for more detail on searching and creating issues.
 
 ## Using 
 
