@@ -27,7 +27,7 @@ you are agreeing to uphold this code. Please report unacceptable behavior. Pleas
 
 > **Note:** Please don't file an issue to ask a question.  You'll get faster results by using the resources below.
 
-* [Documentation](https://besu.hyperledger.org/en/stable/Tutorials/Privacy/eeajs-Multinode-example/)
+* [Documentation](https://besu.hyperledger.org/en/latest/Tutorials/Privacy/web3js-eea-Multinode-example/)
 * [RocketChat]
 
 ## How to Contribute
