@@ -86,7 +86,7 @@ const getPrivateTransactionReceipt = transactionHash => {
     .getTransactionReceipt(transactionHash, orion.node1.publicKey)
     .then(result => {
       console.log("Transaction Hash:", transactionHash);
-      console.log("Event Emited:", result.logs[0].data);
+      console.log("Event Emitted:", result.logs[0].data);
       return result;
     });
 };
