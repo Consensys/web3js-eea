@@ -13,6 +13,7 @@ const web3 = new EEAClient(new Web3(besu.node1.url), 2018);
 */
 const TX_COUNT = 1000;
 const BATCH_SIZE = 120;
+// can set this address to any contract address eg deployed ERC20 contract
 const CONTRACT_ADDRESS = "0x000000000000000000000000000000000000007e"; // privacy precompile address
 
 // get public nonce of account
