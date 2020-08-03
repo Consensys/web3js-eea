@@ -104,7 +104,7 @@ module.exports = async () => {
 
   console.log(callGreetFunctionResult);
 
-  const callSetGreetingFunctionResultFromSecondPartipant = await callGenericFunctionOnContract(
+  const callSetGreetingFunctionResultFromSecondParticipant = await callGenericFunctionOnContract(
     web3Node2,
     orion.node2.publicKey,
     besu.node2.privateKey,
@@ -116,7 +116,7 @@ module.exports = async () => {
     return r;
   });
 
-  console.log(callSetGreetingFunctionResultFromSecondPartipant);
+  console.log(callSetGreetingFunctionResultFromSecondParticipant);
 
   const callFireEventFunctionResult = await callGenericFunctionOnContract(
     web3Node1,
