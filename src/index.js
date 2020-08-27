@@ -477,7 +477,6 @@ function EEAClient(web3, chainId) {
     });
     const functionArgs = web3.eth.abi
       .encodeParameters(functionAbi.inputs, [
-        Buffer.from(options.enclaveKey, "base64"),
         options.participants.map(e => {
           return Buffer.from(e, "base64");
         })
@@ -545,7 +544,6 @@ function EEAClient(web3, chainId) {
     });
     const functionArgs = web3.eth.abi
       .encodeParameters(functionAbi.inputs, [
-        Buffer.from(options.enclaveKey, "base64"),
         Buffer.from(options.participant, "base64")
       ])
       .slice(2);
