@@ -1,6 +1,7 @@
 const Web3 = require("web3");
 const EEAClient = require("../../src");
 
+const Utils = require("./helpers.js");
 const { orion, besu } = require("../keys.js");
 
 const node1 = new EEAClient(new Web3(besu.node1.url), 2018);
@@ -23,7 +24,10 @@ module.exports = async () => {
     addresses: [orion.node1.publicKey, orion.node2.publicKey]
   });
   console.log("Found privacy group results:");
-  console.log(findResult);
+  Utils.logMatchingGroup(
+    findResult,
+    onChainPrivacyGroupCreationResult.privacyGroupId
+  );
 
   const addResult = await node1.privx.addToPrivacyGroup({
     participants: [orion.node3.publicKey],
@@ -50,7 +54,10 @@ module.exports = async () => {
     ]
   });
   console.log("Found privacy groups with added node:");
-  console.log(findResultWithAddedNode);
+  Utils.logMatchingGroup(
+    findResultWithAddedNode,
+    onChainPrivacyGroupCreationResult.privacyGroupId
+  );
 
   const removeResult = await node1.privx.removeFromPrivacyGroup({
     participant: orion.node3.publicKey,
@@ -65,8 +72,10 @@ module.exports = async () => {
   const findResultRemovedNode = await node2.privx.findOnChainPrivacyGroup({
     addresses: [orion.node1.publicKey, orion.node2.publicKey]
   });
-  console.log("Found privacy groups with removed node:");
-  console.log(findResultRemovedNode);
+  Utils.logMatchingGroup(
+    findResultRemovedNode,
+    onChainPrivacyGroupCreationResult.privacyGroupId
+  );
 };
 
 if (require.main === module) {
