@@ -12,7 +12,7 @@ See our [contribution guidelines](https://github.com/PegaSysEng/web3js-eea/blob/
 
 ## Using 
 
-The Besu documentation describes how to [use the web3.js-eea libraries](https://besu.hyperledger.org/en/latest/Reference/web3js-eea-Methods/). 
+The Besu documentation describes how to [use the web3.js-eea libraries](https://besu.hyperledger.org/en/stable/HowTo/Interact/Client-Libraries/web3js-eea/). 
 
 ## Developing
 
