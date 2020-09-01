@@ -1,5 +1,18 @@
-pragma solidity ^0.5.12;
-
+/*
+ * Copyright ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+pragma solidity ^0.6.0;
 import "./PrivacyInterface.sol";
 
 contract PrivacyProxy is PrivacyInterface {
@@ -24,11 +37,11 @@ contract PrivacyProxy is PrivacyInterface {
     return privacyInterface.getParticipants();
   }
 
-  function removeParticipant(bytes32 _member) public override returns (bool) {
+  function removeParticipant(bytes32 _participant) public override returns (bool) {
     PrivacyInterface privacyInterface = PrivacyInterface(implementation);
-    bool result = privacyInterface.removeParticipant(_member);
+    bool result = privacyInterface.removeParticipant(_participant);
     if (result) {
-      emit ParticipantRemoved(_member);
+      emit ParticipantRemoved(_participant);
     }
     return result;
   }
@@ -43,12 +56,12 @@ contract PrivacyProxy is PrivacyInterface {
     return privacyInterface.unlock();
   }
 
-  function canExecute() public override view returns (bool) {
+  function canExecute() public view override returns (bool) {
     PrivacyInterface privacyInterface = PrivacyInterface(implementation);
     return privacyInterface.canExecute();
   }
 
-  function getVersion() public override view returns (bytes32) {
+  function getVersion() public view override returns (bytes32) {
     PrivacyInterface privacyInterface = PrivacyInterface(implementation);
     return privacyInterface.getVersion();
   }
@@ -71,4 +84,5 @@ contract PrivacyProxy is PrivacyInterface {
   event ParticipantRemoved(
     bytes32 publicEnclaveKey
   );
+
 }
