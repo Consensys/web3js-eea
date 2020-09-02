@@ -28,6 +28,11 @@ const getPrivateContractAddress = transactionHash => {
     .getTransactionReceipt(transactionHash, orion.node1.publicKey)
     .then(privateTransactionReceipt => {
       console.log("Private Transaction Receipt\n", privateTransactionReceipt);
+      console.log(
+        `now you have to run:\n export CONTRACT_ADDRESS=${
+          privateTransactionReceipt.contractAddress
+        }\n`
+      );
       return privateTransactionReceipt.contractAddress;
     });
 };
