@@ -34,6 +34,7 @@ const getPrivateContractAddress = transactionHash => {
     .getTransactionReceipt(transactionHash, orion.node1.publicKey)
     .then(privateTransactionReceipt => {
       console.log("Private Transaction Receipt\n", privateTransactionReceipt);
+
       return privateTransactionReceipt.contractAddress;
     });
 };
@@ -43,6 +44,11 @@ module.exports = async () => {
   const contractAddress = await createPrivateEmitterContract(privacyGroupId)
     .then(getPrivateContractAddress)
     .catch(console.error);
+  console.log(
+    `now you have to run:\n export CONTRACT_ADDRESS=${contractAddress}`
+  );
+  console.log(` export PRIVACY_GROUP_ID=${privacyGroupId}`);
+
   return { contractAddress, privacyGroupId };
 };
 
