@@ -120,5 +120,10 @@ module.exports = async () => {
 };
 
 if (require.main === module) {
-  module.exports();
+  module.exports().catch(error => {
+    console.log(error);
+    console.log(
+      "\nThis example requires ONCHAIN privacy to be DISABLED. \nCheck config for ONCHAIN privacy groups."
+    );
+  });
 }

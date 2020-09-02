@@ -40,9 +40,9 @@ const getPrivateContractAddress = transactionHash => {
 
 module.exports = async () => {
   const privacyGroupId = await createGroupId();
-  const contractAddress = await createPrivateEmitterContract(privacyGroupId)
-    .then(getPrivateContractAddress)
-    .catch(console.error);
+  const contractAddress = await createPrivateEmitterContract(
+    privacyGroupId
+  ).then(getPrivateContractAddress);
   console.log(
     `now you have to run:\n export CONTRACT_ADDRESS=${contractAddress}`
   );
@@ -51,5 +51,10 @@ module.exports = async () => {
 };
 
 if (require.main === module) {
-  module.exports();
+  module.exports().catch(error => {
+    console.log(error);
+    console.log(
+      "\nThis example requires ONCHAIN privacy to be DISABLED. \nCheck config for ONCHAIN privacy groups."
+    );
+  });
 }

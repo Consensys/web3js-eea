@@ -40,7 +40,12 @@ const getPrivateContractAddress = transactionHash => {
 module.exports = () => {
   return createPrivateEmitterContract()
     .then(getPrivateContractAddress)
-    .catch(console.error);
+    .catch(error => {
+      console.log(error);
+      console.log(
+        "\nThis example requires ONCHAIN privacy to be DISABLED. \nCheck config for ONCHAIN privacy groups."
+      );
+    });
 };
 
 if (require.main === module) {
