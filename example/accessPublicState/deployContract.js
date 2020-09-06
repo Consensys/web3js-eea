@@ -19,6 +19,7 @@ const binaryCrossContractReader = fs.readFileSync(
 );
 
 const web3 = new EEAClient(new Web3(besu.node1.url), 2018);
+let logBuffer = "";
 
 const createPublicEventEmitter = () => {
   const besuAccount = web3.eth.accounts.privateKeyToAccount(
@@ -45,6 +46,9 @@ const createPublicEventEmitter = () => {
     })
     .then(transactionReceipt => {
       console.log("Public Transaction Receipt\n", transactionReceipt);
+      logBuffer += `now you have to run:\n export PUBLIC_CONTRACT_ADDRESS=${
+        transactionReceipt.contractAddress
+      }\n`;
       return transactionReceipt.contractAddress;
     });
 };
@@ -65,6 +69,10 @@ const getPrivateContractAddress = transactionHash => {
     .getTransactionReceipt(transactionHash, orion.node1.publicKey)
     .then(privateTransactionReceipt => {
       console.log("Private Transaction Receipt\n", privateTransactionReceipt);
+      logBuffer += ` export PRIVATE_CONTRACT_ADDRESS=${
+        privateTransactionReceipt.contractAddress
+      }`;
+      console.log(logBuffer);
       return privateTransactionReceipt.contractAddress;
     });
 };
@@ -73,7 +81,12 @@ module.exports = () => {
   return createPublicEventEmitter()
     .then(createPrivateCrossContractReader)
     .then(getPrivateContractAddress)
-    .catch(console.error);
+    .catch(error => {
+      console.log(error);
+      console.log(
+        "\nThis example requires ONCHAIN privacy to be DISABLED. \nCheck config for ONCHAIN privacy groups."
+      );
+    });
 };
 
 if (require.main === module) {

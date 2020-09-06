@@ -65,7 +65,7 @@ const getValue = (url, address, privateFrom, privacyGroupId, privateKey) => {
       );
     })
     .then(result => {
-      console.log(`Get Value from ${url}:`, result.output);
+      console.log(`GOT Value from ${url}:`, result.output);
       return result;
     });
 };
@@ -91,6 +91,7 @@ const getValueFromNode2 = (address, privacyGroupId) => {
 };
 
 const getValueFromNode3 = (address, privacyGroupId) => {
+  console.log(`EXPECTING AN ERROR: GETTING Value from: ${besu.node3.url}`);
   return getValue(
     besu.node3.url,
     address,
