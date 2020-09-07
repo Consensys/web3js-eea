@@ -43,7 +43,7 @@
     "eea",
     "orion"
   ],
-  "author": "PegaSysEng <support@pegasys.tech>",
+  "author": "ConsenSys <quorum@consensys.net>",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/PegaSysEng/web3js-eea/issues"
