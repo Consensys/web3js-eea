@@ -145,18 +145,19 @@ PubSubSubscription.prototype.subscribe = async function subscribe(
   privacyGroupId,
   filter
 ) {
+  const websocketProvider = this.web3.currentProvider;
   // Register provider events to forward to the caller
-  this.web3.currentProvider
-    .on("connect", () => {
-      this.subscription.emit(Event.CONNECTED);
-    })
-    .on("data", data => {
-      // Log is in `params` key of JSON-RPC response
-      this.subscription.emit(Event.DATA, data.params);
-    })
-    .on("error", e => {
-      this.subscription.emit(Event.ERROR, e);
-    });
+  websocketProvider.on("connect", () => {
+    console.log("CONNECTED");
+    this.subscription.emit(Event.CONNECTED);
+  });
+  websocketProvider.on("data", data => {
+    // Log is in `params` key of JSON-RPC response
+    this.subscription.emit(Event.DATA, data.params);
+  });
+  websocketProvider.on("error", e => {
+    this.subscription.emit(Event.ERROR, e);
+  });
 
   // start subscription
   this.subscription.filterId = await this.web3.privInternal.subscribe(
