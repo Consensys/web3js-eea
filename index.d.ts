@@ -107,11 +107,7 @@ export default class EEAClient extends Web3 {
       delay?: number
     ) => Promise<PrivateTransactionReceipt | null>;
     call: (options: { privacyGroupId: string; to: string; data: string; blockNumber?: number }) => Promise<PrivateTransactionReceipt>;
-    subscribe: (
-      privacyGroupId: string,
-      filter: Filter,
-      callback: (error: Error | null, result?: string) => void
-    ) => Promise<PrivateSubscription>;
+    subscribe: (privacyGroupId: string, filter: Filter, callback: (error: unknown, result: string) => void) => Promise<PrivateSubscription>;
     createPrivacyGroup: (options: { addresses: string[]; name?: string; description?: string }) => Promise<string>;
     getTransaction: (txHash: string) => Promise<PrivateTransaction | null>;
     getPastLogs: (privacyGroupId: string, filter: Filter) => Promise<Log[]>;
@@ -161,9 +157,9 @@ export default class EEAClient extends Web3 {
 declare class PrivateSubscription extends EventEmitter {
   constructor(web3: Web3, privacyGroupId: string, filter: Filter);
   subscribe(): Promise<string>;
-  on(eventName: string, callback: (error: Error | null, result?: PrivateLog) => void): this;
+  on(eventName: string, callback: (error: unknown, result: PrivateLog) => void): this;
   on(eventName: "data", callback: (data: PrivateLog) => void): this;
-  on(eventName: "error", callback: (error: Error) => void): this;
+  on(eventName: "error", callback: (error: unknown) => void): this;
   reset(): void;
   unsubscribe(callback: () => void): Promise<string>;
 }
