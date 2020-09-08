@@ -1,3 +1,18 @@
+/*
+ * Copyright ConsenSys Software Inc.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. 
+ * If a copy of the MPL was not distributed with this file, You can obtain one at 
+ *
+ * http://mozilla.org/MPL/2.0/
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ *
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
 const EventEmitter = require("events");
 
 const Protocol = {
@@ -130,18 +145,19 @@ PubSubSubscription.prototype.subscribe = async function subscribe(
   privacyGroupId,
   filter
 ) {
+  const websocketProvider = this.web3.currentProvider;
   // Register provider events to forward to the caller
-  this.web3.currentProvider
-    .on("connect", () => {
-      this.subscription.emit(Event.CONNECTED);
-    })
-    .on("data", data => {
-      // Log is in `params` key of JSON-RPC response
-      this.subscription.emit(Event.DATA, data.params);
-    })
-    .on("error", e => {
-      this.subscription.emit(Event.ERROR, e);
-    });
+  websocketProvider.on("connect", () => {
+    console.log("CONNECTED");
+    this.subscription.emit(Event.CONNECTED);
+  });
+  websocketProvider.on("data", data => {
+    // Log is in `params` key of JSON-RPC response
+    this.subscription.emit(Event.DATA, data.params);
+  });
+  websocketProvider.on("error", e => {
+    this.subscription.emit(Event.ERROR, e);
+  });
 
   // start subscription
   this.subscription.filterId = await this.web3.privInternal.subscribe(

@@ -28,6 +28,11 @@ const getPrivateContractAddress = transactionHash => {
     .getTransactionReceipt(transactionHash, orion.node1.publicKey)
     .then(privateTransactionReceipt => {
       console.log("Private Transaction Receipt\n", privateTransactionReceipt);
+      console.log(
+        `now you have to run:\n export CONTRACT_ADDRESS=${
+          privateTransactionReceipt.contractAddress
+        }\n`
+      );
       return privateTransactionReceipt.contractAddress;
     });
 };
@@ -35,7 +40,12 @@ const getPrivateContractAddress = transactionHash => {
 module.exports = () => {
   return createPrivateEmitterContract()
     .then(getPrivateContractAddress)
-    .catch(console.error);
+    .catch(error => {
+      console.log(error);
+      console.log(
+        "\nThis example requires ONCHAIN privacy to be DISABLED. \nCheck config for ONCHAIN privacy groups."
+      );
+    });
 };
 
 if (require.main === module) {
