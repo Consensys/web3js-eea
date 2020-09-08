@@ -161,5 +161,5 @@ declare class PrivateSubscription extends EventEmitter {
   on(eventName: "data", callback: (data: PrivateLog) => void): this;
   on(eventName: "error", callback: (error: unknown) => void): this;
   reset(): void;
-  unsubscribe(callback: () => void): Promise<string>;
+  unsubscribe(callback: (error: unknown, result: boolean) => void): Promise<string>;
 }
