@@ -44,7 +44,7 @@
     "orion"
   ],
   "author": "ConsenSys <quorum@consensys.net>",
-    "license": "MPL-2.0",
+  "license": "MPL-2.0",
   "bugs": {
     "url": "https://github.com/PegaSysEng/web3js-eea/issues"
   },
