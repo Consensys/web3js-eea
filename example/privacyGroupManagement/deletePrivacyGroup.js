@@ -26,5 +26,11 @@ if (require.main === module) {
   }
 
   const privacyGroupId = process.env.PRIVACY_GROUP_TO_DELETE;
-  deletePrivacyGroup(privacyGroupId);
+  deletePrivacyGroup(privacyGroupId).catch(error => {
+    console.log(error);
+    console.log(
+      `\nAttempted to delete PRIVACY_GROUP_TO_DELETE=${privacyGroupId}`
+    );
+    console.log("You may need to update PRIVACY_GROUP_TO_DELETE");
+  });
 }
