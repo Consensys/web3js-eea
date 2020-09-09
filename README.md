@@ -16,6 +16,7 @@ The Besu documentation describes how to [use the web3.js-eea libraries](https://
 
 ## Developing
 
+Note that the tests rely on the values in example/keys.js, so revert or stash any local changes to that file before running the tests.
 To run all the tests:
 ```bash
 $ npm test
