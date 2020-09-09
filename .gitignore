@@ -33,6 +33,7 @@ coverage/
 
 # temporary files
 example/eventLogs/params.json
+docker/.quickstart.lock
 
 # doc generation
 /.circleci/process.yml
