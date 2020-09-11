@@ -14,6 +14,16 @@ See our [contribution guidelines](https://github.com/PegaSysEng/web3js-eea/blob/
 
 The Besu documentation describes how to [use the web3.js-eea libraries](https://besu.hyperledger.org/en/stable/HowTo/Interact/Client-Libraries/web3js-eea/). 
 
+## Compatibility Matrix
+
+These libraries have been tested with the following versions of Besu and Orion
+Besu version | Orion version | web3js-eea version
+| ------------------- | ---------------------------- | ---------------------------- |
+1.5.3 | 1.6 | 0.10.0
+1.5.2 | 1.6 | 0.9.0
+1.5.1 | 1.6 | 0.9.0
+
+
 ## Developing
 
 Note that the tests rely on the values in example/keys.js, so revert or stash any local changes to that file before running the tests.
