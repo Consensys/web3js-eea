@@ -12,9 +12,9 @@ const node2 = new EEAClient(
   new Web3(createHttpProvider(orion.node2.jwt, besu.node2.url)),
   2018
 );
-// in this example node3 is a second tenant on besu/orion node1 with orion key orion12
+// in this example node3 is a second tenant on besu/orion node1 with orion key orion11
 const node3 = new EEAClient(
-  new Web3(createHttpProvider(orion.node12.jwt, besu.node1.url)),
+  new Web3(createHttpProvider(orion.node11.jwt, besu.node1.url)),
   2018
 );
 
@@ -40,7 +40,7 @@ module.exports = async () => {
   );
 
   const addResult = await node1.privx.addToPrivacyGroup({
-    participants: [orion.node12.publicKey],
+    participants: [orion.node11.publicKey],
     enclaveKey: orion.node1.publicKey,
     privateFrom: orion.node1.publicKey,
     privacyGroupId: onChainPrivacyGroupCreationResult.privacyGroupId,
@@ -51,7 +51,7 @@ module.exports = async () => {
 
   const receiptFromNode3 = await node3.priv.getTransactionReceipt(
     addResult.commitmentHash,
-    orion.node12.publicKey
+    orion.node11.publicKey
   );
   console.log("Got transaction receipt from added node:");
   console.log(receiptFromNode3);
@@ -60,7 +60,7 @@ module.exports = async () => {
     addresses: [
       orion.node1.publicKey,
       orion.node2.publicKey,
-      orion.node12.publicKey
+      orion.node11.publicKey
     ]
   });
   console.log("Found privacy groups with added node:");
@@ -70,7 +70,7 @@ module.exports = async () => {
   );
 
   const removeResult = await node1.privx.removeFromPrivacyGroup({
-    participant: orion.node12.publicKey,
+    participant: orion.node11.publicKey,
     enclaveKey: orion.node1.publicKey,
     privateFrom: orion.node1.publicKey,
     privacyGroupId: onChainPrivacyGroupCreationResult.privacyGroupId,
