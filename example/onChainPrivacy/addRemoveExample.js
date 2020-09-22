@@ -1,7 +1,7 @@
 const Web3 = require("web3");
 const EEAClient = require("../../src");
 
-const Utils = require("./helpers.js");
+const Utils = require("../helpers.js");
 const { orion, besu } = require("../keys.js");
 
 const node1 = new EEAClient(new Web3(besu.node1.url), 2018);
