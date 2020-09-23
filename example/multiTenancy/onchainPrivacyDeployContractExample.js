@@ -1,16 +1,16 @@
 const fs = require("fs");
 const path = require("path");
 const Web3 = require("web3");
-const EEAClient = require("../../../src");
+const EEAClient = require("../../src");
 
-const { orion, besu } = require("../../keys.js");
-const { createHttpProvider } = require("../../helpers.js");
+const { orion, besu } = require("../keys.js");
+const { createHttpProvider } = require("../helpers.js");
 
 const binary = fs.readFileSync(
-  path.join(__dirname, "../../solidity/Greeter/greeter.bin")
+  path.join(__dirname, "../solidity/Greeter/greeter.bin")
 );
 
-const greeterAbi = require("../../solidity/Greeter/greeter_meta").output.abi;
+const greeterAbi = require("../solidity/Greeter/greeter_meta").output.abi;
 
 const node1 = new EEAClient(
   new Web3(createHttpProvider(orion.node1.jwt, besu.node1.url)),

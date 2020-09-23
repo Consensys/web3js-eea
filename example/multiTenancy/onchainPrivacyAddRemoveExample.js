@@ -1,8 +1,8 @@
 const Web3 = require("web3");
-const EEAClient = require("../../../src");
+const EEAClient = require("../../src");
 
-const { orion, besu } = require("../../keys.js");
-const { logMatchingGroup, createHttpProvider } = require("../../helpers.js");
+const { orion, besu } = require("../keys.js");
+const { logMatchingGroup, createHttpProvider } = require("../helpers.js");
 
 const node1 = new EEAClient(
   new Web3(createHttpProvider(orion.node1.jwt, besu.node1.url)),
