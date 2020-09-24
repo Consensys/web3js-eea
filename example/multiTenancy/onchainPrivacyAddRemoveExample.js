@@ -1,12 +1,22 @@
 const Web3 = require("web3");
 const EEAClient = require("../../src");
 
-const Utils = require("../helpers.js");
 const { orion, besu } = require("../keys.js");
+const { logMatchingGroup, createHttpProvider } = require("../helpers.js");
 
-const node1 = new EEAClient(new Web3(besu.node1.url), 2018);
-const node2 = new EEAClient(new Web3(besu.node2.url), 2018);
-const node3 = new EEAClient(new Web3(besu.node3.url), 2018);
+const node1 = new EEAClient(
+  new Web3(createHttpProvider(orion.node1.jwt, besu.node1.url)),
+  2018
+);
+const node2 = new EEAClient(
+  new Web3(createHttpProvider(orion.node2.jwt, besu.node2.url)),
+  2018
+);
+// in this example node3 is a second tenant on besu/orion node1 with orion key orion11
+const node3 = new EEAClient(
+  new Web3(createHttpProvider(orion.node11.jwt, besu.node1.url)),
+  2018
+);
 
 module.exports = async () => {
   const onChainPrivacyGroupCreationResult = await node1.privx.createPrivacyGroup(
@@ -24,13 +34,13 @@ module.exports = async () => {
     addresses: [orion.node1.publicKey, orion.node2.publicKey]
   });
   console.log("Found privacy group results:");
-  Utils.logMatchingGroup(
+  logMatchingGroup(
     findResult,
     onChainPrivacyGroupCreationResult.privacyGroupId
   );
 
   const addResult = await node1.privx.addToPrivacyGroup({
-    participants: [orion.node3.publicKey],
+    participants: [orion.node11.publicKey],
     enclaveKey: orion.node1.publicKey,
     privateFrom: orion.node1.publicKey,
     privacyGroupId: onChainPrivacyGroupCreationResult.privacyGroupId,
@@ -41,7 +51,7 @@ module.exports = async () => {
 
   const receiptFromNode3 = await node3.priv.getTransactionReceipt(
     addResult.commitmentHash,
-    orion.node3.publicKey
+    orion.node11.publicKey
   );
   console.log("Got transaction receipt from added node:");
   console.log(receiptFromNode3);
@@ -50,17 +60,17 @@ module.exports = async () => {
     addresses: [
       orion.node1.publicKey,
       orion.node2.publicKey,
-      orion.node3.publicKey
+      orion.node11.publicKey
     ]
   });
   console.log("Found privacy groups with added node:");
-  Utils.logMatchingGroup(
+  logMatchingGroup(
     findResultWithAddedNode,
     onChainPrivacyGroupCreationResult.privacyGroupId
   );
 
   const removeResult = await node1.privx.removeFromPrivacyGroup({
-    participant: orion.node3.publicKey,
+    participant: orion.node11.publicKey,
     enclaveKey: orion.node1.publicKey,
     privateFrom: orion.node1.publicKey,
     privacyGroupId: onChainPrivacyGroupCreationResult.privacyGroupId,
@@ -72,7 +82,7 @@ module.exports = async () => {
   const findResultRemovedNode = await node2.privx.findOnChainPrivacyGroup({
     addresses: [orion.node1.publicKey, orion.node2.publicKey]
   });
-  Utils.logMatchingGroup(
+  logMatchingGroup(
     findResultRemovedNode,
     onChainPrivacyGroupCreationResult.privacyGroupId
   );

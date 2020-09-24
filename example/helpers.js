@@ -1,3 +1,5 @@
+const Web3 = require("web3");
+
 function logMatchingGroup(findResult, pgId) {
   const groups = Object.values(findResult);
   console.log(`TOTAL number of matching privacy groups = ${groups.length}`);
@@ -9,6 +11,20 @@ function logMatchingGroup(findResult, pgId) {
     }
   });
 }
+
+function createHttpProvider(jwtToken, besuNodeUrl) {
+  const httpProviderWithJwt = new Web3.providers.HttpProvider(besuNodeUrl, {
+    headers: [
+      {
+        name: "Authorization",
+        value: `Bearer ${jwtToken}`
+      }
+    ]
+  });
+  return httpProviderWithJwt;
+}
+
 module.exports = {
-  logMatchingGroup
+  logMatchingGroup,
+  createHttpProvider
 };
