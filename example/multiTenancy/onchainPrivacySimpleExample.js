@@ -22,7 +22,7 @@ module.exports = async () => {
       privateKey: besu.node1.privateKey
     }
   );
-  console.log("CREATION RESULT");
+  console.log("Creation result");
   console.log(onChainPrivacyGroupCreationResult);
 
   await node1.priv.getTransactionReceipt(

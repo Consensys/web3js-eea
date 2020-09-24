@@ -39,7 +39,7 @@ async function run() {
   const { privacyGroupId } = onChainPrivacyGroupCreationResult;
   console.log(privacyGroupId);
 
-  // console.log("Created privacy group", privacyGroupId);
+  console.log("Created privacy group", privacyGroupId);
 
   // deploy contract
   const deployReceipt = await node.eea
@@ -54,7 +54,7 @@ async function run() {
     });
 
   const { contractAddress, blockNumber } = deployReceipt;
-  console.log("deployed", contractAddress);
+  console.log("Deployed contract at address ", contractAddress);
 
   // save to file
   const params = {

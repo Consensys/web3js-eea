@@ -41,6 +41,7 @@ module.exports = async () => {
     privateKey: besu.node1.privateKey
   });
 
+  console.log("Created privacy group");
   console.log(privacyGroupCreationResult);
 
   const contractAddress = await createEventEmitterContract(
