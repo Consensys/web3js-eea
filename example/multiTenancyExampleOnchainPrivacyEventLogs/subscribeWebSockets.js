@@ -9,7 +9,7 @@ const { createHttpProvider } = require("../helpers.js");
 // use an orion key that is not a member of the group (eg orion.node11.jwt)
 // to demonstrate that they can't create a subscription
 const node = new EEAClient(
-  new Web3(createHttpProvider(orion.node1.jwt, besu.node1.url)),
+  new Web3(createHttpProvider(orion.node11.jwt, besu.node1.url)),
   2018
 );
 const params = JSON.parse(fs.readFileSync(path.join(__dirname, "params.json")));
