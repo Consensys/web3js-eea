@@ -17,7 +17,11 @@ const node = new EEAClient(
 
 async function run() {
   const enclaveKey = orion.node1.publicKey;
-  const addresses = [orion.node1.publicKey, orion.node2.publicKey];
+  const addresses = [
+    orion.node1.publicKey,
+    orion.node11.publicKey,
+    orion.node2.publicKey
+  ];
 
   // create privacy group
   const onChainPrivacyGroupCreationResult = await node.privx.createPrivacyGroup(

@@ -20,3 +20,10 @@ node sendTransaction.js 5
 Each time you run the script, you should see a new log output from `subscribe.js`/`subscribeWebSocket.js`.
 
 Finally, run `getPastLogs.js` for all of the logs sent to the contract.
+
+## flexible privacy groups
+To test behavior when adding and removing users from flexible privacy groups, additional scripts are provided.
+Once you have verified that logs are received with subscribe/subscribeWebSockets and sendTransaction as above, run `removeParticipantFromGroup.js` and you will see the subscription revoked. In besu logs you will see "Error processing JSON-RPC requestBody
+org.hyperledger.besu.ethereum.privacy.MultiTenancyValidationException: Privacy group must contain the enclave public key"
+run sendTransaction now and you won't see any logs
+then run `addParticipantToGroup.js` and you will see access reinstated, including logs that were sent while user was not a member of the group.
