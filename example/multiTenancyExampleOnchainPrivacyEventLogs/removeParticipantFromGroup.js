@@ -14,6 +14,7 @@ const params = JSON.parse(fs.readFileSync(path.join(__dirname, "params.json")));
 
 async function run() {
   const { privacyGroupId } = params;
+  const addressToRemove = orion.node11.publicKey;
 
   const findResultWithAddedNode = await node.privx.findOnChainPrivacyGroup({
     addresses: [
@@ -26,14 +27,22 @@ async function run() {
   logMatchingGroup(findResultWithAddedNode, privacyGroupId);
 
   const removeResult = await node.privx.removeFromPrivacyGroup({
-    participant: orion.node11.publicKey,
+    participant: addressToRemove,
     enclaveKey: orion.node1.publicKey,
     privateFrom: orion.node1.publicKey,
     privacyGroupId,
     privateKey: besu.node1.privateKey
   });
-  console.log("Removed third participant from privacy group:");
   console.log(removeResult);
+  console.log(
+    `Removed third participant ${addressToRemove} from privacy group ${privacyGroupId}`
+  );
+
+  const findResultWithRemovedNode = await node.privx.findOnChainPrivacyGroup({
+    addresses: [orion.node1.publicKey, orion.node2.publicKey]
+  });
+  console.log("Found privacy groups with removed node:");
+  logMatchingGroup(findResultWithRemovedNode, privacyGroupId);
 }
 
 run();
