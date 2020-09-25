@@ -32,7 +32,7 @@ async function run() {
       privateKey: besu.node1.privateKey
     }
   );
-  console.log("CREATION RESULT");
+  console.log("Creation result");
   console.log(onChainPrivacyGroupCreationResult);
 
   await node.priv.getTransactionReceipt(
@@ -41,9 +41,9 @@ async function run() {
   );
 
   const { privacyGroupId } = onChainPrivacyGroupCreationResult;
-  console.log(privacyGroupId);
 
   console.log("Created privacy group", privacyGroupId);
+  console.log(`with members ${addresses}`);
 
   // deploy contract
   const deployReceipt = await node.eea
