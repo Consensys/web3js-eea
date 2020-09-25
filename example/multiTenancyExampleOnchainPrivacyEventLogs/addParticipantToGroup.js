@@ -14,17 +14,20 @@ const params = JSON.parse(fs.readFileSync(path.join(__dirname, "params.json")));
 
 async function run() {
   const { privacyGroupId } = params;
+  const addressesToAdd = [orion.node11.publicKey];
 
   const addResult = await node.privx.addToPrivacyGroup({
-    participants: [orion.node11.publicKey],
+    participants: addressesToAdd,
     enclaveKey: orion.node1.publicKey,
     privateFrom: orion.node1.publicKey,
     privacyGroupId,
     privateKey: besu.node1.privateKey
   });
 
-  console.log("Added new node to privacy group:");
   console.log(addResult);
+  console.log(
+    `Added new participant ${addressesToAdd} to privacy group ${privacyGroupId}`
+  );
 }
 
 run();
