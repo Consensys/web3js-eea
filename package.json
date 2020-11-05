@@ -35,7 +35,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PegaSysEng/web3js-eea.git"
+    "url": "git+https://github.com/Consensys/web3js-eea.git"
   },
   "keywords": [
     "web3",
@@ -46,9 +46,9 @@
   "author": "ConsenSys <quorum@consensys.net>",
   "license": "MPL-2.0",
   "bugs": {
-    "url": "https://github.com/PegaSysEng/web3js-eea/issues"
+    "url": "https://github.com/Consensys/web3js-eea/issues"
   },
-  "homepage": "https://github.com/PegaSysEng/web3js-eea#readme",
+  "homepage": "https://github.com/Consensys/web3js-eea#readme",
   "dependencies": {
     "async-promise-pool": "1.0.3",
     "docdash": "^1.2.0",
