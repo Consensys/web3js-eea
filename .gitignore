@@ -21,7 +21,6 @@ atlassian-ide-plugin.xml
 
 ### JS
 /node_modules/
-package-lock.json
 
 # MacOS
 .DS_Store
