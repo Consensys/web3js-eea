@@ -57,10 +57,10 @@
     "lodash": "4.17.19",
     "minimist": "^1.2.5",
     "rlp": "2.2.4",
-    "web3": "1.2.6"
+    "web3": "1.3.5"
   },
   "devDependencies": {
-    "axios": "0.19.2",
+    "axios": "0.21.1",
     "babel-eslint": "10.0.1",
     "dotenv": "8.0.0",
     "eslint": "5.16.0",
