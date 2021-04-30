@@ -5,7 +5,7 @@ const Web3 = require("web3");
 const Tx = require("ethereumjs-tx");
 const EEAClient = require("../../src");
 
-const { orion, besu } = require("../keys.js");
+const { chainID, orion, besu } = require("../keys.js");
 
 const binaryEventEmitter = fs.readFileSync(
   path.join(__dirname, "../solidity/EventEmitter/EventEmitter.bin")
@@ -18,7 +18,7 @@ const binaryCrossContractReader = fs.readFileSync(
   )
 );
 
-const web3 = new EEAClient(new Web3(besu.node1.url), 2018);
+const web3 = new EEAClient(new Web3(besu.node1.url), chainID);
 let logBuffer = "";
 
 const createPublicEventEmitter = () => {
