@@ -4,10 +4,9 @@ const Web3 = require("web3");
 const EEAClient = require("../../src");
 
 const { contracts, parseError } = require("./support/helpers");
-const { besu, orion } = require("./support/keys");
+const { chainID, besu, orion } = require("./support/keys");
 
 test("getPrivateTransaction", async t => {
-  const chainID = 2018;
   const node1Client = new EEAClient(new Web3(besu.node1.url), chainID);
   const node2Client = new EEAClient(new Web3(besu.node2.url), chainID);
   const node3Client = new EEAClient(new Web3(besu.node3.url), chainID);

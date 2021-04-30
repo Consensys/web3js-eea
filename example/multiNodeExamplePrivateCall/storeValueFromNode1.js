@@ -3,10 +3,10 @@ const EEAClient = require("../../src");
 const EventEmitterAbi = require("../solidity/EventEmitter/EventEmitter.json")
   .output.abi;
 
-const { orion, besu } = require("../keys.js");
+const { chainID, orion, besu } = require("../keys.js");
 
 const storeValueFromNode1 = (address, value, privacyGroupId) => {
-  const web3 = new EEAClient(new Web3(besu.node1.url), 2018);
+  const web3 = new EEAClient(new Web3(besu.node1.url), chainID);
   const contract = new web3.eth.Contract(EventEmitterAbi);
 
   // eslint-disable-next-line no-underscore-dangle
@@ -40,7 +40,7 @@ const storeValueFromNode1 = (address, value, privacyGroupId) => {
 };
 
 const getValue = (url, address, privacyGroupId) => {
-  const web3 = new EEAClient(new Web3(url), 2018);
+  const web3 = new EEAClient(new Web3(url), chainID);
   const contract = new web3.eth.Contract(EventEmitterAbi);
 
   // eslint-disable-next-line no-underscore-dangle
