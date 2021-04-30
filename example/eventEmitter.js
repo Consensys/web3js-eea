@@ -6,13 +6,13 @@ const EEAClient = require("../src");
 const EventEmitterAbi = require("./solidity/EventEmitter/EventEmitter.json")
   .output.abi;
 
-const { orion, besu } = require("./keys.js");
+const { chainID, orion, besu } = require("./keys.js");
 
 const binary = fs.readFileSync(
   path.join(__dirname, "./solidity/EventEmitter/EventEmitter.bin")
 );
 
-const web3 = new EEAClient(new Web3(besu.node1.url), 2018);
+const web3 = new EEAClient(new Web3(besu.node1.url), chainID);
 // eslint-disable-next-line no-new
 new web3.eth.Contract(EventEmitterAbi);
 
