@@ -10,14 +10,15 @@ const binary = fs.readFileSync(
   path.join(__dirname, "../solidity/EventEmitter/EventEmitter.bin")
 );
 
-const web3 = new EEAClient(new Web3(besu.node1.url), 2018);
+const web3 = new EEAClient(new Web3(besu.node1.url), 2018, 0, 2999999);
 
 const createPrivateEmitterContract = () => {
   const contractOptions = {
     data: `0x${binary}`,
     privateFrom: orion.node1.publicKey,
     privateFor: [orion.node2.publicKey],
-    privateKey: besu.node1.privateKey
+    privateKey: besu.node1.privateKey,
+    gasLimi: 3000000
   };
   return web3.eea.sendRawTransaction(contractOptions);
 };
