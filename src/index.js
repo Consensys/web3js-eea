@@ -1,8 +1,8 @@
 /*
  * Copyright ConsenSys Software Inc.
  *
- * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. 
- * If a copy of the MPL was not distributed with this file, You can obtain one at 
+ * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+ * If a copy of the MPL was not distributed with this file, You can obtain one at
  *
  * http://mozilla.org/MPL/2.0/
  *
@@ -26,10 +26,7 @@ const { PrivateSubscription } = require("./privateSubscription");
  * @name EEAClient
  * @class EEAClient
  */
-function EEAClient(web3, chainId) {
-  const GAS_PRICE = 0;
-  const GAS_LIMIT = 3000000;
-
+function EEAClient(web3, chainId, gasPrice = 0, gasLimit = 3000000) {
   if (web3.currentProvider == null) {
     throw new Error("Missing provider");
   }
@@ -121,6 +118,7 @@ function EEAClient(web3, chainId) {
    * - options.nonce
    * - options.to
    * - options.data
+   * @param method Name of the method of the transaction to call.
    */
   const genericSendRawTransaction = (options, method) => {
     if (options.privacyGroupId && options.privateFor) {
@@ -138,8 +136,8 @@ function EEAClient(web3, chainId) {
       })
       .then(transactionCount => {
         tx.nonce = options.nonce || transactionCount;
-        tx.gasPrice = GAS_PRICE;
-        tx.gasLimit = GAS_LIMIT;
+        tx.gasPrice = options.gasPrice || gasPrice;
+        tx.gasLimit = options.gasLimit || gasLimit;
         tx.to = options.to;
         tx.value = 0;
         tx.data = options.data;
