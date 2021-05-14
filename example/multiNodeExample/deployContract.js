@@ -18,7 +18,7 @@ const createPrivateEmitterContract = () => {
     privateFrom: orion.node1.publicKey,
     privateFor: [orion.node2.publicKey],
     privateKey: besu.node1.privateKey,
-    gasLimi: 3000000
+    gasLimit: 3000000
   };
   return web3.eea.sendRawTransaction(contractOptions);
 };
