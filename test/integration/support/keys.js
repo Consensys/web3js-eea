@@ -1,5 +1,5 @@
 module.exports = {
-  chainID: "2018",
+  chainID: 2018,
   orion: {
     node1: {
       publicKey: "A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo="
