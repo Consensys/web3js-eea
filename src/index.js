@@ -116,6 +116,8 @@ function EEAClient(web3, chainId, gasPrice = 0, gasLimit = 3000000) {
    * - options.privacyGroupId
    * - options.privateFor
    * - options.nonce
+   * - options.gasPrice default value 0
+   * - options.gasLimit default value 3000000
    * - options.to
    * - options.data
    * @param method Name of the method of the transaction to call.
