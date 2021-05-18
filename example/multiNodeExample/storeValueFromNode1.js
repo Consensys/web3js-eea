@@ -6,7 +6,7 @@ const EventEmitterAbi = require("../solidity/EventEmitter/EventEmitter.json")
 const { chainID, orion, besu } = require("../keys.js");
 
 const storeValueFromNode1 = (address, value) => {
-  const web3 = new EEAClient(new Web3(besu.node1.url), chainID);
+  const web3 = new EEAClient(new Web3(besu.node1.url), chainID, 0, 3000000);
   const contract = new web3.eth.Contract(EventEmitterAbi);
 
   // eslint-disable-next-line no-underscore-dangle
