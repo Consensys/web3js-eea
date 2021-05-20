@@ -6,13 +6,13 @@ const EEAClient = require("../src");
 const HumanStandardTokenAbi = require("./solidity/HumanStandardToken/HumanStandardToken.json")
   .output.abi;
 const ethUtil = require("../src/custom-ethjs-util");
-const { orion, besu } = require("./keys.js");
+const { chainID, orion, besu } = require("./keys.js");
 
 const binary = fs.readFileSync(
   path.join(__dirname, "./solidity/EventEmitter/EventEmitter.bin")
 );
 
-const web3 = new EEAClient(new Web3(besu.node1.url), 2018);
+const web3 = new EEAClient(new Web3(besu.node1.url), chainID);
 
 const contract = new web3.eth.Contract(HumanStandardTokenAbi);
 

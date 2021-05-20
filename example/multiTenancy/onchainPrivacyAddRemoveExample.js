@@ -1,21 +1,21 @@
 const Web3 = require("web3");
 const EEAClient = require("../../src");
 
-const { orion, besu } = require("../keys.js");
+const { chainID, orion, besu } = require("../keys.js");
 const { logMatchingGroup, createHttpProvider } = require("../helpers.js");
 
 const node1 = new EEAClient(
   new Web3(createHttpProvider(orion.node1.jwt, besu.node1.url)),
-  2018
+  chainID
 );
 const node2 = new EEAClient(
   new Web3(createHttpProvider(orion.node2.jwt, besu.node2.url)),
-  2018
+  chainID
 );
 // in this example node3 is a second tenant on besu/orion node1 with orion key orion11
 const node3 = new EEAClient(
   new Web3(createHttpProvider(orion.node11.jwt, besu.node1.url)),
-  2018
+  chainID
 );
 
 module.exports = async () => {

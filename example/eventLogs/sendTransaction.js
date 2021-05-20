@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const Web3 = require("web3");
 
-const { besu, orion } = require("../keys");
+const { chainID, besu, orion } = require("../keys");
 const EEAClient = require("../../src");
 
 const artifact = fs.readFileSync(
@@ -11,7 +11,7 @@ const artifact = fs.readFileSync(
 const { abi } = JSON.parse(artifact).output;
 const params = JSON.parse(fs.readFileSync(path.join(__dirname, "params.json")));
 
-const node = new EEAClient(new Web3(besu.node1.url), 2018);
+const node = new EEAClient(new Web3(besu.node1.url), chainID);
 
 async function run() {
   const { privacyGroupId, contractAddress } = params;
