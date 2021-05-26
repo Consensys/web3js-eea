@@ -45,6 +45,9 @@ function toBuffer(v) {
     } else if (typeof v === "string") {
       if (ethUtils.isHexString(v)) {
         v = Buffer.from(ethUtils.padToEven(ethUtils.stripHexPrefix(v)), "hex");
+      } else if (v === "restricted" || v === "unrestricted") {
+        // handle restriction field
+        v = Buffer.from(v);
       } else if (
         v.match(
           /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/
@@ -61,9 +64,6 @@ function toBuffer(v) {
         //   )?                       # , or nothing
         //   $                        # End of input
         v = Buffer.from(v, "base64");
-      } else if (v === "restricted" || v === "unrestricted") {
-        // handle restriction field
-        v = Buffer.from(v);
       } else {
         throw new Error(
           `Cannot convert string to buffer. toBuffer only supports 0x-prefixed hex strings and this string was given: ${v}`
