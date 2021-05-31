@@ -3,14 +3,14 @@ const fs = require("fs");
 const path = require("path");
 const EEAClient = require("../../src");
 
-const { besu, orion } = require("../keys");
+const { chainID, besu, orion } = require("../keys");
 
 const bytecode = fs.readFileSync(
   path.join(__dirname, "../solidity/EventEmitter/EventEmitter.bin")
 );
 
 const provider = new Web3.providers.HttpProvider(besu.node1.url);
-const node = new EEAClient(new Web3(provider), 2018);
+const node = new EEAClient(new Web3(provider), chainID);
 
 async function run() {
   const enclaveKey = orion.node1.publicKey;

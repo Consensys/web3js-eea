@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const EEAClient = require("../../src");
 
-const { besu, orion } = require("../keys");
+const { chainID, besu, orion } = require("../keys");
 const { createHttpProvider } = require("../helpers.js");
 
 const bytecode = fs.readFileSync(
@@ -12,7 +12,7 @@ const bytecode = fs.readFileSync(
 
 const node = new EEAClient(
   new Web3(createHttpProvider(orion.node1.jwt, besu.node1.url)),
-  2018
+  chainID
 );
 
 async function run() {

@@ -1,5 +1,6 @@
 const Web3 = require("web3");
 const EEAClient = require("../../src");
+const { chainID } = require("../keys.js");
 
 // Define a WebSocket provider, passing in the desired options:
 // See https://github.com/ethereum/web3.js/tree/1.x/packages/web3-providers-ws for options
@@ -27,7 +28,7 @@ const websocketProvider = new Web3.providers.WebsocketProvider(
   providerOptions
 );
 
-const web3Ws = new EEAClient(new Web3(websocketProvider), 2018);
+const web3Ws = new EEAClient(new Web3(websocketProvider), chainID);
 
 web3Ws.eth
   .getBlockNumber()

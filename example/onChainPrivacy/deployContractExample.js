@@ -3,7 +3,7 @@ const path = require("path");
 const Web3 = require("web3");
 const EEAClient = require("../../src");
 
-const { orion, besu } = require("../keys.js");
+const { chainID, orion, besu } = require("../keys.js");
 
 const binary = fs.readFileSync(
   path.join(__dirname, "../solidity/Greeter/greeter.bin")
@@ -11,8 +11,8 @@ const binary = fs.readFileSync(
 
 const greeterAbi = require("../solidity/Greeter/greeter_meta").output.abi;
 
-const web3Node1 = new EEAClient(new Web3(besu.node1.url), 2018);
-const web3Node2 = new EEAClient(new Web3(besu.node2.url), 2018);
+const web3Node1 = new EEAClient(new Web3(besu.node1.url), chainID);
+const web3Node2 = new EEAClient(new Web3(besu.node2.url), chainID);
 
 const createGreeterContract = privacyGroupId => {
   const contractOptions = {

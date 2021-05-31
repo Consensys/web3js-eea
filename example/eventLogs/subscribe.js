@@ -3,9 +3,9 @@ const path = require("path");
 const Web3 = require("web3");
 const EEAClient = require("../../src");
 
-const { besu } = require("../keys");
+const { chainID, besu } = require("../keys");
 
-const node = new EEAClient(new Web3(besu.node1.url), 2018);
+const node = new EEAClient(new Web3(besu.node1.url), chainID);
 const params = JSON.parse(fs.readFileSync(path.join(__dirname, "params.json")));
 
 async function run() {

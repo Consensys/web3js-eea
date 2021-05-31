@@ -1,5 +1,6 @@
 const Web3 = require("web3");
 const EEAClient = require("../../src");
+const { chainID } = require("../keys.js");
 
 // Define an HTTP provider, passing in the desired options:
 // from https://github.com/ethereum/web3.js/tree/1.x/packages/web3-providers-http
@@ -17,7 +18,7 @@ const httpProvider = new Web3.providers.HttpProvider(
   "http://localhost:20000",
   providerOptions
 );
-const web3Http = new EEAClient(new Web3(httpProvider), 2018);
+const web3Http = new EEAClient(new Web3(httpProvider), chainID);
 
 web3Http.eth
   .getBlockNumber()

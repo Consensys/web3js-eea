@@ -3,12 +3,12 @@ const path = require("path");
 const Web3 = require("web3");
 const EEAClient = require("../../src");
 
-const { besu, orion } = require("../keys");
+const { chainID, besu, orion } = require("../keys");
 const { logMatchingGroup, createHttpProvider } = require("../helpers.js");
 
 const node = new EEAClient(
   new Web3(createHttpProvider(orion.node1.jwt, besu.node1.url)),
-  2018
+  chainID
 );
 const params = JSON.parse(fs.readFileSync(path.join(__dirname, "params.json")));
 
