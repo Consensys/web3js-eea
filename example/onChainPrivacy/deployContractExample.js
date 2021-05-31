@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const Web3 = require("web3");
 const EEAClient = require("../../src");
+const { privateToAddress } = require("../../src/custom-ethjs-util");
 
 const { chainID, orion, besu } = require("../keys.js");
 
@@ -55,6 +56,9 @@ const callGenericFunctionOnContract = (
 
   const functionCall = {
     to: address,
+    from: `0x${privateToAddress(Buffer.from(privateKey, "hex")).toString(
+      "hex"
+    )}`,
     data:
       functionArgs !== null
         ? functionAbi.signature + functionArgs
