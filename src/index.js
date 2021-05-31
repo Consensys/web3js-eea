@@ -153,7 +153,7 @@ function EEAClient(web3, chainId, gasPrice = 0, gasLimit = 3000000) {
         if (options.privacyGroupId) {
           tx.privacyGroupId = options.privacyGroupId;
         }
-        tx.restriction = "restricted";
+        tx.restriction = options.restriction || "restricted";
 
         tx.sign(privateKeyBuffer);
 
