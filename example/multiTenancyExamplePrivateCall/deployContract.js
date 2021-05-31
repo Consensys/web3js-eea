@@ -3,7 +3,7 @@ const path = require("path");
 const Web3 = require("web3");
 const EEAClient = require("../../src");
 
-const { orion, besu } = require("../keys.js");
+const { chainID, orion, besu } = require("../keys.js");
 const { createHttpProvider } = require("../helpers.js");
 
 const binary = fs.readFileSync(
@@ -12,7 +12,7 @@ const binary = fs.readFileSync(
 
 const node1 = new EEAClient(
   new Web3(createHttpProvider(orion.node1.jwt, besu.node1.url)),
-  2018
+  chainID
 );
 
 const createEventEmitterContract = privacyGroupId => {

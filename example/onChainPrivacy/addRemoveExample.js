@@ -2,11 +2,11 @@ const Web3 = require("web3");
 const EEAClient = require("../../src");
 
 const Utils = require("../helpers.js");
-const { orion, besu } = require("../keys.js");
+const { chainID, orion, besu } = require("../keys.js");
 
-const node1 = new EEAClient(new Web3(besu.node1.url), 2018);
-const node2 = new EEAClient(new Web3(besu.node2.url), 2018);
-const node3 = new EEAClient(new Web3(besu.node3.url), 2018);
+const node1 = new EEAClient(new Web3(besu.node1.url), chainID);
+const node2 = new EEAClient(new Web3(besu.node2.url), chainID);
+const node3 = new EEAClient(new Web3(besu.node3.url), chainID);
 
 module.exports = async () => {
   const onChainPrivacyGroupCreationResult = await node1.privx.createPrivacyGroup(

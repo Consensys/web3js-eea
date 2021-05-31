@@ -4,13 +4,13 @@ const path = require("path");
 const Web3 = require("web3");
 const EEAClient = require("../../src");
 
-const { orion, besu } = require("../keys.js");
+const { chainID, orion, besu } = require("../keys.js");
 
 const binary = fs.readFileSync(
   path.join(__dirname, "../solidity/EventEmitter/EventEmitter.bin")
 );
 
-const web3 = new EEAClient(new Web3(besu.node1.url), 2018, 0, 2999999);
+const web3 = new EEAClient(new Web3(besu.node1.url), chainID, 0, 2999999);
 
 const createPrivateEmitterContract = () => {
   const contractOptions = {

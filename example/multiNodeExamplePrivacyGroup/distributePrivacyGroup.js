@@ -7,14 +7,14 @@ const EEAClient = require("../../src");
 
 const createGroup = require("../privacyGroupManagement/createPrivacyGroup");
 
-const { orion, besu } = require("../keys.js");
+const { chainID, orion, besu } = require("../keys.js");
 
 const binary = fs.readFileSync(
   path.join(__dirname, "../solidity/EventEmitter/EventEmitter.bin")
 );
 
-const web3 = new EEAClient(new Web3(besu.node1.url), 2018);
-const web3Node2 = new EEAClient(new Web3(besu.node2.url), 2018);
+const web3 = new EEAClient(new Web3(besu.node1.url), chainID);
+const web3Node2 = new EEAClient(new Web3(besu.node2.url), chainID);
 
 const createGroupId = () => {
   return createGroup.createPrivacyGroup();
