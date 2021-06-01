@@ -367,6 +367,7 @@ function EEAClient(web3, chainId, gasPrice = 0, gasLimit = 3000000) {
   const call = options => {
     const txCall = {};
     txCall.to = options.to;
+    txCall.from = options.from;
     txCall.data = options.data;
 
     return web3.privInternal.call(
