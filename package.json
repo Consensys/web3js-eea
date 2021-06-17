@@ -3,6 +3,7 @@
   "version": "0.11.0",
   "description": "EEA JSON-RPC API",
   "main": "src/index.js",
+  "types": "./src/typescript/index.d.ts",
   "scripts": {
     "test": "npm run test:unit && npm run test:integration && npm run test:onchain",
     "test:unit": "tape test/unit/**/*.js",
