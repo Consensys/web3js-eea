@@ -57,7 +57,7 @@ declare module "web3-eea" {
          * containing A, B, and C is not returned.
          */
         findPrivacyGroup(options: IFindPrivacyGroupOptions): Promise<Array<IPrivacyGroup>>;
-        distributeRawTransaction(options: IPrivateTransactionConfig, method: string): Promise<unknown>;
+        distributeRawTransaction(options: IPrivateTransactionConfig): Promise<unknown>;
         getTransactionCount(options: IGetTransactionCountNoPrivacyGroupIdOptions | IGetTransactionCountWithPrivacyGroupIdOptions): Promise<number>;
         /**
          * Get the private transaction Receipt.
