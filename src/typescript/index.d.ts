@@ -38,7 +38,7 @@ declare module "web3-eea" {
         /**
          * Either lock or unlock the privacy group for member adding
          */
-        setPrivacyGroupLockState(options: ISetPrivacyGroupLockState): Promise<IPrivateTransactionReceipt>;
+        setPrivacyGroupLockState(options: ISetPrivacyGroupLockStateOptions): Promise<IPrivateTransactionReceipt>;
     }
     export interface IPrivWeb3Extension {
         /**
@@ -175,7 +175,7 @@ declare module "web3-eea" {
         readonly data: string;
     }
 
-    export interface ISetPrivacyGroupLockState extends IPrivacyGroupOptions {
+    export interface ISetPrivacyGroupLockStateOptions extends IPrivacyGroupOptions {
         /**
          * boolean indicating whether to lock or unlock
          */
