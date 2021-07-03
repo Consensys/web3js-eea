@@ -118,10 +118,22 @@ declare module "web3-eea" {
     }
 
     export interface ISendGenericTransactionOptions {
+        /**
+         * Private Key used to sign transaction with
+         */
         readonly privateKey: string;
+        /**
+         * Enclave public key
+         */
         readonly privateFrom: string;
-        readonly privacyGroupId?: string;
+        /**
+         * Enclave keys to send the transaction to
+         */
         readonly privateFor: string[];
+        /**
+         * Enclave id representing the receivers of the transaction
+         */
+        readonly privacyGroupId?: string;
         /**
          * getTransactionCount is used to calculate nonce if omitted.
          */
@@ -145,22 +157,6 @@ declare module "web3-eea" {
     }
 
     export interface ISendRawTransactionOptions extends ISendGenericTransactionOptions, TransactionConfig {
-        /**
-         * Private Key used to sign transaction with
-         */
-        readonly privateKey: string;
-        /**
-         * Enclave public key
-         */
-        readonly privateFrom: string;
-        /**
-         * Enclave keys to send the transaction to
-         */
-        readonly privateFor: string[];
-        /**
-         * Enclave id representing the receivers of the transaction
-         */
-        readonly privacyGroupId?: string;
         /**
          * (Optional) : If not provided, will be calculated using`eea_getTransctionCount`
          */
