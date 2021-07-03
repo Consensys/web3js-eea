@@ -102,6 +102,21 @@ declare module "web3-eea" {
         unsubscribe(): Promise<unknown>;
     }
 
+    export interface IPrivacyGroupOptions {
+        /**
+         * Privacy group ID to add to
+         */
+        readonly privacyGroupId: string;
+        /**
+         * Private Key used to sign transaction with
+         */
+        readonly privateKey: string;
+        /**
+         * Orion public key
+         */
+        readonly enclaveKey: string;
+    }
+
     export interface ISendGenericTransactionOptions {
         readonly privateKey: string;
         readonly privateFrom: string;
@@ -160,76 +175,28 @@ declare module "web3-eea" {
         readonly data: string;
     }
 
-    export interface ISetPrivacyGroupLockState {
-        /**
-         * Privacy group ID to lock / unlock
-         */
-        readonly privacyGroupId: string;
-        /**
-         * Private Key used to sign transaction with
-         */
-        readonly privateKey: string;
-        /**
-         * Orion public key
-         */
-        readonly enclaveKey: string;
+    export interface ISetPrivacyGroupLockState extends IPrivacyGroupOptions {
         /**
          * boolean indicating whether to lock or unlock
          */
         readonly lock: boolean;
     }
 
-    export interface IAddToPrivacyGroupOptions {
-        /**
-         * Privacy group ID to add to
-         */
-        readonly privacyGroupId: string;
-        /**
-         * Private Key used to sign transaction with
-         */
-        readonly privateKey: string;
-        /**
-         * Orion public key
-         */
-        readonly enclaveKey: string;
+    export interface IAddToPrivacyGroupOptions extends IPrivacyGroupOptions {
         /**
          * list of enclaveKey to pass to the contract to add to the group
          */
         readonly participants: string[];
     }
 
-    export interface IRemoveFromPrivacyGroupOptions {
-        /**
-         * Privacy group ID to add to
-         */
-        readonly privacyGroupId: string;
-        /**
-         * Private Key used to sign transaction with
-         */
-        readonly privateKey: string;
-        /**
-         * Orion public key
-         */
-        readonly enclaveKey: string;
+    export interface IRemoveFromPrivacyGroupOptions extends IPrivacyGroupOptions {
         /**
          * single enclaveKey to pass to the contract to add to the group
          */
         readonly participant: string;
     }
 
-    export interface ICreatePrivacyGroupOptions {
-        /**
-         * Privacy group ID to add to
-         */
-        readonly privacyGroupId: string;
-        /**
-         * Private Key used to sign transaction with
-         */
-        readonly privateKey: string;
-        /**
-         * Orion public key
-         */
-        readonly enclaveKey: string;
+    export interface ICreatePrivacyGroupOptions extends IPrivacyGroupOptions {
         /**
          * list of enclaveKey to pass to the contract to add to the group
          * Expected to be Base64 encoded array of strings.
