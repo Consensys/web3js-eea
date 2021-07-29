@@ -5,6 +5,18 @@ JavaScript libraries to:
 * Create and send private transactions 
 * Create, delete, and find privacy groups
 
+## ⚠️ Project Deprecation Notice ⚠️
+
+web3js-eea library will be deprecated on December 31st 2021, date from when we will stop supporting the project.
+
+web3js-eea library is deprecated and replaced by [web3js-quorum](https://github.com/ConsenSys/web3js-quorum) that offers wider compatibility with the Quorum stack including both Besu and GoQuorum.
+
+From now on, we encourage all users with active projects using web3js-eea to migrate to web3js-quorum. Please refer to [migration instructions](https://consensys.github.io/web3js-quorum/latest/tutorial-Migrate%20from%20web3js-eea.html).
+
+We will continue to support web3js-eea in particular fixing bugs until the end of 2021.
+
+If you have any questions or concerns, please reach out to the ConsenSys protocol engineering team on [#Discord](https://chat.consensys.net) or by [email](mailto:quorum@consensys.net).
+
 ## Issues 
 
 web3.js-eea issues are tracked in [GitHub](https://github.com/Consensys/web3js-eea/issues). 
